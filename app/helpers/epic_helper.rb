@@ -1,0 +1,2 @@
+module EpicHelper
+end

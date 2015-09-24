@@ -14,3 +14,215 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+//= require d3.v3
+//= require nv.d3
+    Date.prototype.yyyymmdd = function() {         
+                                
+        var yyyy = this.getFullYear().toString();                                    
+        var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based         
+        var dd  = this.getDate().toString();             
+                            
+        return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
+   };
+       /*******/
+
+
+  function sinAndCos() {
+  var sin = [],
+      cos = [];
+
+  for (var i = 0; i < 100; i++) {
+    sin.push({x: i, y: Math.sin(i/10)});
+    cos.push({x: i, y: .5 * Math.cos(i/10)});
+  }
+
+  return [
+    {
+      values: sin,
+      key: 'Sine Wave',
+      color: '#ff7f0e'
+    },
+    {
+      values: cos,
+      key: 'Cosine Wave',
+      color: '#2ca02c'
+    }
+  ];
+}
+	
+	function buildChartData(data, symbol){
+		var valuesArray = [];
+		$(data).find('quote').each(function(){
+            var date = new Date($(this).find('Date').text());
+            var price = $(this).find('Adj_Close').text();
+            valuesArray.push({x: date, y: price});
+        });
+
+        return [
+        	{
+        		values: valuesArray,
+        		key: symbol,
+        		color: '#0000FF',
+        	}
+        ];
+	}
+
+    function genChart(data){
+        var end = (new Date);
+        var start = new Date;
+        var symbol = $(data).find('Symbol').text();
+        start.setDate(end.getDate() - 30);
+        $.ajax({
+            method: "GET",
+            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getHistory?',
+            data: {
+                diagnostics: 'true',
+                env : 'store://datatables.org/alltableswithkeys',
+                symbol : symbol,
+                startDate : start.yyyymmdd(),
+                endDate : end.yyyymmdd(),
+            },
+            success: function(data){
+            	chartData = buildChartData(data, symbol);
+
+				nv.addGraph(function() {
+					var chart = nv.models.lineChart()
+					.useInteractiveGuideline(true)
+					;
+
+					chart.xAxis
+					.axisLabel('Date')
+					.tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
+
+					chart.yAxis
+					.axisLabel('Price ($)')
+					.tickFormat(d3.format('.02f'))
+					;
+
+					d3.select('#chart svg')
+					.datum(chartData)
+					.transition().duration(500)
+					.call(chart)
+					;
+
+					nv.utils.windowResize(chart.update);
+
+					return chart;
+				});
+            }
+        });
+    }
+
+    function printQuote(data){
+        var avgDailyVol = $(data).find('AverageDailyVolume').text();
+        var change = $(data).find('Change').text();
+        var daysLow = $(data).find('DaysLow').text();
+        var daysHigh = $(data).find('DaysHigh').text();
+        var yearLow = $(data).find('YearLow').text();
+        var yearHigh = $(data).find('YearHigh').text();
+        var marketCap = $(data).find('MarketCapitalization').text();
+        var lastTradePrice = $(data).find('LastTradePriceOnly').text();
+        var daysRange = $(data).find('DaysRange').text();
+        var name = $(data).find('Name').text();
+        var symbol = $(data).find('Symbol').text();
+        var volume = $(data).find('Volume').text();
+        var stockxchange = $(data).find('StockExchange').text();
+        
+        $('#quoteResults').empty();
+        
+        var avgDailyVolumeDiv = $('<div>', {
+            id: 'averageDailyVolume',
+            name: 'averageDailyVolume',
+            text: 'Average Daily Volume: ' + avgDailyVol,
+        });
+        $('#quoteResults').append(avgDailyVolumeDiv);
+        
+        var changeDiv = $('<div>', {
+            id: 'change',
+            name: 'change',
+            text: 'Change: ' + change,
+        });
+        $('#quoteResults').append(changeDiv);                  
+        var daysLowDiv = $('<div>', {
+            id: 'daysLow',
+            name: 'daysLow',
+            text: "Day's Low: " + daysLow,
+        });
+        $('#quoteResults').append(daysLowDiv);                  
+        var daysHighDiv = $('<div>', {
+            id: 'daysHigh',
+            name: 'daysHigh',
+            text: "Day's High: " + daysHigh,
+        });
+        $('#quoteResults').append(daysHighDiv);                  
+        var yearLowDiv = $('<div>', {
+            id: 'yearLow',
+            name: 'yearLow',
+            text: "Year Low: " + yearLow,
+        });
+        $('#quoteResults').append(yearLowDiv);                  
+        var yearHighDiv = $('<div>', {
+            id: 'yearHigh',
+            name: 'yearHigh',
+            text: 'Year High: ' + yearHigh,
+        });
+        $('#quoteResults').append(yearHighDiv);
+        var marketCapDiv = $('<div>', {
+            id: 'marketCap',
+            name: 'marketCap',
+            text: 'Market Capitalization: ' + marketCapDiv,
+        });
+        $('#quoteResults').append(marketCapDiv);
+        var lastTradePriceDiv = $('<div>', {
+            id: 'lastTradePrice',
+            name: 'lastTradePrice',
+            text: 'Last Trade Price: ' + lastTradePrice,
+        });                  
+        $('#quoteResults').append(lastTradePriceDiv);
+        var daysRangeDiv = $('<div>', {
+            id: 'daysRange',
+            name: 'daysRange',
+            text: "Day's Range: " + daysRange,
+        });
+        $('#quoteResults').append(daysRangeDiv);
+        var nameDiv = $('<div>', {
+            id: 'name',
+            name: 'name',
+            text: 'Name: ' + name,
+        });
+        $('#quoteResults').append(nameDiv); 
+        var symbolDiv = $('<div>', {
+            id: 'symbol',
+            name: 'symbol',
+            text: 'Symbol: ' + symbol,
+        });                  
+        $('#quoteResults').append(symbolDiv);
+        var volumeDiv = $('<div>', {
+            id: 'volume',
+            name: 'volume',
+            text: 'Volume: ' + volume,
+        });
+        $('#quoteResults').append(volumeDiv); 
+        var stockxchangeDiv = $('<div>', {
+            id: 'stockExchange',
+            name: 'stockExchange',
+            text: 'Stock Exchange: ' + stockxchange,
+        });
+        $('#quoteResults').append(stockxchangeDiv); 
+    }
+	$(document).ready(function() {
+    $('form[name="quote"]').submit(function(event){
+        event.preventDefault();
+        $.ajax({
+            dataType:"xml",
+            type: $('form[name="quote"]').attr('method'),
+            url: $('form[name="quote"]').attr('action'),
+            data: $('form[name="quote"]').serialize(),
+            success: function(data){
+                printQuote(data);
+                genChart(data);
+            }
+        });
+     });
+
+	});

@@ -1,117 +1,4 @@
 <html>
-	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-	<script>
-	$(document).ready(function() {
-    $('form[name="quote"]').submit(function(event){
-        event.preventDefault();
-        $.ajax({
-            dataType:"xml",
-            type: $('form[name="quote"]').attr('method'),
-            url: $('form[name="quote"]').attr('action'),
-            data: $('form[name="quote"]').serialize(),
-            success: function (data) {
-                var avgDailyVol = $(data).find('AverageDailyVolume').text();
-                var change = $(data).find('Change').text();
-                var daysLow = $(data).find('DaysLow').text();
-                var daysHigh = $(data).find('DaysHigh').text();
-                var yearLow = $(data).find('yearLow').text();
-                var yearHigh = $(data).find('yearHigh').text();
-                var marketCap = $(data).find('MarketCapitalization').text();
-                var lastTradePrice = $(data).find('LastTradePriceOnly').text();
-                var daysRange = $(data).find('DaysRange').text();
-                var name = $(data).find('Name').text();
-                var symbol = $(data).find('Symbol').text();
-                var volume = $(data).find('Volume').text();
-                var stockxchange = $(data).find('StockExchange').text();
-                
-                $('#quoteResults').empty();
-                
-                var avgDailyVolumeDiv = $('<div>', {
-                    id: 'averageDailyVolume',
-                    name: 'averageDailyVolume',
-                    text: 'Average Daily Volume: ' + avgDailyVol,
-                });
-                $('#quoteResults').append(avgDailyVolumeDiv);
-                
-                var changeDiv = $('<div>', {
-                    id: 'change',
-                    name: 'change',
-                    text: 'Change: ' + change,
-                });
-                $('#quoteResults').append(changeDiv);                  
-                var daysLowDiv = $('<div>', {
-                    id: 'daysLow',
-                    name: 'daysLow',
-                    text: "Day's Low: " + daysLow,
-                });
-                $('#quoteResults').append(daysLowDiv);                  
-                var daysHighDiv = $('<div>', {
-                    id: 'daysHigh',
-                    name: 'daysHigh',
-                    text: "Day's High: " + daysHigh,
-                });
-                $('#quoteResults').append(daysHighDiv);                  
-                var yearLowDiv = $('<div>', {
-                    id: 'yearLow',
-                    name: 'yearLow',
-                    text: "Year Low: " + yearLow,
-                });
-                $('#quoteResults').append(yearLowDiv);                  
-                var yearHighDiv = $('<div>', {
-                    id: 'yearHigh',
-                    name: 'yearHigh',
-                    text: 'Year High' + yearHigh,
-                });
-                $('#quoteResults').append(yearHighDiv);
-                var marketCapDiv = $('<div>', {
-                    id: 'marketCap',
-                    name: 'marketCap',
-                    text: 'Market Capitalization: ' + marketCapDiv,
-                });
-                $('#quoteResults').append(marketCapDiv);
-                var lastTradePriceDiv = $('<div>', {
-                    id: 'lastTradePrice',
-                    name: 'lastTradePrice',
-                    text: 'Last Trade Price: ' + lastTradePrice,
-                });                  
-                $('#quoteResults').append(lastTradePriceDiv);
-                var daysRangeDiv = $('<div>', {
-                    id: 'daysRange',
-                    name: 'daysRange',
-                    text: "Day's Range: " + daysRange,
-                });
-                $('#quoteResults').append(daysRangeDiv);
-                var nameDiv = $('<div>', {
-                    id: 'name',
-                    name: 'name',
-                    text: 'Name: ' + name,
-                });
-                $('#quoteResults').append(nameDiv); 
-                var symbolDiv = $('<div>', {
-                    id: 'symbol',
-                    name: 'symbol',
-                    text: 'Symbol: ' + symbol,
-                });                  
-                $('#quoteResults').append(symbolDiv);
-                var volumeDiv = $('<div>', {
-                    id: 'volume',
-                    name: 'volume',
-                    text: 'Volume: ' + volume,
-                });
-                $('#quoteResults').append(volumeDiv); 
-                var stockxchangeDiv = $('<div>', {
-                    id: 'stockExchange',
-                    name: 'stockExchange',
-                    text: 'Stock Exchange: ' + stockxchange,
-                });
-                $('#quoteResults').append(stockxchangeDiv); 
-            }
-        });
-     });
-});
-
-	</script>
-
 	<body>
 		<form name="quote" action="https://query.yahooapis.com/v1/public/yql/derekleung/getQuote" method="get">
 	    	Enter Ticker Symbol:
@@ -122,5 +9,19 @@
 		</form>
 
 		<div id="quoteResults" name="quoteResults"></div>
+        <div id="chartContainer" name="chartContainer"></div>
+        <style>
+
+#chart svg {
+  height: 400px;
+  width: 90%;
+}
+
+</style>
+
+
+<div id="chart">
+  <svg></svg>
+</div>
 	</body>
 </html>

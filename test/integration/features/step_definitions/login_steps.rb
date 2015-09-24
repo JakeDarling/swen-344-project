@@ -21,10 +21,18 @@ Then(/^I see the Epic dashboard$/) do
   pending # express the regexp above with the code you wish you had
 end
 
-Given(/^I have logged into Epic$/) do
+Given(/^I have navigated to the dashboard$/) do
   pending # express the regexp above with the code you wish you had
 end
 
-Given(/^I have navigated to the dashboard$/) do
+Given(/^I have logged in to Epic$/) do
+  pending # express the regexp above with the code you wish you had
+end
+
+When(/^I select the logout option$/) do
+  pending # express the regexp above with the code you wish you had
+end
+
+Then(/^I am signed out of Facebook$/) do
   pending # express the regexp above with the code you wish you had
 end

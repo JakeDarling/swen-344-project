@@ -212,21 +212,7 @@
 	            	quoteFormData = data;
 	                printQuote(data);
 	                genChart(data, 30);
-	                $('<button>', {
-	                	id: '7days',
-	                	name: '7days',
-	                	text: '7 days',
-	                }).appendTo('#chartDateButtons');
-	                $('<button>', {
-	                	id: '1month',
-	                	name: '1month',
-	                	text: '1 month',
-	                }).appendTo('#chartDateButtons');
-	                $('<button>', {
-	                	id: '3months',
-	                	name: '3months',
-	                	text: '3 months',
-	                }).appendTo('#chartDateButtons');
+	                $('#chartDateButtons').css('visibility', 'visible');
 	            }
 	        });
 	    });

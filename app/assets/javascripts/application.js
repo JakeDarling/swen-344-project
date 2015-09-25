@@ -49,13 +49,16 @@
     }
   ];
 }
-	
+
 	function buildChartData(data, symbol){
 		var valuesArray = [];
 		$(data).find('quote').each(function(){
             var date = new Date($(this).find('Date').text());
             var price = $(this).find('Adj_Close').text();
             valuesArray.push({x: date, y: price});
+        });
+        valuesArray.sort(function(a, b){
+        	return a.x -b.x;
         });
 
         return [
@@ -93,6 +96,8 @@
 					chart.xAxis
 					.axisLabel('Date')
 					.tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
+
+					chart.xAxis.rotateLabels(-45);
 
 					chart.yAxis
 					.axisLabel('Price ($)')

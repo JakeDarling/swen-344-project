@@ -29,7 +29,7 @@
         return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
     };
 
-	function buildChartData(data, symbol){
+	function buildChartData(data, name, symbol){
 		var valuesArray = [];
 		$(data).find('quote').each(function(){
             var date = new Date($(this).find('Date').text());
@@ -43,17 +43,18 @@
         return [
         	{
         		values: valuesArray,
-        		key: symbol,
+        		key: name + ' ("' + symbol + '")',
         		color: '#0000FF',
         	}
         ];
 	}
 
-    function genChart(data){
+    function genChart(data, days){
         var end = (new Date);
         var start = new Date;
+        var name = $(data).find('Name').text();
         var symbol = $(data).find('Symbol').text();
-        start.setDate(end.getDate() - 30);
+        start.setDate(end.getDate() - days);
         $.ajax({
             method: "GET",
             url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getHistory?',
@@ -65,7 +66,7 @@
                 endDate : end.yyyymmdd(),
             },
             success: function(data){
-            	chartData = buildChartData(data, symbol);
+            	chartData = buildChartData(data, name, symbol);
             	drawChart();
             }
         });
@@ -199,6 +200,7 @@
     }
 
 	$(document).ready(function() {
+		var quoteFormData;
 	    $('form[name="quote"]').submit(function(event){
 	        event.preventDefault();
 	        $.ajax({
@@ -207,10 +209,36 @@
 	            url: $('form[name="quote"]').attr('action'),
 	            data: $('form[name="quote"]').serialize(),
 	            success: function(data){
+	            	quoteFormData = data;
 	                printQuote(data);
-	                genChart(data);
+	                genChart(data, 30);
+	                $('<button>', {
+	                	id: '7days',
+	                	name: '7days',
+	                	text: '7 days',
+	                }).appendTo('#chartDateButtons');
+	                $('<button>', {
+	                	id: '1month',
+	                	name: '1month',
+	                	text: '1 month',
+	                }).appendTo('#chartDateButtons');
+	                $('<button>', {
+	                	id: '3months',
+	                	name: '3months',
+	                	text: '3 months',
+	                }).appendTo('#chartDateButtons');
 	            }
 	        });
+	    });
+
+	    $('body').on('click', '#7days', function(){
+	    	genChart(quoteFormData, 7);
+	    });
+	    $('body').on('click', '#1month', function(){
+	    	genChart(quoteFormData, 30);
+	    });
+	    $('body').on('click', '#3months', function(){
+	    	genChart(quoteFormData, 90);
 	    });
 	});
 /*****************************************************************************/

@@ -16,6 +16,10 @@
 //= require_tree .
 //= require d3.v3
 //= require nv.d3
+
+/*****************************************************************************/
+/* STOCKS PAGE */
+/*****************************************************************************/
     Date.prototype.yyyymmdd = function() {         
                                 
         var yyyy = this.getFullYear().toString();                                    
@@ -23,32 +27,7 @@
         var dd  = this.getDate().toString();             
                             
         return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
-   };
-       /*******/
-
-
-  function sinAndCos() {
-  var sin = [],
-      cos = [];
-
-  for (var i = 0; i < 100; i++) {
-    sin.push({x: i, y: Math.sin(i/10)});
-    cos.push({x: i, y: .5 * Math.cos(i/10)});
-  }
-
-  return [
-    {
-      values: sin,
-      key: 'Sine Wave',
-      color: '#ff7f0e'
-    },
-    {
-      values: cos,
-      key: 'Cosine Wave',
-      color: '#2ca02c'
-    }
-  ];
-}
+    };
 
 	function buildChartData(data, symbol){
 		var valuesArray = [];
@@ -87,35 +66,38 @@
             },
             success: function(data){
             	chartData = buildChartData(data, symbol);
-
-				nv.addGraph(function() {
-					var chart = nv.models.lineChart()
-					.useInteractiveGuideline(true)
-					;
-
-					chart.xAxis
-					.axisLabel('Date')
-					.tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
-
-					chart.xAxis.rotateLabels(-45);
-
-					chart.yAxis
-					.axisLabel('Price ($)')
-					.tickFormat(d3.format('.02f'))
-					;
-
-					d3.select('#chart svg')
-					.datum(chartData)
-					.transition().duration(500)
-					.call(chart)
-					;
-
-					nv.utils.windowResize(chart.update);
-
-					return chart;
-				});
+            	drawChart();
             }
         });
+    }
+
+    function drawChart(){
+		nv.addGraph(function() {
+			var chart = nv.models.lineChart()
+			.useInteractiveGuideline(true)
+			;
+
+			chart.xAxis
+			.axisLabel('Date')
+			.tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
+
+			chart.xAxis.rotateLabels(-45);
+
+			chart.yAxis
+			.axisLabel('Price ($)')
+			.tickFormat(d3.format('.02f'))
+			;
+
+			d3.select('#chart svg')
+			.datum(chartData)
+			.transition().duration(500)
+			.call(chart)
+			;
+
+			nv.utils.windowResize(chart.update);
+
+			return chart;
+		});
     }
 
     function printQuote(data){
@@ -215,19 +197,22 @@
         });
         $('#quoteResults').append(stockxchangeDiv); 
     }
-	$(document).ready(function() {
-    $('form[name="quote"]').submit(function(event){
-        event.preventDefault();
-        $.ajax({
-            dataType:"xml",
-            type: $('form[name="quote"]').attr('method'),
-            url: $('form[name="quote"]').attr('action'),
-            data: $('form[name="quote"]').serialize(),
-            success: function(data){
-                printQuote(data);
-                genChart(data);
-            }
-        });
-     });
 
+	$(document).ready(function() {
+	    $('form[name="quote"]').submit(function(event){
+	        event.preventDefault();
+	        $.ajax({
+	            dataType:"xml",
+	            type: $('form[name="quote"]').attr('method'),
+	            url: $('form[name="quote"]').attr('action'),
+	            data: $('form[name="quote"]').serialize(),
+	            success: function(data){
+	                printQuote(data);
+	                genChart(data);
+	            }
+	        });
+	    });
 	});
+/*****************************************************************************/
+/* END STOCKS PAGE */
+/*****************************************************************************/

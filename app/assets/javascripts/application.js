@@ -175,7 +175,7 @@
         var marketCapDiv = $('<div>', {
             id: 'marketCap',
             name: 'marketCap',
-            text: 'Market Capitalization: ' + marketCapDiv,
+            text: 'Market Capitalization: ' + marketCap,
         });
         $('#quoteResults').append(marketCapDiv);
         var lastTradePriceDiv = $('<div>', {

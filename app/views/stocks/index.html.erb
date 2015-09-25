@@ -1,1 +1,19 @@
-<h1>Test</h1>
+<html>
+	<body>
+		<form name="quote" action="https://query.yahooapis.com/v1/public/yql/derekleung/getQuote" method="get">
+	    	Enter Ticker Symbol:
+		    <input type="text" name="symbol"/>
+		    <input type="submit" value="Get quote"/>
+		    <input type="hidden" name="format" value="xml&diagnostics=true"/>
+		    <input type="hidden" name="env" value="store://datatables.org/alltableswithkeys"/>
+		</form>
+
+		<div id="quoteResults" name="quoteResults"></div>
+        <div id="chartContainer" name="chartContainer">
+            <div id="chartDateButtons" name="chartDateButtons"></div>
+            <div id="chart">
+                <svg></svg>
+            </div>
+        </div>
+	</body>
+</html>

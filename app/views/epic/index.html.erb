@@ -1,1 +1,24 @@
-<h1>Test</h1> - <h2>Heroku works!</h2>
+<script>
+	$(document).ready(function() {
+		var data = "<?xml version='1.0' encoding='UTF-8'?>" +
+						"<results>" +
+							"<Name>" +
+								"NASDAQ" +
+							"</Name>" +
+							"<Symbol>" +
+								"NDAQ" +
+							"</Symbol>" +
+						"</results>";
+		genChart(data, 7);
+	});
+	genChart()
+</script>
+
+<html>
+	<body>
+		<h1>Test</h1> - <h2>Heroku works!</h2>
+		<div id="chart">
+		    <svg></svg>
+		</div>
+	</body>
+</html>

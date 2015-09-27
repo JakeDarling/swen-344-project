@@ -18,7 +18,7 @@
 //= require nv.d3
 
 /*****************************************************************************/
-/* STOCKS PAGE */
+/* STOCKS*/
 /*****************************************************************************/
     Date.prototype.yyyymmdd = function() {         
                                 
@@ -29,7 +29,7 @@
         return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
     };
 
-	function buildChartData(data, name, symbol){
+	function buildChartData(data, name, symbol, lst){
 		var valuesArray = [];
 		$(data).find('quote').each(function(){
             var date = new Date($(this).find('Date').text());
@@ -40,16 +40,15 @@
         	return a.x -b.x;
         });
 
-        return [
-        	{
-        		values: valuesArray,
-        		key: name + ' ("' + symbol + '")',
-        		color: '#0000FF',
-        	}
-        ];
+       return {
+                values: valuesArray,
+                key: name + ' ("' + symbol + '")',
+                color: '#0000FF',
+            };
+
 	}
 
-    function genChart(data, days){
+    function genChart(data, days, divId){
         var end = (new Date);
         var start = new Date;
         var name = $(data).find('Name').text();
@@ -66,13 +65,13 @@
                 endDate : end.yyyymmdd(),
             },
             success: function(data){
-            	chartData = buildChartData(data, name, symbol);
-            	drawChart();
+            	window.chartData.push(buildChartData(data, name, symbol));
+                drawChart(divId);
             }
         });
     }
 
-    function drawChart(){
+    function drawChart(divId){
 		nv.addGraph(function() {
 			var chart = nv.models.lineChart()
 			.useInteractiveGuideline(true)
@@ -89,8 +88,8 @@
 			.tickFormat(d3.format('.02f'))
 			;
 
-			d3.select('#chart svg')
-			.datum(chartData)
+			d3.select('#' + divId + ' svg')
+			.datum(window.chartData)
 			.transition().duration(500)
 			.call(chart)
 			;
@@ -99,6 +98,15 @@
 
 			return chart;
 		});
+    }
+
+    function printTicker(data, divId){
+        var lastTradePrice = $(data).find('LastTradePriceOnly').text();
+        var change = $(data).find('Change').text();
+
+        $('#' + divId + '>' + '[name=price]').html(lastTradePrice);
+        $('#' + divId + '>' + '[name=change]').html(change);
+
     }
 
     function printQuote(data){
@@ -198,35 +206,6 @@
         });
         $('#quoteResults').append(stockxchangeDiv); 
     }
-
-	$(document).ready(function() {
-		var quoteFormData;
-	    $('form[name="quote"]').submit(function(event){
-	        event.preventDefault();
-	        $.ajax({
-	            dataType:"xml",
-	            type: $('form[name="quote"]').attr('method'),
-	            url: $('form[name="quote"]').attr('action'),
-	            data: $('form[name="quote"]').serialize(),
-	            success: function(data){
-	            	quoteFormData = data;
-	                printQuote(data);
-	                genChart(data, 30);
-	                $('#chartDateButtons').css('visibility', 'visible');
-	            }
-	        });
-	    });
-
-	    $('body').on('click', '#7days', function(){
-	    	genChart(quoteFormData, 7);
-	    });
-	    $('body').on('click', '#1month', function(){
-	    	genChart(quoteFormData, 30);
-	    });
-	    $('body').on('click', '#3months', function(){
-	    	genChart(quoteFormData, 90);
-	    });
-	});
 /*****************************************************************************/
-/* END STOCKS PAGE */
+/* END STOCKS*/
 /*****************************************************************************/

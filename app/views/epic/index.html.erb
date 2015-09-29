@@ -152,6 +152,7 @@
     });
   }
 
+  
   function showWall() {
   	FB.api(
     "/me/posts",
@@ -159,11 +160,20 @@
       if (response && !response.error) {
         console.log(response);
         for (i = 0; i < response.data.length; i++) {
-          var asdf = document.getElementById('feed').innerHTML;
-          document.getElementById('feed').innerHTML = asdf + '</br>' + 
-            '<h4>' + name + '</h4>' +
-            '<h5>' + new Date(response.data[i].created_time).toDateString() + '</h5>' +
-            '<p>' + response.data[i].message + '</p>';
+          var post = response.data[i];
+          if (post.message || post.story) {
+            var postText = '';
+            if (post.message) {
+              postText = post.message;
+            } else if (post.story) {
+              postText = post.story;
+            }
+            var wallText = document.getElementById('feed').innerHTML;
+            document.getElementById('feed').innerHTML = wallText + '</br>' + 
+              '<h4>' + name + '</h4>' +
+              '<h5>' + new Date(post.created_time).toDateString() + '</h5>' +
+              '<p>' + postText + '</p>';
+          }
         }
       }
     }

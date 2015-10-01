@@ -1,26 +1,35 @@
 <html>
 	<body>
-		<h1>Test</h1> - <h2>Heroku works!</h2>
 		<div id="tickerContainer" name="tickerContainer">
 			<div id='ndaq' name='ndaq'>
 				<div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
-				<div name='price' class='one-line last-trade-price'></div>
-				<div name='change' class='one-line'></div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
 			</div>
 			<div id="nyse" name='nyse'>
 				<div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
-				<div name='price' class='one-line last-trade-price'></div>
-				<div name='change' class='one-line'></div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
 			</div>
 			<div id="dow" name='dow'>
 				<div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
-				<div name='price' class='one-line last-trade-price'></div>
-				<div name='change' class='one-line'></div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
 			</div>
 			<div id="googl" name='googl'>
-				<div name='title' class='one-line'>Google Inc.</div>
-				<div name='price' class='one-line last-trade-price'></div>
-				<div name='change' class='one-line'></div>
+				<div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
+			</div>
+			<div id="xrx" name='xrx'>
+				<div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
+			</div>
+			<div id="xom" name='xom'>
+				<div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
 			</div>
 		</div>
 
@@ -117,10 +126,50 @@
 		    });			
 		}
 
+		function xrx(){
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : 'XRX',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'xrx');
+		        },
+		        complete: function(){
+		        	setTimeout(xrx, 5000);
+		        }
+		    });			
+		}
+
+		function xom(){
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : 'XOM',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'xom');
+		        },
+		        complete: function(){
+		        	setTimeout(xom, 5000);
+		        }
+		    });			
+		}
+
 	    ndaq();
 	    nyse();
 	    dow();
-	    googl();    	    
+	    googl();
+	    xrx();
+	    xom();    	    
 
 	});
 

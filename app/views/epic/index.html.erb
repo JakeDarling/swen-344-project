@@ -22,12 +22,18 @@
 		<fb:login-button scope="user_posts,public_profile,email," onlogin="checkLoginState();">
 		</fb:login-button>
 
-		<div id="status">
+		<div id="login-status" name="login-status">
 		</div>
 
-		<div id="feed">
+		<div id="wall" name="wall">
 		</div>
 	</body>
+
+	<style>
+		.wall {
+
+		}
+	</style>
 
 	<script>
 	$(document).ready(function() {	
@@ -102,10 +108,10 @@
       testAPI();
       showWall();
     } else if (response.status === 'not_authorized') {
-      document.getElementById('status').innerHTML = 'Please log ' +
+      document.getElementById('login-status').innerHTML = 'Please log ' +
         'into this app.';
     } else {
-      document.getElementById('status').innerHTML = 'Please log ' +
+      document.getElementById('login-status').innerHTML = 'Please log ' +
         'into Facebook.';
     }
   }
@@ -138,21 +144,21 @@
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
 
-  var name = ''
-
   function testAPI() {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       name = response.name
       console.log(response);
       console.log('Successful login for: ' + response.name);
-      document.getElementById('status').innerHTML =
+      document.getElementById('login-status').innerHTML =
         'Thanks for logging in, ' + response.name + '!';
-      document.getElementById('feed').innerHTML = '<h2>' + response.name + '\'s Wall</h2>'
+      document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>'
     });
   }
 
-  
+  // Real name of Facebook user
+  var name = ''
+
   function showWall() {
   	FB.api(
     "/me/posts",
@@ -168,8 +174,8 @@
             } else if (post.story) {
               postText = post.story;
             }
-            var wallText = document.getElementById('feed').innerHTML;
-            document.getElementById('feed').innerHTML = wallText + '</br>' + 
+            var wallText = document.getElementById('wall').innerHTML;
+            document.getElementById('wall').innerHTML = wallText + '</br>' + 
               '<h4>' + name + '</h4>' +
               '<h5>' + new Date(post.created_time).toDateString() + '</h5>' +
               '<p>' + postText + '</p>';

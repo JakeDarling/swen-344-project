@@ -17,6 +17,11 @@
 				<div name='price' class='one-line last-trade-price'></div>
 				<div name='change' class='one-line'></div>
 			</div>
+			<div id="googl" name='googl'>
+				<div name='title' class='one-line'>Google Inc.</div>
+				<div name='price' class='one-line last-trade-price'></div>
+				<div name='change' class='one-line'></div>
+			</div>
 		</div>
 
 		<fb:login-button scope="user_posts,public_profile,email,publish_actions" onlogin="checkLoginState();">
@@ -90,12 +95,32 @@
 		        complete: function(){
 		        	setTimeout(dow, 5000);
 		        }
+		    });
+	    }	
+
+		    function googl(){
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : 'GOOGL',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'googl');
+		        },
+		        complete: function(){
+		        	setTimeout(googl, 5000);
+		        }
 		    });			
 		}
 
 	    ndaq();
 	    nyse();
-	    dow();    	    
+	    dow();
+	    googl();    	    
 
 	});
 

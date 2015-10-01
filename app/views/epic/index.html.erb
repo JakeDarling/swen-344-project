@@ -19,7 +19,7 @@
 			</div>
 		</div>
 
-		<fb:login-button scope="user_posts,public_profile,email," onlogin="checkLoginState();">
+		<fb:login-button scope="user_posts,public_profile,email,publish_actions" onlogin="checkLoginState();">
 		</fb:login-button>
 
 		<div id="login-status" name="login-status">
@@ -124,7 +124,7 @@
 
   window.fbAsyncInit = function() {
   FB.init({
-    appId      : '1715981821968291',
+    appId      : '459724754210681', // 1715981821968291
     cookie     : true,
     xfbml      : true,
     version    : 'v2.2'
@@ -154,6 +154,8 @@
         'Thanks for logging in, ' + response.name + '!';
       document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>'
     });
+
+    // updateStatus("This is a test!");
   }
 
   // Real name of Facebook user
@@ -184,6 +186,14 @@
       }
     }
 	);
+  }
+
+  function updateStatus(status) {
+  	FB.api('/me/feed', 'post', {message: status});
+  }
+
+  function logout() {
+	FB.logout();
   }
 </script>
 </html>

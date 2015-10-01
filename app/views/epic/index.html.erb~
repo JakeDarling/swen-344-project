@@ -1,1 +1,199 @@
-<h1>Test</h1>
+<html>
+	<body>
+		<h1>Test</h1> - <h2>Heroku works!</h2>
+		<div id="tickerContainer" name="tickerContainer">
+			<div id='ndaq' name='ndaq'>
+				<div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
+				<div name='price' class='one-line last-trade-price'></div>
+				<div name='change' class='one-line'></div>
+			</div>
+			<div id="nyse" name='nyse'>
+				<div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
+				<div name='price' class='one-line last-trade-price'></div>
+				<div name='change' class='one-line'></div>
+			</div>
+			<div id="dow" name='dow'>
+				<div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
+				<div name='price' class='one-line last-trade-price'></div>
+				<div name='change' class='one-line'></div>
+			</div>
+		</div>
+
+		<fb:login-button scope="user_posts,public_profile,email,publish_actions" onlogin="checkLoginState();">
+		</fb:login-button>
+
+		<div id="login-status" name="login-status">
+		</div>
+
+		<div id="wall" name="wall">
+		</div>
+	</body>
+
+	<style>
+		.wall {
+
+		}
+	</style>
+
+	<script>
+	$(document).ready(function() {	
+		function ndaq() {
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : 'NDAQ',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'ndaq');	
+		        },
+		        complete: function(){
+		        	setTimeout(ndaq, 5000);
+		        }
+		    });
+		}
+		function nyse(){
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : '^NYA',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'nyse');
+		        },
+		        complete: function(){
+		        	setTimeout(nyse, 5000);
+		        }
+		    });
+		}
+
+		function dow(){
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : 'DOW',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'dow');
+		        },
+		        complete: function(){
+		        	setTimeout(dow, 5000);
+		        }
+		    });			
+		}
+
+	    ndaq();
+	    nyse();
+	    dow();    	    
+
+	});
+
+
+	// Login and Wall stuff
+	function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+      testAPI();
+      showWall();
+    } else if (response.status === 'not_authorized') {
+      document.getElementById('login-status').innerHTML = 'Please log ' +
+        'into this app.';
+    } else {
+      document.getElementById('login-status').innerHTML = 'Please log ' +
+        'into Facebook.';
+    }
+  }
+
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '459724754210681', // 1715981821968291
+    cookie     : true,
+    xfbml      : true,
+    version    : 'v2.2'
+  });
+
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+
+  };
+
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      name = response.name
+      console.log(response);
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('login-status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+      document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>'
+    });
+
+    updateStatus("This is a test!");
+  }
+
+  // Real name of Facebook user
+  var name = ''
+
+  function showWall() {
+  	FB.api(
+    "/me/posts",
+    function (response) {
+      if (response && !response.error) {
+        console.log(response);
+        for (i = 0; i < response.data.length; i++) {
+          var post = response.data[i];
+          if (post.message || post.story) {
+            var postText = '';
+            if (post.message) {
+              postText = post.message;
+            } else if (post.story) {
+              postText = post.story;
+            }
+            var wallText = document.getElementById('wall').innerHTML;
+            document.getElementById('wall').innerHTML = wallText + '</br>' + 
+              '<h4>' + name + '</h4>' +
+              '<h5>' + new Date(post.created_time).toDateString() + '</h5>' +
+              '<p>' + postText + '</p>';
+          }
+        }
+      }
+    }
+	);
+  }
+
+  function updateStatus(status) {
+  	FB.api('/me/feed', 'post', {message: status});
+  }
+
+  function logout() {
+	FB.logout();
+  }
+</script>
+</html>

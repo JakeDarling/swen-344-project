@@ -230,7 +230,7 @@
       document.getElementById('login-status').innerHTML =
         'Thanks for logging in, ' + response.name + '!';
 	  document.getElementById('facebook-post-status').innerHTML =
-	    '<form onsubmit="updateStatus(status)">Post Status: <input type="text" name="status" /><input type="submit" /></form>';
+	    '<form onsubmit="updateStatus(this.status.value)">Post Status: <input type="text" name="status" /><input type="submit" /></form>';
       document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
     });
   }

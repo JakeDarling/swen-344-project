@@ -33,7 +33,7 @@
 		var valuesArray = [];
 		$(data).find('quote').each(function(){
             var date = new Date($(this).find('Date').text());
-            var price = parseFloat($(this).find('Adj_Close').text());
+            var price = parseFloat($(this).find('Adj_Close').text()).toFixed(2);
             valuesArray.push({x: date, y: price});
         });
         valuesArray.sort(function(a, b){
@@ -101,11 +101,13 @@
     }
 
     function printTicker(data, divId){
-        var lastTradePrice = $(data).find('LastTradePriceOnly').text();
+        var lastTradePrice = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
         var change = $(data).find('Change').text();
+        var op = change[0];
+        change = parseFloat(change.slice(1)).toFixed(2);
 
         $('#' + divId + '>' + '[name=price]').html(lastTradePrice);
-        $('#' + divId + '>' + '[name=change]').html(change);
+        $('#' + divId + '>' + '[name=change]').html(op + change);
 
     }
 

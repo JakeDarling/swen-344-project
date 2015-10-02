@@ -11,8 +11,8 @@ Background:
         Then my Facebook status is updated
 
     @p1 @uc4
-    Scenario: View news feed
+    Scenario: View my wall
         Given I have navigated to the dashboard
-        Then I see posts from my news feed
+        Then I see posts from my wall
 
     

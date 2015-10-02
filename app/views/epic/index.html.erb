@@ -39,6 +39,9 @@
 		<div id="login-status" name="login-status">
 		</div>
 
+		<div id="facebook-post-status" name="facebook-post-status">
+		</div>
+
 		<div id="wall" name="wall">
 		</div>
 	</body>
@@ -50,7 +53,7 @@
 	</style>
 
 	<script>
-	$(document).ready(function() {	
+	$(document).ready(function() {
 		function ndaq() {
 			$.ajax({
 		        dataType:"xml",
@@ -62,7 +65,7 @@
 		        	symbol : 'NDAQ',
 		        },
 		        success: function(data){
-		        	printTicker(data, 'ndaq');	
+		        	printTicker(data, 'ndaq');
 		        },
 		        complete: function(){
 		        	setTimeout(ndaq, 5000);
@@ -105,7 +108,7 @@
 		        	setTimeout(dow, 5000);
 		        }
 		    });
-	    }	
+	    }
 
 		    function googl(){
 			$.ajax({
@@ -123,7 +126,7 @@
 		        complete: function(){
 		        	setTimeout(googl, 5000);
 		        }
-		    });			
+		    });
 		}
 
 		function xrx(){
@@ -142,7 +145,7 @@
 		        complete: function(){
 		        	setTimeout(xrx, 5000);
 		        }
-		    });			
+		    });
 		}
 
 		function xom(){
@@ -161,7 +164,7 @@
 		        complete: function(){
 		        	setTimeout(xom, 5000);
 		        }
-		    });			
+		    });
 		}
 
 	    ndaq();
@@ -169,7 +172,7 @@
 	    dow();
 	    googl();
 	    xrx();
-	    xom();    	    
+	    xom();
 
 	});
 
@@ -198,7 +201,7 @@
 
   window.fbAsyncInit = function() {
   FB.init({
-    appId      : '1715981821968291', // 1715981821968291 //459724754210681
+    appId      : '459724754210681', // 1715981821968291 //459724754210681
     cookie     : true,
     xfbml      : true,
     version    : 'v2.4'
@@ -226,10 +229,10 @@
       console.log('Successful login for: ' + response.name);
       document.getElementById('login-status').innerHTML =
         'Thanks for logging in, ' + response.name + '!';
-      document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>'
+	  document.getElementById('facebook-post-status').innerHTML =
+	    '<form onsubmit="updateStatus(this.status.value)">Post Status: <input type="text" name="status" /><input type="submit" /></form>';
+      document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
     });
-
-    // updateStatus("This is a test!");
   }
 
   // Real name of Facebook user
@@ -251,7 +254,7 @@
               postText = post.story;
             }
             var wallText = document.getElementById('wall').innerHTML;
-            document.getElementById('wall').innerHTML = wallText + '</br>' + 
+            document.getElementById('wall').innerHTML = wallText + '</br>' +
               '<h4>' + name + '</h4>' +
               '<h5>' + new Date(post.created_time).toDateString() + '</h5>' +
               '<p>' + postText + '</p>';
@@ -271,3 +274,4 @@
   }
 </script>
 </html>
+

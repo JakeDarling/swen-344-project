@@ -54,3 +54,8 @@ gem 'novus-nvd3-rails'
 
 #foudnation 5
 gem 'foundation-rails'
+
+#fullcalendar
+gem 'momentjs-rails'
+gem 'fullcalendar-rails'
+

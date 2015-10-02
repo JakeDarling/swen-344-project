@@ -17,6 +17,8 @@
 //= require d3.v3
 //= require nv.d3
 //= require foundation
+//= require moment
+//= require fullcalendar
 $(document).foundation();
 
 /*****************************************************************************/

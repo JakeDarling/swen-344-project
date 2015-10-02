@@ -1,3 +1,17 @@
 // Place all the styles related to the epic controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.dashboard-chart {
+  height: 400px;
+  width: 90%;
+  padding-bottom: 30px;
+}
+
+.one-line {
+	display: inline;
+}
+
+.last-trade-price {
+	margin-left: 20px;
+	margin-right: 5px;
+}

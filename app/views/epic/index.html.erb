@@ -1,277 +1,278 @@
 <html>
-	<body>
-		<div id="tickerContainer" name="tickerContainer">
-			<div id='ndaq' name='ndaq'>
-				<div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
-				<div name='price' class='one-line last-trade-price quote-info'></div>
-				<div name='change' class='one-line quote-info'></div>
-			</div>
-			<div id="nyse" name='nyse'>
-				<div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
-				<div name='price' class='one-line last-trade-price quote-info'></div>
-				<div name='change' class='one-line quote-info'></div>
-			</div>
-			<div id="dow" name='dow'>
-				<div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
-				<div name='price' class='one-line last-trade-price quote-info'></div>
-				<div name='change' class='one-line quote-info'></div>
-			</div>
-			<div id="googl" name='googl'>
-				<div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
-				<div name='price' class='one-line last-trade-price quote-info'></div>
-				<div name='change' class='one-line quote-info'></div>
-			</div>
-			<div id="xrx" name='xrx'>
-				<div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
-				<div name='price' class='one-line last-trade-price quote-info'></div>
-				<div name='change' class='one-line quote-info'></div>
-			</div>
-			<div id="xom" name='xom'>
-				<div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
-				<div name='price' class='one-line last-trade-price quote-info'></div>
-				<div name='change' class='one-line quote-info'></div>
-			</div>
-		</div>
+<body>
+<div class="row">
+    <!-- FACEBOOK INFO-->
+    <div class="row"></div>
+    <div id="login-status" name="login-status">
+    </div>
 
-		<fb:login-button scope="user_posts,public_profile,email,publish_actions" onlogin="checkLoginState();">
-		</fb:login-button>
+    <div id="facebook-post-status" name="facebook-post-status">
+    </div>
 
-		<div id="login-status" name="login-status">
-		</div>
+    <div id="wall" class="large-6 small-12 columns" name="wall">
+    </div>
 
-		<div id="facebook-post-status" name="facebook-post-status">
-		</div>
+    <!-- STOCK INFO -->
+    <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
+      <div class="row">
+        <div id='ndaq' name='ndaq'>
+          <div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="nyse" name='nyse'>
+          <div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="dow" name='dow'>
+          <div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="googl" name='googl'>
+          <div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="xrx" name='xrx'>
+          <div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="xom" name='xom'>
+          <div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-		<div id="wall" name="wall">
-		</div>
-	</body>
+</div>
+</body>
 
-	<style>
-		.wall {
-
-		}
-	</style>
-
-	<script>
-	$(document).ready(function() {
-		function ndaq() {
-			$.ajax({
-		        dataType:"xml",
-		        type: 'GET',
-		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-		        data: {
-		        	diagnostics: 'true',
-		        	env : 'store://datatables.org/alltableswithkeys',
-		        	symbol : 'NDAQ',
-		        },
-		        success: function(data){
-		        	printTicker(data, 'ndaq');
-		        },
-		        complete: function(){
-		        	setTimeout(ndaq, 5000);
-		        }
-		    });
-		}
-		function nyse(){
-			$.ajax({
-		        dataType:"xml",
-		        type: 'GET',
-		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-		        data: {
-		        	diagnostics: 'true',
-		        	env : 'store://datatables.org/alltableswithkeys',
-		        	symbol : '^NYA',
-		        },
-		        success: function(data){
-		        	printTicker(data, 'nyse');
-		        },
-		        complete: function(){
-		        	setTimeout(nyse, 5000);
-		        }
-		    });
-		}
-
-		function dow(){
-			$.ajax({
-		        dataType:"xml",
-		        type: 'GET',
-		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-		        data: {
-		        	diagnostics: 'true',
-		        	env : 'store://datatables.org/alltableswithkeys',
-		        	symbol : 'DOW',
-		        },
-		        success: function(data){
-		        	printTicker(data, 'dow');
-		        },
-		        complete: function(){
-		        	setTimeout(dow, 5000);
-		        }
-		    });
-	    }
-
-		    function googl(){
-			$.ajax({
-		        dataType:"xml",
-		        type: 'GET',
-		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-		        data: {
-		        	diagnostics: 'true',
-		        	env : 'store://datatables.org/alltableswithkeys',
-		        	symbol : 'GOOGL',
-		        },
-		        success: function(data){
-		        	printTicker(data, 'googl');
-		        },
-		        complete: function(){
-		        	setTimeout(googl, 5000);
-		        }
-		    });
-		}
-
-		function xrx(){
-			$.ajax({
-		        dataType:"xml",
-		        type: 'GET',
-		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-		        data: {
-		        	diagnostics: 'true',
-		        	env : 'store://datatables.org/alltableswithkeys',
-		        	symbol : 'XRX',
-		        },
-		        success: function(data){
-		        	printTicker(data, 'xrx');
-		        },
-		        complete: function(){
-		        	setTimeout(xrx, 5000);
-		        }
-		    });
-		}
-
-		function xom(){
-			$.ajax({
-		        dataType:"xml",
-		        type: 'GET',
-		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-		        data: {
-		        	diagnostics: 'true',
-		        	env : 'store://datatables.org/alltableswithkeys',
-		        	symbol : 'XOM',
-		        },
-		        success: function(data){
-		        	printTicker(data, 'xom');
-		        },
-		        complete: function(){
-		        	setTimeout(xom, 5000);
-		        }
-		    });
-		}
-
-	    ndaq();
-	    nyse();
-	    dow();
-	    googl();
-	    xrx();
-	    xom();
-
-	});
-
-
-	// Login and Wall stuff
-	function statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);
-    if (response.status === 'connected') {
-      testAPI();
-      showWall();
-    } else if (response.status === 'not_authorized') {
-      document.getElementById('login-status').innerHTML = 'Please log ' +
-        'into this app.';
-    } else {
-      document.getElementById('login-status').innerHTML = 'Please log ' +
-        'into Facebook.';
-    }
-  }
-
-  function checkLoginState() {
-    FB.getLoginStatus(function(response) {
-      statusChangeCallback(response);
-    });
-  }
-
-  window.fbAsyncInit = function() {
-  FB.init({
-    appId      : '1715981821968291', // 1715981821968291 //459724754210681
-    cookie     : true,
-    xfbml      : true,
-    version    : 'v2.4'
-  });
-
-  FB.getLoginStatus(function(response) {
-    statusChangeCallback(response);
-  });
-
-  };
-
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
-  function testAPI() {
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-      name = response.name
-      console.log(response);
-      console.log('Successful login for: ' + response.name);
-      document.getElementById('login-status').innerHTML =
-        'Thanks for logging in, ' + response.name + '!';
-	  document.getElementById('facebook-post-status').innerHTML =
-	    '<form onsubmit="updateStatus(this.status.value)">Post Status: <input type="text" name="status" /><input type="submit" /></form>';
-      document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
-    });
-  }
-
-  // Real name of Facebook user
-  var name = ''
-
-  function showWall() {
-  	FB.api(
-    "/me/posts",
-    function (response) {
-      if (response && !response.error) {
-        console.log(response);
-        for (i = 0; i < response.data.length; i++) {
-          var post = response.data[i];
-          if (post.message || post.story) {
-            var postText = '';
-            if (post.message) {
-              postText = post.message;
-            } else if (post.story) {
-              postText = post.story;
-            }
-            var wallText = document.getElementById('wall').innerHTML;
-            document.getElementById('wall').innerHTML = wallText + '</br>' +
-              '<h4>' + name + '</h4>' +
-              '<h5>' + new Date(post.created_time).toDateString() + '</h5>' +
-              '<p>' + postText + '</p>';
-          }
+<script>
+    $(document).ready(function () {
+        function ndaq() {
+            $.ajax({
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: 'NDAQ',
+                },
+                success: function (data) {
+                    printTicker(data, 'ndaq');
+                },
+                complete: function () {
+                    setTimeout(ndaq, 5000);
+                }
+            });
         }
-      }
+
+        function nyse() {
+            $.ajax({
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: '^NYA',
+                },
+                success: function (data) {
+                    printTicker(data, 'nyse');
+                },
+                complete: function () {
+                    setTimeout(nyse, 5000);
+                }
+            });
+        }
+
+        function dow() {
+            $.ajax({
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: 'DOW',
+                },
+                success: function (data) {
+                    printTicker(data, 'dow');
+                },
+                complete: function () {
+                    setTimeout(dow, 5000);
+                }
+            });
+        }
+
+        function googl() {
+            $.ajax({
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: 'GOOGL',
+                },
+                success: function (data) {
+                    printTicker(data, 'googl');
+                },
+                complete: function () {
+                    setTimeout(googl, 5000);
+                }
+            });
+        }
+
+        function xrx() {
+            $.ajax({
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: 'XRX',
+                },
+                success: function (data) {
+                    printTicker(data, 'xrx');
+                },
+                complete: function () {
+                    setTimeout(xrx, 5000);
+                }
+            });
+        }
+
+        function xom() {
+            $.ajax({
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: 'XOM',
+                },
+                success: function (data) {
+                    printTicker(data, 'xom');
+                },
+                complete: function () {
+                    setTimeout(xom, 5000);
+                }
+            });
+        }
+
+        ndaq();
+        nyse();
+        dow();
+        googl();
+        xrx();
+        xom();
+
+    });
+
+
+    // Login and Wall stuff
+    function statusChangeCallback(response) {
+        console.log('statusChangeCallback');
+        console.log(response);
+        if (response.status === 'connected') {
+            testAPI();
+            showWall();
+        } else if (response.status === 'not_authorized') {
+            document.getElementById('login-status').innerHTML = 'Please log ' +
+                    'into this app.';
+        } else {
+            document.getElementById('login-status').innerHTML = 'Please log ' +
+                    'into Facebook.';
+        }
     }
-	);
-  }
 
-  function updateStatus(status) {
-  	FB.api('/me/feed', 'post', {message: status});
-  }
+    function checkLoginState() {
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    }
 
-  function logout() {
-	FB.logout();
-  }
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '1715981821968291', // 1715981821968291 //459724754210681
+            cookie: true,
+            xfbml: true,
+            version: 'v2.4'
+        });
+
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function testAPI() {
+        console.log('Welcome!  Fetching your information.... ');
+        FB.api('/me', function (response) {
+            name = response.name
+            console.log(response);
+            console.log('Successful login for: ' + response.name);
+            document.getElementById('login-status').innerHTML =
+                    'Thanks for logging in, ' + response.name + '!';
+            document.getElementById('facebook-post-status').innerHTML =
+                    '<form onsubmit="updateStatus(this.status.value)">Post Status: <input type="text" name="status" /><input type="submit" /></form>';
+            document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
+        });
+    }
+
+    // Real name of Facebook user
+    var name = ''
+
+    function showWall() {
+        FB.api(
+                "/me/posts",
+                function (response) {
+                    if (response && !response.error) {
+                        console.log(response);
+                        for (i = 0; i < response.data.length; i++) {
+                            var post = response.data[i];
+                            if (post.message || post.story) {
+                                var postText = '';
+                                if (post.message) {
+                                    postText = post.message;
+                                } else if (post.story) {
+                                    postText = post.story;
+                                }
+                                var wallText = document.getElementById('wall').innerHTML;
+                                document.getElementById('wall').innerHTML = wallText + '</br>' +
+                                        '<h4>' + name + '</h4>' +
+                                        '<h5>' + new Date(post.created_time).toDateString() + '</h5>' +
+                                        '<p>' + postText + '</p>';
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
+    function updateStatus(status) {
+        FB.api('/me/feed', 'post', {message: status});
+    }
+
+    function logout() {
+        FB.logout();
+    }
 </script>
 </html>
-

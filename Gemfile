@@ -51,3 +51,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 #ndv3 for stock charts
 gem 'novus-nvd3-rails'
+
+#foudnation 5
+gem 'foundation-rails'

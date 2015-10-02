@@ -1,6 +1,11 @@
 // Place all the styles related to the epic controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+#main_wrap{
+  min-height: 45em;
+}
+
 .dashboard-chart {
   height: 400px;
   width: 90%;
@@ -21,6 +26,19 @@
 }
 
 #tickerContainer {
-	float: right;
-	width: 500px;
+	/*Removed styling, replaced my foundation styling */
+}
+
+#wall{
+  background: #d8d8d8;
+  min-height: 25em;
+  overflow:auto;
+}
+
+/**---------------------------------------------------------
+ * Foundation Overwrites
+ *----------------------------------------------------------*/
+
+a{
+  color: #ff5500;
 }

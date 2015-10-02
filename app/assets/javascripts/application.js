@@ -33,7 +33,7 @@
 		var valuesArray = [];
 		$(data).find('quote').each(function(){
             var date = new Date($(this).find('Date').text());
-            var price = $(this).find('Adj_Close').text();
+            var price = parseFloat($(this).find('Adj_Close').text());
             valuesArray.push({x: date, y: price});
         });
         valuesArray.sort(function(a, b){

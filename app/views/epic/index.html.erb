@@ -1,33 +1,53 @@
 <html>
 	<body>
-		<h1>Test</h1> - <h2>Heroku works!</h2>
 		<div id="tickerContainer" name="tickerContainer">
 			<div id='ndaq' name='ndaq'>
 				<div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
-				<div name='price' class='one-line last-trade-price'></div>
-				<div name='change' class='one-line'></div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
 			</div>
 			<div id="nyse" name='nyse'>
 				<div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
-				<div name='price' class='one-line last-trade-price'></div>
-				<div name='change' class='one-line'></div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
 			</div>
 			<div id="dow" name='dow'>
 				<div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
-				<div name='price' class='one-line last-trade-price'></div>
-				<div name='change' class='one-line'></div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
+			</div>
+			<div id="googl" name='googl'>
+				<div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
+			</div>
+			<div id="xrx" name='xrx'>
+				<div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
+			</div>
+			<div id="xom" name='xom'>
+				<div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
+				<div name='price' class='one-line last-trade-price quote-info'></div>
+				<div name='change' class='one-line quote-info'></div>
 			</div>
 		</div>
 
-		<fb:login-button scope="user_posts,public_profile,email," onlogin="checkLoginState();">
+		<fb:login-button scope="user_posts,public_profile,email,publish_actions" onlogin="checkLoginState();">
 		</fb:login-button>
 
-		<div id="status">
+		<div id="login-status" name="login-status">
 		</div>
 
-		<div id="feed">
+		<div id="wall" name="wall">
 		</div>
 	</body>
+
+	<style>
+		.wall {
+
+		}
+	</style>
 
 	<script>
 	$(document).ready(function() {	
@@ -84,12 +104,72 @@
 		        complete: function(){
 		        	setTimeout(dow, 5000);
 		        }
+		    });
+	    }	
+
+		    function googl(){
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : 'GOOGL',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'googl');
+		        },
+		        complete: function(){
+		        	setTimeout(googl, 5000);
+		        }
+		    });			
+		}
+
+		function xrx(){
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : 'XRX',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'xrx');
+		        },
+		        complete: function(){
+		        	setTimeout(xrx, 5000);
+		        }
+		    });			
+		}
+
+		function xom(){
+			$.ajax({
+		        dataType:"xml",
+		        type: 'GET',
+		        url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+		        data: {
+		        	diagnostics: 'true',
+		        	env : 'store://datatables.org/alltableswithkeys',
+		        	symbol : 'XOM',
+		        },
+		        success: function(data){
+		        	printTicker(data, 'xom');
+		        },
+		        complete: function(){
+		        	setTimeout(xom, 5000);
+		        }
 		    });			
 		}
 
 	    ndaq();
 	    nyse();
-	    dow();    	    
+	    dow();
+	    googl();
+	    xrx();
+	    xom();    	    
 
 	});
 
@@ -102,10 +182,10 @@
       testAPI();
       showWall();
     } else if (response.status === 'not_authorized') {
-      document.getElementById('status').innerHTML = 'Please log ' +
+      document.getElementById('login-status').innerHTML = 'Please log ' +
         'into this app.';
     } else {
-      document.getElementById('status').innerHTML = 'Please log ' +
+      document.getElementById('login-status').innerHTML = 'Please log ' +
         'into Facebook.';
     }
   }
@@ -118,7 +198,7 @@
 
   window.fbAsyncInit = function() {
   FB.init({
-    appId      : '1715981821968291',
+    appId      : '459724754210681', // 1715981821968291
     cookie     : true,
     xfbml      : true,
     version    : 'v2.2'
@@ -138,21 +218,23 @@
     fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));
 
-  var name = ''
-
   function testAPI() {
     console.log('Welcome!  Fetching your information.... ');
     FB.api('/me', function(response) {
       name = response.name
       console.log(response);
       console.log('Successful login for: ' + response.name);
-      document.getElementById('status').innerHTML =
+      document.getElementById('login-status').innerHTML =
         'Thanks for logging in, ' + response.name + '!';
-      document.getElementById('feed').innerHTML = '<h2>' + response.name + '\'s Wall</h2>'
+      document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>'
     });
+
+    // updateStatus("This is a test!");
   }
 
-  
+  // Real name of Facebook user
+  var name = ''
+
   function showWall() {
   	FB.api(
     "/me/posts",
@@ -168,8 +250,8 @@
             } else if (post.story) {
               postText = post.story;
             }
-            var wallText = document.getElementById('feed').innerHTML;
-            document.getElementById('feed').innerHTML = wallText + '</br>' + 
+            var wallText = document.getElementById('wall').innerHTML;
+            document.getElementById('wall').innerHTML = wallText + '</br>' + 
               '<h4>' + name + '</h4>' +
               '<h5>' + new Date(post.created_time).toDateString() + '</h5>' +
               '<p>' + postText + '</p>';
@@ -178,6 +260,14 @@
       }
     }
 	);
+  }
+
+  function updateStatus(status) {
+  	FB.api('/me/feed', 'post', {message: status});
+  }
+
+  function logout() {
+	FB.logout();
   }
 </script>
 </html>

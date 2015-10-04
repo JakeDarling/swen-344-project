@@ -25,12 +25,10 @@
   <section class="top-bar-section">
     <!-- Right Nav Section -->
     <ul class="right">
-      <li><a href="#">Calendar</a></li>
+      <li><a href="/calendar">Calendar</a></li>
       <li><a href="/stocks">Stocks</a></li>
       <li>
-        <fb:login-button scope="user_posts,public_profile,email,publish_actions" onlogin="checkLoginState();">
-        </fb:login-button>
-
+        <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logon.png', :alt => 'facebook logon') %></a>
         <div id="login-status" name="login-status">
         </div>
       </li>
@@ -38,7 +36,7 @@
 
     <!-- Left Nav Section -->
     <ul class="left">
-      <li><a href="/">Dashboard</a></li>
+      <li><a class="dash" href="/"><%= image_tag('dash_button.png', :alt => 'Dashboard') %></a></li>
     </ul>
   </section>
 </nav>

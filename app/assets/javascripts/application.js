@@ -245,7 +245,7 @@ function fb_login() {
 
         }
     }, {
-        scope: 'publish_actions,email'
+        scope: 'publish_actions,email,public_profile,user_posts'
     });
 }
 (function () {

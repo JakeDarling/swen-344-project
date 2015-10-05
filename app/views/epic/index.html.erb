@@ -1,59 +1,4 @@
 <html>
-<body>
-<div class="row">
-  <!-- FACEBOOK INFO-->
-  <div class="row">
-    <div data-alert class="alert-box">
-      <div id="login-status" name="login-status"></div>
-      <a href="#" class="close">&times;</a>
-    </div>
-
-    <div id="facebook-post-status" name="facebook-post-status">
-    </div>
-
-    <div id="wall" class="large-6 small-12 columns" name="wall">
-    </div>
-
-    <!-- STOCK INFO -->
-    <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
-      <div class="row">
-        <div id='ndaq' name='ndaq'>
-          <div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="nyse" name='nyse'>
-          <div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="dow" name='dow'>
-          <div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="googl" name='googl'>
-          <div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="xrx" name='xrx'>
-          <div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="xom" name='xom'>
-          <div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-</body>
-
 <script>
     $(document).ready(function () {
         function ndaq() {
@@ -277,4 +222,58 @@
         FB.logout();
     }
 </script>
+<body>
+<div class="row">
+  <!-- FACEBOOK INFO-->
+  <div class="row">
+    <div data-alert class="alert-box">
+      <div id="login-status" name="login-status"></div>
+      <a href="#" class="close">&times;</a>
+    </div>
+
+    <div id="facebook-post-status" name="facebook-post-status">
+    </div>
+
+    <div id="wall" class="large-6 small-12 columns" name="wall">
+    </div>
+
+    <!-- STOCK INFO -->
+    <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
+      <div class="row">
+        <div id='ndaq' name='ndaq'>
+          <div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="nyse" name='nyse'>
+          <div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="dow" name='dow'>
+          <div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="googl" name='googl'>
+          <div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="xrx" name='xrx'>
+          <div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="xom" name='xom'>
+          <div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</body>
 </html>

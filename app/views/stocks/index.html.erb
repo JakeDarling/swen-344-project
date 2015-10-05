@@ -1,58 +1,63 @@
-<html>
-	<body>
-		<form name="quote" action="https://query.yahooapis.com/v1/public/yql/derekleung/getQuote" method="get">
-	    	Enter Ticker Symbol:
-		    <input type="text" name="symbol"/>
-		    <input type="submit" value="Get quote"/>
-		    <input type="hidden" name="format" value="xml&diagnostics=true"/>
-		    <input type="hidden" name="env" value="store://datatables.org/alltableswithkeys"/>
-		</form>
+<div class="row">
+  <div class="large-12 small-12 columns">
+    <form name="quote" action="https://query.yahooapis.com/v1/public/yql/derekleung/getQuote" method="get">
+      Enter Ticker Symbol:
+      <input type="text" name="symbol"/>
+      <input type="submit" value="Get quote"/>
+      <input type="hidden" name="format" value="xml&diagnostics=true"/>
+      <input type="hidden" name="env" value="store://datatables.org/alltableswithkeys"/>
+    </form>
 
-		<div id="quoteResults" name="quoteResults"></div>
-        <div id="chartContainer" name="chartContainer">
-            <div id="chartDateButtons" name="chartDateButtons">
-            	<button id='7days' name='7days'>7 days</button>
-            	<button id='1month' name='1month'>1 month</button>
-            	<button id='3months' name='3months'>3 months</button>
-            </div>
-            <div id="chart">
-                <svg></svg>
-            </div>
-        </div>
-	</body>
-	<script>
-	    window.chartData = [];
-		$(document).ready(function() {
-			var quoteFormData;
-		    $('form[name="quote"]').submit(function(event){
-		        event.preventDefault();
-	            window.chartData = [];
-		        $.ajax({
-		            dataType:"xml",
-		            type: $('form[name="quote"]').attr('method'),
-		            url: $('form[name="quote"]').attr('action'),
-		            data: $('form[name="quote"]').serialize(),
-		            success: function(data){
-		            	quoteFormData = data;
-		                printQuote(data);
-		                genChart(data, 30, 'chart');
-		                $('#chartDateButtons').css('visibility', 'visible');
-		            }
-		        });
-		    });
+    <table>
+      <tr id="quoteResults" name="quoteResults">
 
-		    $('body').on('click', '#7days', function(){
-		    	window.chartData = [];
-	            genChart(quoteFormData, 7, 'chart');
-		    });
-		    $('body').on('click', '#1month', function(){
-		    	window.chartData = [];
-	            genChart(quoteFormData, 30, 'chart');
-		    });
-		    $('body').on('click', '#3months', function(){
-		    	window.chartData = [];
-	            genChart(quoteFormData, 90, 'chart');
-		    });
-		});
-	</script>
-</html>
+      </tr>
+    </table>
+    <div id="chartContainer" name="chartContainer">
+      <div id="chartDateButtons" name="chartDateButtons">
+            <button id='7days' class="large-4 small-4 columns" name='7days'>7 days</button>
+            <button id='1month' class="large-4 small-4 columns" name='1month'>1 month</button>
+            <button id='3months' class="large-4 small-4 columns" name='3months'>3 month</button>
+      </div>
+      <div id="chart">
+        <svg></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    window.chartData = [];
+    $(document).ready(function () {
+        var quoteFormData;
+        $('form[name="quote"]').submit(function (event) {
+            event.preventDefault();
+            window.chartData = [];
+            $.ajax({
+                dataType: "xml",
+                type: $('form[name="quote"]').attr('method'),
+                url: $('form[name="quote"]').attr('action'),
+                data: $('form[name="quote"]').serialize(),
+                success: function (data) {
+                    quoteFormData = data;
+                    printQuote(data);
+                    genChart(data, 30, 'chart');
+                    $('#chartDateButtons').css('visibility', 'visible');
+                }
+            });
+        });
+
+        $('body').on('click', '#7days', function () {
+            window.chartData = [];
+            genChart(quoteFormData, 7, 'chart');
+        });
+        $('body').on('click', '#1month', function () {
+            window.chartData = [];
+            genChart(quoteFormData, 30, 'chart');
+        });
+        $('body').on('click', '#3months', function () {
+            window.chartData = [];
+            genChart(quoteFormData, 90, 'chart');
+        });
+    });
+</script>

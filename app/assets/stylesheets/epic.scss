@@ -1,6 +1,24 @@
 // Place all the styles related to the epic controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+/**---------------------------------------------------------
+ * SASS MIXINS
+ *----------------------------------------------------------*/
+@mixin animate($time) {
+  transition: all $time ease;
+  -o-transition: all $time ease;
+  -moz-transition: all $time ease;
+  -webkit-transition: all $time ease;
+}
+
+/**---------------------------------------------------------
+ * MAIN STYLING
+ *----------------------------------------------------------*/
+#main_wrap {
+  min-height: 45em;
+}
+
 .dashboard-chart {
   height: 400px;
   width: 90%;
@@ -8,19 +26,71 @@
 }
 
 .one-line {
-	display: inline;
+  display: inline;
 }
 
 .last-trade-price {
-	margin-left: 20px;
-	margin-right: 5px;
+  margin-left: 20px;
+  margin-right: 5px;
 }
 
 .quote-info {
-	float: right;
+  float: right;
 }
 
 #tickerContainer {
-	float: right;
-	width: 500px;
+  /*Removed styling, replaced my foundation styling */
 }
+
+#wall {
+  background: #d8d8d8;
+  min-height: 25em;
+  overflow: auto;
+}
+
+/**---------------------------------------------------------
+ * Custom Menu Styling
+ *----------------------------------------------------------*/
+.clean {
+  padding: 0 !important;
+  background: #b0b0b0;
+}
+
+.top-bar {
+  a {
+    @include animate(.3s);
+    img {
+      vertical-align: top;
+    }
+  }
+  a.facebook {
+    @extend .clean;
+    @extend a;
+    background: #ffffff !important;
+    :hover{
+      background: #87d6ff;
+    }
+  }
+  a.dash {
+    @extend .clean;
+    @extend a;
+    width: 51px;
+    background: #ffffff !important;
+    :hover{
+      background: #87d6ff;
+    }
+  }
+}
+
+/**---------------------------------------------------------
+ * Foundation Overwrites
+ *----------------------------------------------------------*/
+a {
+
+}
+
+img {
+  margin: 0;
+  padding: 0;
+}
+

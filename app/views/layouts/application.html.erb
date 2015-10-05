@@ -1,14 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Epic</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title><%= content_for?(:title) ? yield(:title) : "foundation-rails" %></title>
+
+  <%= stylesheet_link_tag "application" %>
+  <%= javascript_include_tag "vendor/modernizr" %>
+  <%= javascript_include_tag "application", 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
 </head>
-<body>
 
-<%= yield %>
+<body>
+<nav class="top-bar" data-topbar role="navigation">
+  <ul class="title-area">
+    <li class="name">
+      <h1><a href="#">EPIC</a></h1>
+    </li>
+    <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+    <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+  </ul>
+
+  <section class="top-bar-section">
+    <!-- Right Nav Section -->
+    <ul class="right">
+      <li><a href="/calendar">Calendar</a></li>
+      <li><a href="/stocks">Stocks</a></li>
+      <li>
+        <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logon.png', :alt => 'facebook logon') %></a>
+        </div>
+      </li>
+    </ul>
+
+    <!-- Left Nav Section -->
+    <ul class="left">
+      <li><a class="dash" href="/"><%= image_tag('dash_button.png', :alt => 'Dashboard') %></a></li>
+    </ul>
+  </section>
+</nav>
+<div id="main_wrap" class="large-12 small-12 columns">
+  <%= yield %>
+</div>
+<div class="row">
+  <div class="large-12 columns">
+    <div class="row">
+      <div class="large-6 columns">
+        <p>&copy; Copyright EPIC development-team 2015</p>
+      </div>
+      <div class="large-6 columns">
+        <ul class="inline-list right">
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/">Calendar</a></li>
+          <li><a href="/stocks">Stocks</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

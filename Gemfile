@@ -59,3 +59,5 @@ gem 'foundation-rails'
 gem 'momentjs-rails'
 gem 'fullcalendar-rails'
 
+gem 'coffee-script-source', '1.8.0'
+

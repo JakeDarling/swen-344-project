@@ -237,6 +237,7 @@ function fb_login() {
                 user_email = response.email; //get user email
                 // you can store this data into your database
             });
+            window.location.reload();
 
         } else {
             //user hit cancel button

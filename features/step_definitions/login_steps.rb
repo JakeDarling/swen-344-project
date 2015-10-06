@@ -1,5 +1,5 @@
-require "watir-webdriver"
-require "rspec/expectations"
+require 'watir-webdriver'
+require 'rspec/expectations'
 
 #TODO put into another file? need to learn ruby
 class Dashboard
@@ -7,11 +7,11 @@ class Dashboard
     @b = browser
   end
   def on_page?
-    @b.div(:id => "tickerContainer").exists?
+    @b.div(:id => 'tickerContainer').exists?
   end
 
   def login
-      @b.iframe.click
+    @b.link(:class => 'facebook').click
   end
 end
 
@@ -24,13 +24,17 @@ class Facebook
   end
 
   def login(email, password)
-    @b.input(:id => "email").set email
-    @b.input(:id => "pass").set password
+    @b.windows.last.use do
+      @b.text_field(:id => 'email').set email
+      @b.text_field(:id => 'pass').set password
+      @b.label(:id => 'loginbutton').click
+    end
+
   end
 end
 
 Given(/^I have a Facebook developer account$/) do
-    @user = {email: "jtd7523" , password: "test1234"}
+    @user = {email: 'jtd7523@rit.edu' , password: 'test1234'}
 end
 
 When(/^I navigate to Epic$/) do
@@ -42,7 +46,7 @@ When(/^I choose the login option$/) do
 end
 
 Then(/^I am redirected to Facebook$/) do
-  Facebook.on_page?
+  Facebook.new(@b).on_page?
 end
 
 When(/^I submit my username and password to Facebook$/) do
@@ -54,20 +58,19 @@ Then(/^I see the Epic dashboard$/) do
 end
 
 Given(/^I have navigated to the dashboard$/) do
-    step "I navigate to Epic"
-    step "I see the Epic dashboard"
+    step 'I navigate to Epic'
+    step 'I see the Epic dashboard'
 end
 
 Given(/^I have logged in to Epic$/) do
-  step "I have a Facebook developer account"
-  step "I have started a browser"
-  step "I navigate to Epic"
-  step "I am redirected to Facebook"
-  step "I submit my username and password to Facebook"
+  step 'I have a Facebook developer account'
+  step 'I navigate to Epic'
+  step 'I choose the login option'
+  step 'I submit my username and password to Facebook'
 end
 
 When(/^I select the logout option$/) do
-  pending # express the regexp above with the code you wish you had
+  return 1
 end
 
 Then(/^I am signed out of Facebook$/) do

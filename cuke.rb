@@ -24,21 +24,23 @@ parser.parse!
 command = ARGV.pop
 case command
 when "login"
-    feature_tags = ['@uc1', '@uc2']
+    feature_tags = ['@uc1', '@uc2', '@done']
 
 when "social"
     feature_tags = ['@uc3', '@uc4']
 
 end
 
-# Construct the command
-final_cmd = 'cucumber --tags ' + feature_tags.join(",")
+# Construct the command, and only run tests that are done
+# Cucumber ANDs tags when used like --tags @t1 --tag @t2
+# Cucumber ORs tags when used like --tags, @t1, @t2
+final_cmd = 'cucumber --tags @done --tags ' + feature_tags.join(",")
 
 # Change current directory of this script
 # Cucumber only runs when in the features directory
-Dir.chdir 'integration' do 
-    
+#Dir.chdir 'integration' do
+
     puts final_cmd
     system final_cmd
-end
+#end
 

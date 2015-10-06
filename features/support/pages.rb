@@ -15,14 +15,20 @@ class Dashboard
     @b.link(:class => 'facebook').click
   end
   def set_status(status)
-    @b.text_field(:name => 'status').set status
+    @b.text_field(:name => 'status').when_present.set status
   end
   def submit_status
     @b.button.click
   end
+  # True if there is at least one wall post visiable (not just the container)
   def wall_post?
-    #todo validate more here
-    @b.h4(:css => 'div#wall h4')
+    @b.h4(:css => 'div#wall h4').exists?
+  end
+  # Returns the status text of the nth wall post
+  def get_wall_post(index)
+    p = @b.p(:css => 'div#wall p', :index => index)
+    p.when_present
+    p.text
   end
 end
 

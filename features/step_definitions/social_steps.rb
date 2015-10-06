@@ -12,8 +12,7 @@ When(/^I submit my status$/) do
 end
 
 Then(/^my Facebook status is updated$/) do
-  #todo check @status
-  expect(Dashboard.new(@b).wall_post?)
+  expect(Dashboard.new(@b).get_wall_post(0) == @status)
 end
 
 Then(/^I see posts from my wall$/) do

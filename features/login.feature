@@ -1,6 +1,6 @@
 Feature: Login and logout
 
-    @p1 @uc1
+    @p1 @uc1 @done
     Scenario: Log in using a Facebook account
         Given I have a Facebook developer account
         And I have navigated to the dashboard

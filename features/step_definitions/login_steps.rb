@@ -1,37 +1,7 @@
 require 'watir-webdriver'
 require 'rspec/expectations'
+require_relative '../support/pages'
 
-#TODO put into another file? need to learn ruby
-class Dashboard
-  def initialize(browser)
-    @b = browser
-  end
-  def on_page?
-    @b.div(:id => 'tickerContainer').exists?
-  end
-
-  def login
-    @b.link(:class => 'facebook').click
-  end
-end
-
-class Facebook
-  def initialize(browser)
-    @b = browser
-  end
-  def on_page?
-    true
-  end
-
-  def login(email, password)
-    @b.windows.last.use do
-      @b.text_field(:id => 'email').set email
-      @b.text_field(:id => 'pass').set password
-      @b.label(:id => 'loginbutton').click
-    end
-
-  end
-end
 
 Given(/^I have a Facebook developer account$/) do
     @user = {email: 'jtd7523@rit.edu' , password: 'test1234'}
@@ -70,7 +40,7 @@ Given(/^I have logged in to Epic$/) do
 end
 
 When(/^I select the logout option$/) do
-  return 1
+  pending 'We need a logout button'
 end
 
 Then(/^I am signed out of Facebook$/) do

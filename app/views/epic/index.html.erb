@@ -195,18 +195,23 @@
                         console.log(response);
                         for (i = 0; i < response.data.length; i++) {
                             var post = response.data[i];
+                            var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
+                            var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
+                                            "August", "September", "October", "November", "December"];
+                            var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
+                            var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
                             if (post.message || post.story) {
-                                var postText = '';
-                                if (post.message) {
-                                    postText = post.message;
-                                } else if (post.story) {
-                                    postText = post.story;
-                                }
-                                var wallText = document.getElementById('wall').innerHTML;
-                                document.getElementById('wall').innerHTML = wallText + '</br>' +
-                                        '<h4>' + name + '</h4>' +
-                                        '<h5>' + new Date(post.created_time.substring(0,(post.created_time.length-5))).toDateString() + '</h5>' +
-                                        '<p>' + postText + '</p>';
+                              var postText = '';
+                              if (post.message) {
+                                postText = post.message;
+                              } else if (post.story) {
+                                postText = post.story;
+                              }
+                              var wallText = document.getElementById('feed').innerHTML;
+                              document.getElementById('feed').innerHTML = wallText + '</br>' + 
+                                '<h4>' + name + '</h4>' +
+                                '<h5>' + strFbTime + '</h5>' +
+                                '<p>' + postText + '</p>';
                             }
                         }
                     }

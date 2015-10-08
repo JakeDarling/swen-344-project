@@ -205,7 +205,7 @@
                                 var wallText = document.getElementById('wall').innerHTML;
                                 document.getElementById('wall').innerHTML = wallText + '</br>' +
                                         '<h4>' + name + '</h4>' +
-                                        '<h5>' + new Date(post.created_time).toDateString() + '</h5>' +
+                                        '<h5>' + new Date(post.created_time.substring(0,(post.created_time.length-5))).toDateString() + '</h5>' +
                                         '<p>' + postText + '</p>';
                             }
                         }

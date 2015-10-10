@@ -11,12 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151010191636) do
+ActiveRecord::Schema.define(version: 20151010211420) do
 
   create_table "users", force: :cascade do |t|
     t.string   "fbUserId"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_index "users", ["fbUserId"], name: "index_users_on_fbUserId", unique: true
 
 end

@@ -237,7 +237,7 @@ function fb_login() {
             $.ajax({
                 type:'POST',
                 url:'/associate-user',
-                data:{'idString': user_id},
+                data:{'idString': response.authResponse.userID},
                 success: function(){
                     alert("Successfully associated user with FB ID: " + user_id);
                 }

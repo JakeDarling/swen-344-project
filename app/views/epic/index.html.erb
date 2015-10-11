@@ -175,6 +175,17 @@
         FB.api('/me', function (response) {
             name = response.name
             console.log(response);
+
+            //associate user in our database
+            $.ajax({
+                type:'POST',
+                url:'/associate-user',
+                data:{'idString': response.id},
+                success: function(){
+                    alert("Successfully associated user with FB ID: " + response.id);
+                }
+            });
+
             console.log('Successful login for: ' + response.name);
             document.getElementById('login-status').innerHTML =
                     'Thanks for logging in, ' + response.name + '!';

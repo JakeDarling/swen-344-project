@@ -232,22 +232,12 @@ function fb_login() {
             //console.log(response); // dump complete info
             access_token = response.authResponse.accessToken; //get access token
             user_id = response.authResponse.userID; //get FB UID
-            window.fbId = user_id;
 
             FB.api('/me', function (response) {
                 user_email = response.email; //get user email
                 // you can store this data into your database
             });
             window.location.reload();
-            //associate user in our database
-            $.ajax({
-                type:'POST',
-                url:'/associate-user',
-                data:{'idString': window.fbId},
-                success: function(){
-                    alert("Successfully associated user with FB ID: " + user_id);
-                }
-            });
 
         } else {
             //user hit cancel button

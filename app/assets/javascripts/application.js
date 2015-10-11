@@ -233,6 +233,11 @@ function fb_login() {
             access_token = response.authResponse.accessToken; //get access token
             user_id = response.authResponse.userID; //get FB UID
 
+            FB.api('/me', function (response) {
+                user_email = response.email; //get user email
+                // you can store this data into your database
+            });
+            window.location.reload();
             //associate user in our database
             $.ajax({
                 type:'POST',
@@ -242,12 +247,6 @@ function fb_login() {
                     alert("Successfully associated user with FB ID: " + user_id);
                 }
             });
-
-            FB.api('/me', function (response) {
-                user_email = response.email; //get user email
-                // you can store this data into your database
-            });
-            window.location.reload();
 
         } else {
             //user hit cancel button

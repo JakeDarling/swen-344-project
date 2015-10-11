@@ -12,6 +12,21 @@
   <%= csrf_meta_tags %>
 </head>
 
+<script>
+  $(document).ready(function(){
+    $('#fbSubmit').click(function(){
+      $.ajax({
+        type:'POST',
+        url:'/associate-user',
+        data:{'idString': $('#fbIdTextBox').val()},
+        success: function(){
+            alert("Successfully associated user with FB ID: " + $('#fbIdTextBox').val());
+        }
+      });
+    });
+  });
+</script>
+
 <body>
 <nav class="top-bar" data-topbar role="navigation">
   <ul class="title-area">
@@ -27,6 +42,8 @@
     <ul class="right">
       <li><a href="/calendar">Calendar</a></li>
       <li><a href="/stocks">Stocks</a></li>
+      <li><input type="text" id="fbIdTextBox" name="fbIdTextBox"/></li>
+      <li><input type="submit" id="fbSubmit" name="fbSubmit"/></li>
       <li>
         <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logon.png', :alt => 'facebook logon') %></a>
         </div>

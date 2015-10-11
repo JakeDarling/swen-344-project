@@ -232,6 +232,7 @@ function fb_login() {
             //console.log(response); // dump complete info
             access_token = response.authResponse.accessToken; //get access token
             user_id = response.authResponse.userID; //get FB UID
+            window.fbId = user_id;
 
             FB.api('/me', function (response) {
                 user_email = response.email; //get user email
@@ -242,7 +243,7 @@ function fb_login() {
             $.ajax({
                 type:'POST',
                 url:'/associate-user',
-                data:{'idString': response.authResponse.userID},
+                data:{'idString': window.fbId},
                 success: function(){
                     alert("Successfully associated user with FB ID: " + user_id);
                 }

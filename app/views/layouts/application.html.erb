@@ -26,7 +26,6 @@
     });
   });
 </script>
-
 <body>
 <nav class="top-bar" data-topbar role="navigation">
   <ul class="title-area">
@@ -57,6 +56,7 @@
   </section>
 </nav>
 <div id="main_wrap" class="large-12 small-12 columns">
+  <div>Session User FB ID: <%= session[:user] %></div>
   <%= yield %>
 </div>
 <div class="row">

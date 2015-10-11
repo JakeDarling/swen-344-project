@@ -234,6 +234,7 @@ function fb_login() {
             user_id = response.authResponse.userID; //get FB UID
 
             //associate user in our database
+            alert('hi')
             $.ajax({
                 type:'POST',
                 url:'/associate-user',

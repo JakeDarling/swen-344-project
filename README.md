@@ -25,7 +25,7 @@ Powershell treats @ as a variable, so any must be escaped with backticks
 
 ## Writing new tests
 ### Setup and teardown
-The browser (the @b variable) is created and closed in [features/support/hooks.rb](https://github.com/jakedarling/swen-344-project/)  
+The browser (the @b variable) is created and closed in [features/support/hooks.rb](https://github.com/JakeDarling/swen-344-project/blob/master/features/support/hooks.rb)  
 The Before and After methods are per-scenario, so each test will start fresh  
 
 ### Feature files and step definitions

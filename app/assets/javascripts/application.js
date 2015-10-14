@@ -53,8 +53,8 @@ function buildChartData(data, name, symbol, lst) {
 }
 
 function genChart(data, days, divId) {
-    var end = (new Date);
-    var start = new Date;
+    var end = (new Date());
+    var start = new Date();
     var name = $(data).find('Name').text();
     var symbol = $(data).find('Symbol').text();
     start.setDate(end.getDate() - days);

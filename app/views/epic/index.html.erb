@@ -1,4 +1,32 @@
 <html>
+<style>
+  #feed {
+    background-color: #e9eaed;
+    border: 1px solid black;
+    padding: 5px;
+  }
+
+  .fbPost {
+    background-color: white;
+    border: 1px solid #303030;
+    margin: 10px;
+    padding: 5px;
+    max-width: 510px;
+  }
+
+  .fbPost a {
+    text-decoration: none;
+  }
+
+  .fbComments {
+    background-color: #f6f7f8;
+    padding: 5px;
+  }
+
+  .fbPostButtonBox ul {
+    list-style: none;
+  }
+</style>
 <script>
     $(document).ready(function () {
         function ndaq() {
@@ -195,40 +223,97 @@
         });
     }
 
-    // Real name of Facebook user
-    var name = ''
-
     function showWall() {
-        FB.api(
-                "/me/posts",
-                function (response) {
-                    if (response && !response.error) {
-                        console.log(response);
-                        for (i = 0; i < response.data.length; i++) {
-                            var post = response.data[i];
-                            var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
-                            var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
-                                            "August", "September", "October", "November", "December"];
-                            var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
-                            var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
-                            if (post.message || post.story) {
-                              var postText = '';
-                              if (post.message) {
-                                postText = post.message;
-                              } else if (post.story) {
-                                postText = post.story;
-                              }
-                              var wallText = document.getElementById('feed').innerHTML;
-                              document.getElementById('feed').innerHTML = wallText + '</br>' + 
-                                '<h4>' + name + '</h4>' +
-                                '<h5>' + strFbTime + '</h5>' +
-                                '<p>' + postText + '</p>';
-                            }
-                        }
+    FB.api(
+      '/me/feed?fields=story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link', 
+      function(response) {
+        if (response && !response.error) {
+          postsData = response.data;
+          for (i = 0; i < postsData.length; i++) {
+            var post = postsData[i];
+
+            // Post Time
+            var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
+            var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
+                              "August", "September", "October", "November", "December"];
+            var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
+            var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
+
+            // Post Message or Story
+            if (post.message || post.story) {
+              var postText = '';
+              if (post.message) {
+                postText = post.message;
+              } else if (post.story) {
+                postText = post.story;
+              }
+
+              // Post Picture
+              var postPicture = '';
+              if (post.picture) {
+                postPicture = post.picture;
+              }
+
+              // Post Comments
+              var comments = '';
+              var commentPicURL = '';
+              if (post.comments) {
+                var commentsData = post.comments.data;
+                for (j = 0; j < commentsData.length; j++) {
+                  var comment = commentsData[j];
+
+                  comments += 
+                    // Comment Image
+                    '<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><img src="https://graph.facebook.com/' + comment.from.id + '/picture?fields=url&type=square" alt="Comment Pic" height="32px" width="32px"></a>' +
+                    // Comment Name
+                    '<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><strong>' + comment.from.name + '</strong></a>' + 
+                    // Comment Message
+                    ' ' + comment.message + '<br>';
+
+                  // Like/Unlike Comment
+                  if (comment.can_like) {
+                    if (comment.user_likes==true) {
+                      comments += '<a href="#">Unlike</a>';
+                    } else {
+                      comments += '<a href="#">Like</a>';
                     }
+                  }
+
+                  // Reply to Comment
+                  if (comment.can_comment) {
+                    comments += '<a href="#"> · Reply</a><br>';
+                  }
+
+                  // Profile Pic of Poster
+                  var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
                 }
-        );
-    }
+              }
+
+              // Display Post in Wall
+              var wallText = document.getElementById('feed').innerHTML;
+              document.getElementById('feed').innerHTML = wallText + 
+                '<div name="fbPost" class="fbPost">' +
+                  '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><img src="' + postProfilePic + '" alt="Post Profile Picture" height="40px" width="40px"></a>' +  
+                  '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><h4>' + post.from.name + '</h4></a>' +
+                  '<a href="' + post.link + '" target="_blank"><p>' + strFbTime + '</p></a>' +
+                  '<p>' + postText + '</p>' + 
+                  '<img src="' + postPicture + '" alt="Post Photo">' +
+                  '<hr>' + 
+                  '<div class="fbPostButtonBox" name="fbPostButtonBox">' + 
+                    '<ul>' + 
+                      '<li><a href="#">Like</a></li>' + 
+                      '<li><a href="#">Comment</a></li>' + 
+                    '</ul>' +
+                  '</div>' +
+                  '<div name="fbComments" class="fbComments">' + 
+                    comments +
+                  '</div>' +
+                '</div>';
+            }
+          }
+        }
+    });
+  }
 
     function updateStatus(status) {
         FB.api('/me/feed', 'post', {message: status});

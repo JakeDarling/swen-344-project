@@ -1,6 +1,6 @@
 <html>
 <style>
-  #feed {
+  #wall {
     background-color: #e9eaed;
     border: 1px solid black;
     padding: 5px;
@@ -290,8 +290,8 @@
               }
 
               // Display Post in Wall
-              var wallText = document.getElementById('feed').innerHTML;
-              document.getElementById('feed').innerHTML = wallText + 
+              var wallText = document.getElementById('wall').innerHTML;
+              document.getElementById('wall').innerHTML = wallText + 
                 '<div name="fbPost" class="fbPost">' +
                   '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><img src="' + postProfilePic + '" alt="Post Profile Picture" height="40px" width="40px"></a>' +  
                   '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><h4>' + post.from.name + '</h4></a>' +

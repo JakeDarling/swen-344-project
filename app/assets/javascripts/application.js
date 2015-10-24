@@ -214,6 +214,63 @@ function printQuote(data) {
     });
     $('#quoteResults').append(stockxchangeDiv);
 }
+
+    function validateBuyForm(){
+        var ticker = $('#buy-ticker').val().toUpperCase();
+        var shares = $('#buy-shares').val();
+        var sReg = new RegExp('^[0-9]*$');
+        var tReg = new RegExp('^[a-zA-Z]+$');
+
+        //validate inputs
+        if (ticker=='' || shares=='' || !sReg.test(shares) || !tReg.test(ticker)) {
+            alert("invalid field(s)");
+        } else {
+            getStockPrice(ticker, shares);
+            //alert("purchased");
+        }
+    }
+
+    function postBuyForm(ticker, shares, price){
+        var pReg = new RegExp("^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*\.[0-9]{2}$");
+
+        if(pReg.test(price)) {
+            $.ajax({
+                type:'POST',
+                url:'/buy-stock',
+                data:{
+                    'ticker_symbol': ticker,
+                    'shares': shares,
+                    'price': price,
+                },
+                success: function(){
+                    alert("Successfully purchased");
+                }
+            });
+        } else {
+            alert("No such stock ticker");
+        }
+
+        
+    }
+
+    function getStockPrice(ticker, shares){
+        var price;
+        $.ajax({
+            dataType: "xml",
+            type: 'GET',
+            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+            data: {
+                diagnostics: 'true',
+                env: 'store://datatables.org/alltableswithkeys',
+                symbol: ticker,
+            },
+            success: function (data) {
+                //printTicker(data, 'ndaq');
+                price = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
+                postBuyForm(ticker, shares, price);
+            }
+        });
+    }
 /*****************************************************************************/
 /* END STOCKS*/
 /*****************************************************************************/

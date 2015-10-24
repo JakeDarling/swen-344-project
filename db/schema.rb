@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151024153242) do
+ActiveRecord::Schema.define(version: 20151024161356) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,18 @@ ActiveRecord::Schema.define(version: 20151024153242) do
 
   add_index "stocks", ["user_id"], name: "index_stocks_on_user_id", using: :btree
 
+  create_table "transactions", force: :cascade do |t|
+    t.string   "ticker_symbol"
+    t.integer  "user_id"
+    t.datetime "timestamp"
+    t.decimal  "price"
+    t.integer  "shares"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "transactions", ["user_id"], name: "index_transactions_on_user_id", using: :btree
+
   create_table "users", force: :cascade do |t|
     t.string   "fbUserId"
     t.datetime "created_at", null: false
@@ -36,4 +48,5 @@ ActiveRecord::Schema.define(version: 20151024153242) do
   add_index "users", ["fbUserId"], name: "index_users_on_fbUserId", unique: true, using: :btree
 
   add_foreign_key "stocks", "users"
+  add_foreign_key "transactions", "users"
 end

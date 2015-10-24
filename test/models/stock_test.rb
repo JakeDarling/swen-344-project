@@ -5,9 +5,10 @@ class StockTest < ActiveSupport::TestCase
   #   assert true
   # end
   def setup
-  	@valid_stock = Stock.new(ticker_symbol:"Test", shares:1)
-  	@missing_symbol = Stock.new(shares:1)
-  	@missing_shares = Stock.new(ticker_symbol:"Test1")
+  	@valid_stock = Stock.new(ticker_symbol:"Test", shares:1, user_id:1)
+  	@missing_symbol = Stock.new(shares:1, user_id:1)
+  	@missing_shares = Stock.new(ticker_symbol:"Test1",user_id:1)
+    @missing_user = Stock.new(ticker_symbol:"Test2", shares:1)
   end
 
   test "should be valid" do
@@ -25,6 +26,10 @@ class StockTest < ActiveSupport::TestCase
 
   test "shares should be present" do
   	assert_not @missing_shares.valid?
+  end
+
+  test "user_id should be present" do
+    assert_not @missing_user.valid?
   end
 
 end

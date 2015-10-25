@@ -353,7 +353,8 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
         marketCap,
         gain,
         gain_pc,
-        days_gain
+        days_gain,
+        '<button>sell</button>'
     ];
     sArr.push(row);
     if(index==numStocks){
@@ -369,6 +370,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
                 { title: "Gain" },
                 { title: "Gain %" },
                 { title: "Day's Gain" },
+                { title: "" }
             ];
         options.fnInitComplete = function(){
             $('#myTable tfoot').prepend(                
@@ -397,6 +399,11 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
                 '</tr>'
             );
         };
+
+        options.aoColumnDefs = [
+
+            { "bSortable": false, 'aTargets': [ -1 ]},
+        ];
 
         window.stockTable = $('#myTable').DataTable(options);
     }

@@ -249,7 +249,7 @@ function postBuyForm(ticker, shares, price){
             },
             success: function(){
                 alert("Successfully purchased");
-                
+
                 //refresh the datatable and stock buy form
                 clearChildren(document.getElementById('buy-form'));
                 window.stockTable.destroy();
@@ -317,6 +317,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
     var change = $(data).find('Change').text();
     var sign = change.substring(0, 1);
     change = change.substring(1);
+    var changeStr = sign + change;
     if(sign=="-"){
         change *= -1;
     }
@@ -347,7 +348,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
         name,
         symbol,
         lastTradePrice,
-        sign + '' + change,
+        changeStr,
         value['shares'],
         marketCap,
         gain,

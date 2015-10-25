@@ -249,7 +249,13 @@ function postBuyForm(ticker, shares, price){
             },
             success: function(){
                 alert("Successfully purchased");
-                window.location.reload();
+                
+                //refresh the datatable and stock buy form
+                clearChildren(document.getElementById('buy-form'));
+                window.stockTable.destroy();
+                $('#myTable tfoot tr').remove();
+                $('#myTable tbody').remove();
+                getUserStockData();
             }
         });
     } else {
@@ -391,8 +397,20 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
             );
         };
 
-        $('#myTable').DataTable(options);
+        window.stockTable = $('#myTable').DataTable(options);
     }
+}
+
+function getUserStockData(){
+    $.ajax({
+        type:'GET',
+        url:'/get-my-stocks',
+        dataType:'json',
+
+        success: function(data){
+            buildStockTable(data);
+        }
+    });
 }
 /*****************************************************************************/
 /* END STOCKS*/
@@ -434,3 +452,31 @@ function fb_login() {
     e.async = true;
     document.getElementById('fb-root').appendChild(e);
 }());
+
+/*****************************************************************************/
+/* HELPER*/
+/*****************************************************************************/
+/*
+    clears the children of an element.
+    use to clear forms
+*/
+function clearChildren(element) {
+   for (var i = 0; i < element.childNodes.length; i++) {
+      var e = element.childNodes[i];
+      if (e.tagName) switch (e.tagName.toLowerCase()) {
+         case 'input':
+            switch (e.type) {
+               case "radio":
+               case "checkbox": e.checked = false; break;
+               case "button":
+               case "submit":
+               case "image": break;
+               default: e.value = ''; break;
+            }
+            break;
+         case 'select': e.selectedIndex = 0; break;
+         case 'textarea': e.innerHTML = ''; break;
+         default: clearChildren(e);
+      }
+   }
+}

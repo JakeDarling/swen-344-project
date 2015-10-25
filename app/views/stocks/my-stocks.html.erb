@@ -9,15 +9,7 @@
     	window.totalGain = 0;
     	window.totalGainPc = 0;
     	window.totalDaysGain = 'TBD';
-		$.ajax({
-                type:'GET',
-                url:'/get-my-stocks',
-                dataType:'json',
-
-                success: function(data){
-                	buildStockTable(data);
-                }
-        });
+		getUserStockData()
 
 	});
 	</script>

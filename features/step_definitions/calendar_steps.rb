@@ -1,6 +1,6 @@
 require 'watir-webdriver'
 require 'rspec/expectations'
-require_relative 'pages.rb'
+require_relative '../support/pages.rb'
 
 And(/^I have navigated to the calendar page$/) do
   pending # express the regexp above with the code you wish you had

@@ -7,5 +7,5 @@ Feature:
     Scenario: Send a chat message
       Given I have opened the chat dialog
       When I type a message into the chat
-      And I ssend the message
+      And I send the message
       Then I see the message in the global chat

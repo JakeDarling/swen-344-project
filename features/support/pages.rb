@@ -37,9 +37,6 @@ class Facebook
   def initialize(browser)
     @b = browser
   end
-  def on_page?
-    false
-  end
 
   def login(email, password)
     @b.windows.last.use do

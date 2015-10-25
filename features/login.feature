@@ -13,4 +13,3 @@ Feature: Login and logout
         Given I have logged in to Epic
         When I select the logout option
         Then I am signed out of Facebook
-        And I am redirected to Facebook

@@ -12,6 +12,9 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require dataTables/jquery.dataTables
+//= require dataTables/jquery.dataTables.foundation
+//= require dataTables/jquery.dataTables
 //= require turbolinks
 //= require_tree .
 //= require d3.v3
@@ -19,6 +22,8 @@
 //= require foundation
 //= require moment
 //= require fullcalendar
+//= require dataTables/jquery.dataTables
+//= require dataTables/jquery.dataTables.foundation
 $(document).foundation();
 
 /*****************************************************************************/
@@ -270,6 +275,122 @@ function printQuote(data) {
                 postBuyForm(ticker, shares, price);
             }
         });
+    }
+
+        function buildStockTable(data){
+        //$('#debug-output').html(JSON.stringify(data));
+        var stocks = data['stocks'];
+        var sArr = [];
+        var row;
+        var numStocks = Object.keys(stocks).length
+        var index = 0;
+
+        $.each(stocks, function(index, value){
+            index ++;
+            $.ajax({
+                async: false,
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: value['ticker_symbol'],
+                },
+                success: function (data) {
+                    buildRows(data, value, sArr, index, numStocks, totalChange);
+                },
+            });
+            
+        });
+    }
+
+    function buildRows(data, value, sArr, index, numStocks, totalChange){
+        var avgDailyVol = $(data).find('AverageDailyVolume').text();
+        var change = $(data).find('Change').text();
+        var sign = change.substring(0, 1);
+        change = change.substring(1);
+        if(sign=="-"){
+            change *= -1;
+        }
+        var daysLow = $(data).find('DaysLow').text();
+        var daysHigh = $(data).find('DaysHigh').text();
+        var yearLow = $(data).find('YearLow').text();
+        var yearHigh = $(data).find('YearHigh').text();
+        var marketCap = parseFloat($(data).find('MarketCapitalization').text()).toFixed(2);
+        var lastTradePrice = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
+        var daysRange = $(data).find('DaysRange').text();
+        var name = $(data).find('Name').text();
+        var symbol = $(data).find('Symbol').text();
+        var volume = $(data).find('Volume').text();
+        var stockxchange = $(data).find('StockExchange').text();
+        
+        var gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
+        var gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
+        var days_gain = 'TBD'//change * value['shares'];
+
+        //update totals
+
+        window.totalChange = (parseFloat(window.totalChange) + parseFloat(change)).toFixed(2);
+        window.totalMarketCap = (parseFloat(window.totalMarketCap) + parseFloat(marketCap)).toFixed(2);
+        window.totalGain = (parseFloat(window.totalGain) + parseFloat(gain)).toFixed(2);
+        window.totalGainPc = (parseFloat(window.totalGainPc) + parseFloat(gain_pc)).toFixed(2);
+        window.totalDaysGain = "TBD";
+        row = [
+            name,
+            symbol,
+            lastTradePrice,
+            sign + '' + change,
+            value['shares'],
+            marketCap,
+            gain,
+            gain_pc,
+            days_gain
+        ];
+        sArr.push(row);
+        if(index==numStocks){
+            var options = {}
+            options.data = sArr;
+            options.columns = [
+                    { title: "Name" },
+                    { title: "Symbol" },
+                    { title: "Last Trade Price" },
+                    { title: "Change" },
+                    { title: "Shares" },
+                    { title: "Market Cap." },
+                    { title: "Gain" },
+                    { title: "Gain %" },
+                    { title: "Day's Gain" },
+                ];
+            options.fnInitComplete = function(){
+                $('#myTable tfoot').prepend(                
+                    '<tr>' +
+                        '<th>' +
+                            'Portfolio Value' +
+                        '</th>' +
+                        '<th></th><th></th>' + 
+                        '<th>' +
+                            window.totalChange +
+                        '</th>' +
+                        '<th>' +
+                        '</th>' +
+                        '<th>' +
+                            window.totalMarketCap +
+                        '</th>' +
+                        '<th>' +
+                            window.totalGain +
+                        '</th>' +
+                        '<th>' +
+                            window.totalGainPc +
+                        '</th>' +
+                        '<th>' +
+                            window.totalDaysGain +
+                        '</th>' +
+                    '</tr>'
+                );
+            };
+            $('#myTable').DataTable(options);
+        }
     }
 /*****************************************************************************/
 /* END STOCKS*/

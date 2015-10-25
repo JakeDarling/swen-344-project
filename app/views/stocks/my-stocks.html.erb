@@ -3,7 +3,23 @@
 	$(document).ready(function(){
 		$('#buy-submit').click(function(){
 			validateBuyForm();
+			window.location.reload()
 		});
+		window.totalChange = parseFloat(0);
+    	window.totalMarketCap = 0;
+    	window.totalGain = 0;
+    	window.totalGainPc = 0;
+    	window.totalDaysGain = 'TBD';
+		$.ajax({
+                type:'GET',
+                url:'/get-my-stocks',
+                dataType:'json',
+
+                success: function(data){
+                	buildStockTable(data);
+                }
+        });
+
 	});
 	</script>
 	<style type="text/css">
@@ -12,10 +28,20 @@
 		}
 	</style>
 	<body>
+		<div id="debug-output">
+		</div>
 		<div id="buy-form" name="buy-form">
 			<input id="buy-ticker" type="text" style="display:inline; width:30%;" placeholder="ticker">
 			<input id="buy-shares" type="text" style="display:inline; width:30%;" placeholder="shares">
 			<input id="buy-submit" type="submit" style="display:inline" value="submit">
 		</div>
+		<table id="myTable">
+			<thead>
+			</thead>
+			<tbody>
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>
 	</body>
 </html>

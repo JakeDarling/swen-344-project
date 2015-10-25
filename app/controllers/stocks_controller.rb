@@ -6,8 +6,18 @@ class StocksController < ApplicationController
   def index
   end
 
+=begin
+  display all of the stocks held by the current user
+=end
   def view_my_stocks
-    render :template => "stocks/my-stocks" 
+    render :template => "stocks/my-stocks"
+  end
+
+  def get_my_stocks
+    user = User.find_by(fbUserId:session[:user])
+    stocks = Stock.where(user_id:user.id)
+
+    render :json => {stocks:stocks}
   end
 
 =begin
@@ -30,41 +40,51 @@ class StocksController < ApplicationController
     tran = Transaction.new( ticker_symbol:ticker, \
                             user_id:user.id, \
                             timestamp:DateTime.now, \
-                            price:price, \
+                            price:price.to_f.round(2), \
                             shares:shares \
                           )
     if tran.valid?
       tran.save()
     else
-      #render failure template but this shouldn't happen since client validates
+      #TODO: render failure template but this shouldn't happen since client validates
+      puts "=========================================="
+      puts "Transaction failed. transaction entry invalid."
+      puts "=========================================="
     end
     puts tran.inspect
 
     #update Stock table
     stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
+    cost = (shares.to_i * price.to_f).round(2)
     if stock != nil
       stock.shares += shares.to_i
+      stock.base_cost += cost
     else
-      stock = Stock.new(ticker_symbol:ticker, shares:shares, user_id:user.id)
+      stock = Stock.new(ticker_symbol:ticker, shares:shares, user_id:user.id, base_cost:cost)
     end
     
     if stock.valid?
       stock.save()
+
+      #log to console
+      puts "==================================="
+      puts "Transaction Complete"
+      puts "user id: #{user.id}"
+      puts "user fbUserId: #{user.fbUserId}"
+      puts "stock: #{stock.ticker_symbol}"
+      puts "shares: #{tran.shares}"
+      puts "price: #{tran.price}"
+
+      puts "shares held: #{stock.shares}"
+      puts "base cost: #{stock.base_cost}"
+      puts "==================================="
     else
-      #err wat?
+      puts "=========================================="
+      puts "Transaction failed. stock entry invalid."
+      puts "=========================================="
     end
 
-    #log to console
-    puts "==================================="
-    puts "Transaction Complete"
-    puts "user id: #{user.id}"
-    puts "user fbUserId: #{user.fbUserId}"
-    puts "stock: #{stock.ticker_symbol}"
-    puts "shares: #{tran.shares}"
-    puts "price: #{tran.price}"
 
-    puts "shares held: #{stock.shares}"
-    puts "==================================="
 
     render:nothing => true
   end

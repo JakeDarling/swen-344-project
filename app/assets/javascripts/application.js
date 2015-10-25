@@ -405,6 +405,9 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
             { "bSortable": false, 'aTargets': [ -1 ]},
         ];
 
+        options.lengthMenu = [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]];
+        options.pageLength = 5;
+
         window.stockTable = $('#myTable').DataTable(options);
     }
 }

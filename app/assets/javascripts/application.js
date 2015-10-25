@@ -277,7 +277,7 @@ function printQuote(data) {
         });
     }
 
-        function buildStockTable(data){
+    function buildStockTable(data){
         //$('#debug-output').html(JSON.stringify(data));
         var stocks = data['stocks'];
         var sArr = [];
@@ -389,6 +389,7 @@ function printQuote(data) {
                     '</tr>'
                 );
             };
+
             $('#myTable').DataTable(options);
         }
     }

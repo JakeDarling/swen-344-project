@@ -24,16 +24,36 @@
 	</script>
 	<style type="text/css">
 		#buy-form {
-			width:200px;
+			width: 300px;
+		}
+
+		#buy-ticker {
+			display:inline; 
+			width:30%;
+		}
+
+		#buy-shares {
+			display:inline; 
+			width:35%;
+		}
+
+		#buy-submit {
+			margin-left:10px;
+		}
+		div.row {
+			max-width: 100%!important;
+			width:100%;
+			margin-right: 0px;
+			margin-left: 0px;
 		}
 	</style>
 	<body>
 		<div id="debug-output">
 		</div>
 		<div id="buy-form" name="buy-form">
-			<input id="buy-ticker" type="text" style="display:inline; width:30%;" placeholder="ticker">
-			<input id="buy-shares" type="text" style="display:inline; width:30%;" placeholder="shares">
-			<input id="buy-submit" type="submit" style="display:inline" value="submit">
+			<input id="buy-ticker" type="text" placeholder="ticker">
+			<input id="buy-shares" type="text" placeholder="shares">
+			<button id="buy-submit" class="button tiny radius">Buy</button>
 		</div>
 		<table id="myTable">
 			<thead>

@@ -354,7 +354,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
         gain,
         gain_pc,
         days_gain,
-        '<button>sell</button>'
+        '<button id="' + symbol +  '" class="button small radius">sell</button>'
     ];
     sArr.push(row);
     if(index==numStocks){

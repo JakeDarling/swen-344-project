@@ -2,9 +2,16 @@
 
   $(document).ready(function () {
   	var selectedEvent = '';
-
   	$('#removeBtn').hide();
+
     $('#calendar').fullCalendar({
+    	header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			defaultView: 'agendaWeek',
+			//editable: true,
 		  dayClick: function(date, jsEvent, view) {
 				var title = prompt('Event Title:');
 				var start = prompt('Event start:');

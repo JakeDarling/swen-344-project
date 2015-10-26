@@ -9,4 +9,8 @@ class CreateEvents < ActiveRecord::Migration
       t.timestamps null: false
     end
   end
+
+  def up
+  	rename_column :events, :end, :end1
+  end
 end

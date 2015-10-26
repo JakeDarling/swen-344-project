@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get '/stocks' => 'stocks#index'
   get '/calendar' => 'calendar#index'
   post '/associate-user' => 'application#associate_user'
+  post '/store-event' => 'calendar#store_event'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

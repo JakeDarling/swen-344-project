@@ -8,16 +8,28 @@
 		  dayClick: function(date, jsEvent, view) {
 				var title = prompt('Event Title:');
 				var start = prompt('Event start:');
-				var end = prompt('Event end:');
+				var end1 = prompt('Event end:');
 
 				var eventData;
 				if (title) {
 					eventData = {
 						title: title,
 						start: start,
-						end: end
+						end1: end1
 					};
 					$('#calendar').fullCalendar('renderEvent', eventData, true);
+					$.ajax({
+            type:'POST',
+            url:'/store-event',
+            data:{
+              'title': title,
+              'start': start,
+              'end1': end1,
+            },
+            success: function(){
+              alert("Event successfully stored");
+            }
+           });
 				}
 		  },
 		  eventClick: function(calEvent, jsEvent, view) {

@@ -1,9 +1,15 @@
 Rails.application.routes.draw do
 
+  post '/associate-user' => 'application#associate_user'
   get '/' => 'epic#index'
   get '/stocks' => 'stocks#index'
   get '/calendar' => 'calendar#index'
-  post '/associate-user' => 'application#associate_user'
+
+  #stocks actions
+  post '/buy-stock' => 'stocks#buy_stock'
+  get '/my-stocks' => 'stocks#view_my_stocks'
+  get '/get-my-stocks' => 'stocks#get_my_stocks'
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

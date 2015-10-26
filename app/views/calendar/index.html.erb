@@ -2,7 +2,19 @@
     $(document).ready(function () {
       $('#calendar').fullCalendar({
 			  dayClick: function(date, jsEvent, view) {
+					var title = prompt('Event Title:');
+					var start = prompt('Event start:');
+					var end = prompt('Event end:');
 
+					var eventData;
+					if (title) {
+						eventData = {
+							title: title,
+							start: start,
+							end: end
+						};
+						$('#calendar').fullCalendar('renderEvent', eventData, true);
+					}
 			  },
 			  events: [
 					{

@@ -11,33 +11,61 @@
 				right: 'month,agendaWeek,agendaDay'
 			},
 			defaultView: 'agendaWeek',
-			//editable: true,
-		  dayClick: function(date, jsEvent, view) {
+			selectable: true,
+			selectHelper: true,
+			editable: true,
+		  // select: function(start, end) {
+				// var title = prompt('Event Title:');
+				// console.log('start: ' + start);
+				// var eventData;
+				// if (title) {
+				// 	eventData = {
+				// 		title: title,
+				// 		start: start,
+				// 		end: end
+				// 	};
+				// 	$('#calendar').fullCalendar('renderEvent', eventData, true);
+				// 	$.ajax({
+    //         type:'POST',
+    //         url:'/store-event',
+    //         data:{
+    //           'title': title,
+    //           'start': start,
+    //           'end1': end1
+    //         },
+    //         success: function(){
+    //           alert("Event successfully stored");
+    //         }
+    //        });
+				// }
+				// $('#calendar').fullCalendar('unselect');
+		  // },
+		  select: function(start, end) {
+		  	start = start.format();
+		  	end = end.format();
 				var title = prompt('Event Title:');
-				var start = prompt('Event start:');
-				var end1 = prompt('Event end:');
-
 				var eventData;
 				if (title) {
 					eventData = {
 						title: title,
 						start: start,
-						end1: end1
+						end: end
 					};
 					$('#calendar').fullCalendar('renderEvent', eventData, true);
 					$.ajax({
-            type:'POST',
-            url:'/store-event',
-            data:{
-              'title': title,
-              'start': start,
-              'end1': end1,
-            },
-            success: function(){
-              alert("Event successfully stored");
-            }
-           });
+	          type:'POST',
+	          url:'/store-event',
+	          data:{
+	            'title': title,
+	            'start': start,
+	            'end1': end,
+	          },
+	          success: function(){
+	            alert("Event successfully stored");
+	          }
+	        });
 				}
+				$('#calendar').fullCalendar('unselect');
 		  },
 		  eventClick: function(calEvent, jsEvent, view) {
   			$('#removeBtn').show();

@@ -218,7 +218,12 @@
             document.getElementById('login-status').innerHTML =
                     'Thanks for logging in, ' + response.name + '!';
             document.getElementById('facebook-post-status').innerHTML =
+                    '<select id="status_privacy"><option value="EVERYONE">Public</option><option value="ALL_FRIENDS">Friends</option>' +
+                    '<option value="FRIENDS_OF_FRIENDS">Friends of Friends</option><option value="SELF">Only Me</option></select>';
+            document.getElementById('facebook-post-status').innerHTML +=
                     '<form onsubmit="updateStatus(this.status.value)">Post Status: <input type="text" name="status" /><input type="submit" /></form>';
+            document.getElementById('facebook-post-status').innerHTML +=
+                    '<form onsubmit="uploadPhoto(this.caption.value, this.url.value)">Post Photo (Enter URL): <input type="text" name="url" />Caption: <input type="text" name="caption" /><input type="submit" /></form>';
             document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
         });
     }
@@ -315,9 +320,28 @@
     });
   }
 
-    function updateStatus(status) {
-        FB.api('/me/feed', 'post', {message: status});
-    }
+  function updateStatus(status) {
+      FB.api('/me/feed',
+              'post',
+              {
+                  message: status,
+                  privacy: {
+                      "value": $("#status_privacy").val()
+                  }
+              });
+  }
+
+  function uploadPhoto(status, url) {
+      FB.api("/me/photos",
+             "POST",
+             {
+              "caption": status,
+              "url": url,
+              "privacy": {
+                  "value": $("#status_privacy").val()
+              }
+             });
+  }
 
     function logout() {
         FB.logout();

@@ -40,6 +40,11 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+# Gems we need because heroku can't serve assets properly without them
+gem 'rails_stdout_logging'
+gem 'rails_serve_static_assets'
+gem 'rails_12factor'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'

@@ -254,3 +254,17 @@ function fb_login() {
     e.async = true;
     document.getElementById('fb-root').appendChild(e);
 }());
+
+/*********************************************************/
+/* CALENDAR */
+/*********************************************************/
+function getUserEventData(){
+$.ajax({
+  type:'GET',
+  url:'/get-my-events',
+  dataType:'json',
+
+  success: function(data){
+    alert('got events!');
+  }
+});

@@ -14,32 +14,6 @@
 			selectable: true,
 			selectHelper: true,
 			editable: true,
-		  // select: function(start, end) {
-				// var title = prompt('Event Title:');
-				// console.log('start: ' + start);
-				// var eventData;
-				// if (title) {
-				// 	eventData = {
-				// 		title: title,
-				// 		start: start,
-				// 		end: end
-				// 	};
-				// 	$('#calendar').fullCalendar('renderEvent', eventData, true);
-				// 	$.ajax({
-    //         type:'POST',
-    //         url:'/store-event',
-    //         data:{
-    //           'title': title,
-    //           'start': start,
-    //           'end1': end1
-    //         },
-    //         success: function(){
-    //           alert("Event successfully stored");
-    //         }
-    //        });
-				// }
-				// $('#calendar').fullCalendar('unselect');
-		  // },
 		  select: function(start, end) {
 		  	start = start.format();
 		  	end = end.format();
@@ -71,18 +45,6 @@
   			$('#removeBtn').show();
   			selectedEvent = calEvent;
 		  },
-		  events: [
-				{
-					title: 'Meeting 1',
-					start: '2015-10-12T10:30:00',
-					end: '2015-10-12T12:30:00'
-				},
-				{
-					title: 'Meeting 2',
-					start: '2015-10-22T10:30:00',
-					end: '2015-10-22T12:30:00'
-				}
-			]
 		});
 
 		$('#removeBtn').click(function() {
@@ -94,5 +56,7 @@
 </script>
 <button type="button" name="removeBtn" id="removeBtn">Remove</button>
 <div class="row">
-  <div id='calendar'></div>
+  <div id='calendar' class='modal'></div>
+  <div id='eventModal'></div>
 </div>
+

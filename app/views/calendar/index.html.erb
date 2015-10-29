@@ -17,7 +17,10 @@
 		  select: function(start, end) {
 		  	start = start.format();
 		  	end = end.format();
-				var title = prompt('Event Title:');
+
+
+		  	$('#myModal').foundation('reveal', 'open');
+				//var title = prompt('Event Title:');
 				var eventData;
 				if (title) {
 					eventData = {
@@ -50,6 +53,10 @@
 		$('#removeBtn').click(function() {
 		  $('#calendar').fullCalendar('removeEvents', selectedEvent._id);
 		});
+
+		$('a.closeModal').on('click', function() {
+		  $('#myModal').foundation('reveal', 'close');
+		});
   });
 
 
@@ -57,6 +64,37 @@
 <button type="button" name="removeBtn" id="removeBtn">Remove</button>
 <div class="row">
   <div id='calendar' class='modal'></div>
-  <div id='eventModal'></div>
+  <div id="myModal" class="reveal-modal small" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+	  <h2 id="modalTitle">Add Event</h2>
+	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+	  <form>
+		  <div class="row">
+		    <div class="large-12 columns">
+		      <label>Title
+		        <input type="text" placeholder="New Event" />
+		      </label>
+		    </div>
+		  </div>
+		  <div class="row">
+		    <div class="large-4 columns">
+		      <label>Date
+		        <input type="text" placeholder="Jan. 1, 2015" />
+		      </label>
+		    </div>
+		    <div class="large-4 columns">
+		      <label>Start Time
+		        <input type="text" placeholder="8:00 AM" />
+		      </label>
+		    </div>
+		    <div class="large-4 columns">
+		      <label>End Time
+		        <input type="text" placeholder="10:00 AM" />
+		      </label>
+		    </div>
+		  </div>
+		  <a href="#" class="button small round right closeModal">Round Button</a>
+		</form>
+
+	</div>
 </div>
 

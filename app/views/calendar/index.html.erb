@@ -2,6 +2,12 @@
 
   $(document).ready(function () {
   	var selectedEvent = '';
+  	var eventTitle = '';
+  	var eventStartDate = '';
+  	var eventStartTime = '';
+  	var eventEndDate = '';
+  	var eventEndTime = '';
+
   	$('#removeBtn').hide();
 
     $('#calendar').fullCalendar({
@@ -17,37 +23,13 @@
 
 			// Adding an event
 		  select: function(start, end) {
-		  	start = start.format();
-		  	end = end.format();
-
+		  	eventStartDate = start.format('MMM DD, YYYY');
+		  	eventStartTime = start.format('hh:mm A');
+		  	eventEndDate = end.format('MMM DD, YYYY');
+		  	eventEndTime = end.format('hh:mm A');
 
 		  	$('#myModal').foundation('reveal', 'open');
-				//var title = prompt('Event Title:');
-				var eventData;
-				if (title) {
-					eventData = {
-						title: title,
-						start: start,
-						end: end
-					};
-					$('#calendar').fullCalendar('renderEvent', eventData, true);
-
-					// Store event in database
-					$.ajax({
-	          type:'POST',
-	          url:'/store-event',
-	          data:{
-	            'title': title,
-	            'start': start,
-	            'end1': end,
-	          },
-	          success: function(){
-	            alert("Event successfully stored");
-	          }
-	        });
-				}
-				$('#calendar').fullCalendar('unselect');
-		  },
+			},
 
 		  // Show event info
 		  eventClick: function(calEvent, jsEvent, view) {
@@ -60,27 +42,84 @@
 		  $('#calendar').fullCalendar('removeEvents', selectedEvent._id);
 		});
 
+		// Model is open
+		$(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+		  var modal = $(this);
+		  $('#startDateField').val(eventStartDate);
+		  $('#startTimeField').val(eventStartTime);
+		  $('#endDateField').val(eventEndDate);
+		  $('#endTimeField').val(eventEndTime);
+		});
+
+		// Save Button
 		$('a.closeModal').on('click', function() {
-		  $('#myModal').foundation('reveal', 'close');
+			// If All fields are filled...
+			if ($('#titleField').val() != '' &&
+					$('#startDateField').val() != '' &&
+					$('#startTimeField').val() != '' &&
+					$('#endDateField').val() != '' &&
+					$('#endTimeField').val() != '') {
+				
+				// Create eventData to render FullCalendar event
+				var eventData;
+				eventData = {
+					title: $('#titleField').val(),
+					start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+					end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+				};
+
+				// Store event in database
+				if (eventData.title && eventData.start && eventData.end) {
+					$.ajax({
+	          type:'POST',
+	          url:'/store-event',
+	          data:{
+	            'title': eventData.title,
+	            'start': eventData.start,
+	            'end1': eventData.end,
+	          },
+	          success: function(){
+	            console.log('Event stored');
+							$('#calendar').fullCalendar('renderEvent', eventData, true);
+					  	$('#myModal').foundation('reveal', 'close');
+	          },
+	          error: function() {
+	          	alert('Error adding event to database');
+	          }
+	        });
+				}
+			} else {
+				alert('Please fill in all fields');
+			}
+		});
+
+		// Modal is closed
+		$(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+			$('#calendar').fullCalendar('unselect');
+			// Reset Fields
+			$('#titleField').val('');
+			$('#startDateField').val('');
+			$('#startTimeField').val('');
+			$('#endDateField').val('');
+			$('#endTimeField').val('');
 		});
   });
-
-
 </script>
+
 <button type="button" name="removeBtn" id="removeBtn">Remove</button>
 <div class="row">
   <div id='calendar' class='modal'></div>
 
   <!-- Add Event Modal -->
-  <div id="myModal" class="reveal-modal small" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-	  <h2 id="modalTitle">Add Event</h2>
+  <div id="myModal" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+	  <h3 id="modalTitle">Add Event</h3>
 	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 	  <form>
 	  	<div class="panel">
 			  <div class="row">
 			    <div class="large-12 columns">
 			      <label>Title
-			        <input type="text" placeholder="New Event" />
+			        <input type="text" placeholder="New Event" name="titleField" id="titleField"/>
 			      </label>
 			    </div>
 			  </div>
@@ -89,24 +128,24 @@
 			  <div class="row">
 			    <div class="large-6 columns">
 			      <label>Start Date
-			        <input type="text" placeholder="Jan. 1, 2015" />
+			        <input type="text" placeholder="Jan. 1, 2015" name="startDateField" id="startDateField"/>
 			      </label>
 			    </div>
 			    <div class="large-6 columns">
 			      <label>Start Time
-			        <input type="text" placeholder="8:00 AM" />
+			        <input type="text" placeholder="8:00 AM"  name="startTimeField" id="startTimeField"/>
 			      </label>
 			    </div>
 			  </div>
 			  <div class="row">
 			    <div class="large-6 columns">
 			      <label>End Date
-			        <input type="text" placeholder="Jan. 1, 2015" />
+			        <input type="text" placeholder="Jan. 1, 2015"  name="endDateField" id="endDateField"/>
 			      </label>
 			    </div>
 			    <div class="large-6 columns">
 			      <label>End Time
-			        <input type="text" placeholder="8:00 AM" />
+			        <input type="text" placeholder="8:00 AM"  name="endTimeField" id="endTimeField"/>
 			      </label>
 			    </div>
 			  </div>

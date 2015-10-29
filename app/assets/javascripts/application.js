@@ -258,13 +258,4 @@ function fb_login() {
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
-function getUserEventData(){
-$.ajax({
-  type:'GET',
-  url:'/get-my-events',
-  dataType:'json',
 
-  success: function(data){
-    alert('got events!');
-  }
-});

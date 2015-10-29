@@ -3,7 +3,6 @@ Rails.application.routes.draw do
   get '/' => 'epic#index'
   get '/stocks' => 'stocks#index'
   get '/calendar' => 'calendar#index'
-  get '/get-my-events' => 'calendar#get_my_events'
   post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
 

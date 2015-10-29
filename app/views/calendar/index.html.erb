@@ -14,6 +14,8 @@
 			selectable: true,
 			selectHelper: true,
 			editable: true,
+
+			// Adding an event
 		  select: function(start, end) {
 		  	start = start.format();
 		  	end = end.format();
@@ -29,6 +31,8 @@
 						end: end
 					};
 					$('#calendar').fullCalendar('renderEvent', eventData, true);
+
+					// Store event in database
 					$.ajax({
 	          type:'POST',
 	          url:'/store-event',
@@ -44,6 +48,8 @@
 				}
 				$('#calendar').fullCalendar('unselect');
 		  },
+
+		  // Show event info
 		  eventClick: function(calEvent, jsEvent, view) {
   			$('#removeBtn').show();
   			selectedEvent = calEvent;
@@ -64,35 +70,48 @@
 <button type="button" name="removeBtn" id="removeBtn">Remove</button>
 <div class="row">
   <div id='calendar' class='modal'></div>
+
+  <!-- Add Event Modal -->
   <div id="myModal" class="reveal-modal small" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
 	  <h2 id="modalTitle">Add Event</h2>
 	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 	  <form>
-		  <div class="row">
-		    <div class="large-12 columns">
-		      <label>Title
-		        <input type="text" placeholder="New Event" />
-		      </label>
-		    </div>
-		  </div>
-		  <div class="row">
-		    <div class="large-4 columns">
-		      <label>Date
-		        <input type="text" placeholder="Jan. 1, 2015" />
-		      </label>
-		    </div>
-		    <div class="large-4 columns">
-		      <label>Start Time
-		        <input type="text" placeholder="8:00 AM" />
-		      </label>
-		    </div>
-		    <div class="large-4 columns">
-		      <label>End Time
-		        <input type="text" placeholder="10:00 AM" />
-		      </label>
-		    </div>
-		  </div>
-		  <a href="#" class="button small round right closeModal">Round Button</a>
+	  	<div class="panel">
+			  <div class="row">
+			    <div class="large-12 columns">
+			      <label>Title
+			        <input type="text" placeholder="New Event" />
+			      </label>
+			    </div>
+			  </div>
+			 </div>
+			<div class="panel">
+			  <div class="row">
+			    <div class="large-6 columns">
+			      <label>Start Date
+			        <input type="text" placeholder="Jan. 1, 2015" />
+			      </label>
+			    </div>
+			    <div class="large-6 columns">
+			      <label>Start Time
+			        <input type="text" placeholder="8:00 AM" />
+			      </label>
+			    </div>
+			  </div>
+			  <div class="row">
+			    <div class="large-6 columns">
+			      <label>End Date
+			        <input type="text" placeholder="Jan. 1, 2015" />
+			      </label>
+			    </div>
+			    <div class="large-6 columns">
+			      <label>End Time
+			        <input type="text" placeholder="8:00 AM" />
+			      </label>
+			    </div>
+			  </div>
+			</div>
+		  <a href="#" class="button small round right closeModal">Save</a>
 		</form>
 
 	</div>

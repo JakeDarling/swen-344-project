@@ -23,7 +23,7 @@ gem 'coffee-rails', '~> 4.1.0'
 # gem 'therubyracer', platforms: :ruby
 
 # Use jquery as the JavaScript library
-gem 'jquery-rails'
+gem 'jquery-rails', '4.0.5'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -39,6 +39,11 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+
+# Gems we need because heroku can't serve assets properly without them
+gem 'rails_stdout_logging'
+gem 'rails_serve_static_assets'
+gem 'rails_12factor'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -71,3 +76,6 @@ gem 'momentjs-rails'
 gem 'fullcalendar-rails'
 
 gem 'coffee-script-source', '1.8.0'
+
+#jquery datatables
+gem 'jquery-datatables-rails', '~> 3.3.0'

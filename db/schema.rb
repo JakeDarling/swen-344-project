@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(version: 20151026205222) do
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
     t.integer  "user_id"
+    t.decimal  "base_cost"
   end
 
   add_index "stocks", ["user_id"], name: "index_stocks_on_user_id", using: :btree

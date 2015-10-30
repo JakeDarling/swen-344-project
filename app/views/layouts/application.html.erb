@@ -21,6 +21,7 @@
         data:{'idString': $('#fbIdTextBox').val()},
         success: function(){
             //alert("Successfully associated user with FB ID: " + $('#fbIdTextBox').val());
+            window.location.reload();
         }
       });
     });
@@ -41,6 +42,7 @@
     <ul class="right">
       <li><a href="/calendar">Calendar</a></li>
       <li><a href="/stocks">Stocks</a></li>
+      <li><a href="/my-stocks">My Stocks</a></li>
       <li><input type="text" id="fbIdTextBox" name="fbIdTextBox"/></li>
       <li><input type="submit" id="fbSubmit" name="fbSubmit"/></li>
       <li>
@@ -75,6 +77,5 @@
     </div>
   </div>
 </div>
-<%= debug session %>
 </body>
 </html>

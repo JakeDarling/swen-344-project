@@ -9,7 +9,7 @@ class CalendarController < ApplicationController
 
 		user = User.find_by(fbUserId:session[:user])
 
-		event = Event.new(title: title, start: start, end1: end1)
+		event = Event.new(title: title, start: start, end1: end1, user_id: user.id)
 
 		if event.valid?
 			event.save()

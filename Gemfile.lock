@@ -230,7 +230,7 @@ DEPENDENCIES
   fullcalendar-rails
   jbuilder (~> 2.0)
   jquery-datatables-rails (~> 3.3.0)
-  jquery-rails (= 4.0.5)
+  jquery-rails (= 4.0.3)
   momentjs-rails
   novus-nvd3-rails
   pg

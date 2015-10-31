@@ -227,11 +227,24 @@ function validateBuyForm(){
     var tReg = new RegExp('^[a-zA-Z]+$');
 
     //validate inputs
-    if (ticker=='' || shares=='' || !sReg.test(shares) || !tReg.test(ticker)) {
-        alert("invalid field(s)");
+    if ((ticker=='' || !tReg.test(ticker)) && (shares=='' || !sReg.test(shares))){
+        $('#invalid-buy-modal').foundation('reveal', 'open');
+        $('#invalid-buy-modal p:first').html("Invalid ticker");
+        $('#invalid-buy-modal p:first').append("<br>Invalid shares");
+    } else if (ticker=='' || !tReg.test(ticker)) {
+        //alert("invalid field(s)");
+        //return false;
+        $('#invalid-buy-modal').foundation('reveal', 'open');
+        $('#invalid-buy-modal p:first').html("Invalid ticker");
+    } else if (shares=='' || !sReg.test(shares)){
+        $('#invalid-buy-modal').foundation('reveal', 'open');
+        $('#invalid-buy-modal p:first').html("Invalid shares");
     } else {
-        getStockPrice(ticker, shares);
+        //getStockPrice(ticker, shares);
         //alert("purchased");
+        //return true;
+        $('#confirm-modal').foundation('reveal','open');
+        $('#confirm-modal p:first').html("Are you sure you want to buy " + shares + " share(s) of " + ticker + "?");
     }
 }
 
@@ -248,14 +261,7 @@ function postBuyForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                alert("Successfully purchased");
-
-                //refresh the datatable and stock buy form
-                clearChildren(document.getElementById('buy-form'));
-                window.stockTable.destroy();
-                $('#myTable tfoot tr').remove();
-                $('#myTable tbody').remove();
-                getUserStockData();
+                $('#buy-success-modal').foundation('reveal', 'open');
             }
         });
     } else {
@@ -464,12 +470,10 @@ function fb_login() {
     document.getElementById('fb-root').appendChild(e);
 }());
 
-<<<<<<< HEAD
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
 
-=======
 /*****************************************************************************/
 /* HELPER*/
 /*****************************************************************************/
@@ -497,4 +501,3 @@ function clearChildren(element) {
       }
    }
 }
->>>>>>> origin/develop

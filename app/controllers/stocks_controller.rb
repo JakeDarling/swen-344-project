@@ -99,16 +99,16 @@ class StocksController < ApplicationController
 =end
   def sell_stock
     ticker = params[:ticker_symbol]
-    shares = params[:shares]
-    price = params[:price]
+    shares = params[:shares].to_i * -1
+    price = params[:price].to_f.round(2)
     user = User.find_by(fbUserId:session[:user])
 
     #record the transaction
     tran = Transaction.new( ticker_symbol:ticker, \
                             user_id:user.id, \
                             timestamp:DateTime.now, \
-                            price:price.to_f.round(2), \
-                            shares:shares.to_i * -1 \
+                            price:price, \
+                            shares:shares \
                           )
     if tran.valid?
       tran.save()
@@ -122,9 +122,9 @@ class StocksController < ApplicationController
 
     #update Stock table
     stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
-    cost = (shares.to_i * price.to_f).round(2)
+    cost = (shares * price).round(2)
     if stock != nil
-      stock.shares += shares.to_i
+      stock.shares += shares
       stock.base_cost += cost
     else
       #user doesn't own this stock
@@ -136,8 +136,7 @@ class StocksController < ApplicationController
     
     if stock.valid?
       stock.save()
-
-      #log to console
+            #log to console
       puts "==================================="
       puts "Transaction Complete"
       puts "user id: #{user.id}"
@@ -153,6 +152,13 @@ class StocksController < ApplicationController
       puts "=========================================="
       puts "Transaction failed. stock entry invalid."
       puts "=========================================="
+    end
+
+    if stock.shares <= 0
+      stock.destroy()
+      puts "==========================================================="
+      puts "User no longer owns any shares of this stock. destroying..."
+      puts "==========================================================="
     end
 
     render:nothing => true

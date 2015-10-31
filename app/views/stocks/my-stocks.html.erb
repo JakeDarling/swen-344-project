@@ -34,6 +34,15 @@
 			getStockPrice(ticker, shares, 'sell')
 		});
 
+		$('#sell-success-close').click(function(){
+			//refresh the datatable and stock buy form
+			clearChildren(document.getElementById('buy-form'));
+            window.stockTable.destroy();
+            $('#myTable tfoot tr').remove();
+            $('#myTable tbody').remove();
+            getUserStockData();
+		});
+
 		window.totalChange = parseFloat(0);
     	window.totalMarketCap = 0;
     	window.totalGain = 0;

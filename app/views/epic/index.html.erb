@@ -237,6 +237,9 @@
           for (i = 0; i < postsData.length; i++) {
             var post = postsData[i];
 
+            // Profile Pic of Poster
+            var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
+
             // Post Time
             var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
             var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
@@ -288,9 +291,6 @@
                   if (comment.can_comment) {
                     comments += '<a href="#"> · Reply</a><br>';
                   }
-
-                  // Profile Pic of Poster
-                  var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
                 }
               }
 

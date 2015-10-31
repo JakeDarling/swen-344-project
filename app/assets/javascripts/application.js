@@ -225,41 +225,13 @@ function validateBuyForm(){
     var shares = $('#buy-shares').val();
     var sReg = new RegExp('^[0-9]*$');
     var tReg = new RegExp('^[a-zA-Z]+$');
-    var invalid=false;
-    var invalidFields = {
-        ticker: false,
-        shares: false,
-        sharesMax: false,
-    };
 
     //validate inputs
-    if (ticker=='' || !tReg.test(ticker)) {
-        invalid = true;
-        invalidFields['ticker'] = true;
-    }
-    if (shares=='' || !sReg.test(shares)){
-        invalid = true;
-        invalidFields['shares'] = true;
-    } else if (parseInt(shares) > 1000000) {
-        invalid = true;
-        invalidFields['sharesMax'] = true;
-    }
-    
-    if(invalid){
-        $('#invalid-buy-modal p:first').empty();
-        $('#invalid-buy-modal').foundation('reveal', 'open');
-        if(invalidFields['ticker']){
-            $('#invalid-buy-modal p:first').append("<br>Invalid ticker");
-        }
-        if(invalidFields['shares']){
-            $('#invalid-buy-modal p:first').append("<br>Invalid shares");
-        }
-        if(invalidFields['sharesMax']){
-            $('#invalid-buy-modal p:first').append("<br>Shares cannot be greater than 1,000,000");
-        }
+    if (ticker=='' || shares=='' || !sReg.test(shares) || !tReg.test(ticker)) {
+        alert("invalid field(s)");
     } else {
-        $('#confirm-modal').foundation('reveal','open');
-        $('#confirm-modal p:first').html("Are you sure you want to buy " + shares + " share(s) of " + ticker + "?");
+        getStockPrice(ticker, shares);
+        //alert("purchased");
     }
 }
 
@@ -276,7 +248,14 @@ function postBuyForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                $('#buy-success-modal').foundation('reveal', 'open');
+                alert("Successfully purchased");
+
+                //refresh the datatable and stock buy form
+                clearChildren(document.getElementById('buy-form'));
+                window.stockTable.destroy();
+                $('#myTable tfoot tr').remove();
+                $('#myTable tbody').remove();
+                getUserStockData();
             }
         });
     } else {
@@ -485,10 +464,12 @@ function fb_login() {
     document.getElementById('fb-root').appendChild(e);
 }());
 
+<<<<<<< HEAD
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
 
+=======
 /*****************************************************************************/
 /* HELPER*/
 /*****************************************************************************/
@@ -516,3 +497,4 @@ function clearChildren(element) {
       }
    }
 }
+>>>>>>> origin/develop

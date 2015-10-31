@@ -469,6 +469,7 @@ function validateSellForm(){
         shares: false,
         sharesMax: false,
         moreSharesThanHeld: false,
+        sharesNone: false,
     };
 
     if (shares=='' || !sReg.test(shares)){
@@ -483,6 +484,10 @@ function validateSellForm(){
             invalid = true;
             invalidFields['moreSharesThanHeld'] = true;
         }
+        if(parseInt(shares) < 1){
+            invalid = true;
+            invalidFields['sharesNone'] = true;
+        }
     }
 
     if(invalid){
@@ -496,6 +501,9 @@ function validateSellForm(){
         }
         if(invalidFields['moreSharesThanHeld']){
             $('#invalid-sell-modal p:first').append("<br>Shares cannot be greater than the number of shares you hold.");
+        }
+        if(invalidFields['sharesNone']){
+            $('#invalid-sell-modal p:first').append("<br>Shares must be greater than 0");
         }    
     } else {
         $('#confirm-sell-modal').foundation('reveal','open');

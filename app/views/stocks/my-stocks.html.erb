@@ -37,6 +37,7 @@
 		$('#sell-success-close').click(function(){
 			//refresh the datatable and stock buy form
 			clearChildren(document.getElementById('buy-form'));
+			clearChildren(document.getElementById('sell-modal'));
             window.stockTable.destroy();
             $('#myTable tfoot tr').remove();
             $('#myTable tbody').remove();

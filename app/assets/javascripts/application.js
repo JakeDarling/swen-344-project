@@ -225,24 +225,39 @@ function validateBuyForm(){
     var shares = $('#buy-shares').val();
     var sReg = new RegExp('^[0-9]*$');
     var tReg = new RegExp('^[a-zA-Z]+$');
+    var invalid=false;
+    var invalidFields = {
+        ticker: false,
+        shares: false,
+        sharesMax: false,
+    };
 
     //validate inputs
-    if ((ticker=='' || !tReg.test(ticker)) && (shares=='' || !sReg.test(shares))){
+    if (ticker=='' || !tReg.test(ticker)) {
+        invalid = true;
+        invalidFields['ticker'] = true;
+    }
+    if (shares=='' || !sReg.test(shares)){
+        invalid = true;
+        invalidFields['shares'] = true;
+    } else if (parseInt(shares) > 1000000) {
+        invalid = true;
+        invalidFields['sharesMax'] = true;
+    }
+    
+    if(invalid){
+        $('#invalid-buy-modal p:first').empty();
         $('#invalid-buy-modal').foundation('reveal', 'open');
-        $('#invalid-buy-modal p:first').html("Invalid ticker");
-        $('#invalid-buy-modal p:first').append("<br>Invalid shares");
-    } else if (ticker=='' || !tReg.test(ticker)) {
-        //alert("invalid field(s)");
-        //return false;
-        $('#invalid-buy-modal').foundation('reveal', 'open');
-        $('#invalid-buy-modal p:first').html("Invalid ticker");
-    } else if (shares=='' || !sReg.test(shares)){
-        $('#invalid-buy-modal').foundation('reveal', 'open');
-        $('#invalid-buy-modal p:first').html("Invalid shares");
+        if(invalidFields['ticker']){
+            $('#invalid-buy-modal p:first').append("<br>Invalid ticker");
+        }
+        if(invalidFields['shares']){
+            $('#invalid-buy-modal p:first').append("<br>Invalid shares");
+        }
+        if(invalidFields['sharesMax']){
+            $('#invalid-buy-modal p:first').append("<br>Shares cannot be greater than 1,000,000");
+        }
     } else {
-        //getStockPrice(ticker, shares);
-        //alert("purchased");
-        //return true;
         $('#confirm-modal').foundation('reveal','open');
         $('#confirm-modal p:first').html("Are you sure you want to buy " + shares + " share(s) of " + ticker + "?");
     }

@@ -1,6 +1,6 @@
 <html>
 <style>
-  #feed {
+  #wall {
     background-color: #e9eaed;
     border: 1px solid black;
     padding: 5px;
@@ -46,16 +46,16 @@
     clear: left;
   }
 
-  #feed a {
+  #wall a {
     color: #3b5998;
     text-decoration: none;
   }
 
-  #feed a:hover {
+  #wall a:hover {
     text-decoration: underline;
   }
 
-  #feed img {
+  #wall img {
     border: 1px solid #aeacae;
   }
 
@@ -76,7 +76,7 @@
     margin-left: 4px;
   }
 
-  #feed a.postTime {
+  #wall a.postTime {
     font-size: 12px;
     line-height: 16px;
     float: left;
@@ -84,7 +84,7 @@
     margin-top: 3px;
   }
 
-  #feed a.likePost, #feed a.commentPost, #feed a.sharePost {
+  #wall a.likePost, #wall a.commentPost, #wall a.sharePost {
     color: #7f7f7f;
     font-weight: bold;
     font-size: 12px;
@@ -103,7 +103,7 @@
     margin-right: 8px;
   }
 
-  #feed a.commenter {
+  #wall a.commenter {
     font-weight: bold;
     margin-right: 3px;
   }
@@ -356,7 +356,7 @@
             }
 
             // Post
-            $('#feed').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + postId}));
+            $('#wall').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + postId}));
 
             // Post Profile Pic Link
             $('#post' + postId).append($('<a>', {
@@ -460,7 +460,7 @@
             }
 
             // Comments Box
-            $('#feed').append($('<div>', {
+            $('#wall').append($('<div>', {
               name: 'fbComments',
               class: 'fbComments',
               id: 'comments' + postId

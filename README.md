@@ -9,10 +9,10 @@ and fill in the element ids or selectors. *Do not hesitate to ask me (Jake) for 
 
 For a more detailed explanation on how everything works, read the section on writing new tests.
 
-After your PR merges into the ```develop``` branch, you may run the appropriate promotion job
+After your PR merges into the ```develop``` branch, you may run the promote-stage job
 [on jenkins](http://vm344a.se.rit.edu:8080/)
 Jenkins will push to our dev heroku app, run the appropriate tests, push to heroku staging, and then merge
-develop into master and push the new master.
+develop into master and push the new master. Credentials for Jenkins are in the Google Drive "VM and Jenkins Creds" 
 
 
 ## Running Integration Tests  

@@ -26,6 +26,9 @@
 //= require dataTables/jquery.dataTables.foundation
 $(document).foundation();
 
+$(function() {
+    $(document).foundation();
+});
 /*****************************************************************************/
 /* STOCKS*/
 /*****************************************************************************/

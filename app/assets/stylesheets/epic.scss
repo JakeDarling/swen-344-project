@@ -1,7 +1,6 @@
 // Place all the styles related to the epic controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-
 /**---------------------------------------------------------
  * SASS MIXINS
  *----------------------------------------------------------*/
@@ -15,8 +14,13 @@
 /**---------------------------------------------------------
  * MAIN STYLING
  *----------------------------------------------------------*/
+body{
+  background: #e1e1e1 !important;
+}
+
 #main_wrap {
   min-height: 45em;
+  padding:1em;
 }
 
 .dashboard-chart {
@@ -43,9 +47,24 @@
 }
 
 #wall {
-  background: #d8d8d8;
+  background: rgba(255, 255, 255, 1);
   min-height: 25em;
   overflow: auto;
+}
+
+/**---------------------------------------------------------
+ * Foundation Overwrites
+ *----------------------------------------------------------*/
+img{
+  margin: 0;
+  padding: 0;
+}
+
+.full_width {
+  width: 96%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: initial;
 }
 
 /**---------------------------------------------------------
@@ -54,43 +73,5 @@
 .clean {
   padding: 0 !important;
   background: #b0b0b0;
-}
-
-.top-bar {
-  a {
-    @include animate(.3s);
-    img {
-      vertical-align: top;
-    }
-  }
-  a.facebook {
-    @extend .clean;
-    @extend a;
-    background: #ffffff !important;
-    :hover{
-      background: #87d6ff;
-    }
-  }
-  a.dash {
-    @extend .clean;
-    @extend a;
-    width: 51px;
-    background: #ffffff !important;
-    :hover{
-      background: #87d6ff;
-    }
-  }
-}
-
-/**---------------------------------------------------------
- * Foundation Overwrites
- *----------------------------------------------------------*/
-a {
 
 }
-
-img {
-  margin: 0;
-  padding: 0;
-}
-

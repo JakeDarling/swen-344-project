@@ -563,21 +563,21 @@
 <body>
 <div class="row">
   <!-- FACEBOOK INFO-->
-  <div class="row">
-    <div data-alert class="alert-box">
-      <div id="login-status" name="login-status"></div>
-      <a href="#" class="close">&times;</a>
-    </div>
+  <div data-alert class="alert-box">
+    <div id="login-status" name="login-status"></div>
+    <a href="#" class="close">&times;</a>
+  </div>
 
-    <div id="facebook-post-status" name="facebook-post-status">
-    </div>
+  <div id="facebook-post-status" name="facebook-post-status">
+  </div>
 
-    <div id="wall" class="large-6 small-12 columns" name="wall">
-    </div>
+  <div id="wall" class="large-6 small-12 columns" name="wall">
+  </div>
 
-    <!-- STOCK INFO -->
-    <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
-      <div class="row">
+  <!-- STOCK INFO -->
+  <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
+    <div class="row">
+      <div class="large-12 small-12 columns">
         <div id='ndaq' name='ndaq'>
           <div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
           <div name='price' class='one-line last-trade-price quote-info'></div>
@@ -612,7 +612,6 @@
     </div>
   </div>
 </div>
-<%= debug(params) if Rails.env.development? %>
 </div>
 </body>
 </html>

@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   get '/' => 'epic#index'
   get '/stocks' => 'stocks#index'
   get '/calendar' => 'calendar#index'
-
+  post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
 
   #stocks actions

@@ -53,3 +53,11 @@ end
 Then(/^the updated event is displayed on my calendar$/) do
   pending # express the regexp above with the code you wish you had
 end
+
+When(/^I delete the "([^"]*)" calendar event$/) do |arg|
+  pending
+end
+
+Then(/^my calendar does not display any events$/) do
+  pending
+end

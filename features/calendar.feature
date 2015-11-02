@@ -23,3 +23,8 @@ Feature: Calendar scenarios
      And I change the description
      Then the updated event is displayed on my calendar
 
+   @p1
+   Scenario: Delete event
+     Given I have created a calendar event
+     When I delete the "1st" calendar event
+     Then my calendar does not display any events

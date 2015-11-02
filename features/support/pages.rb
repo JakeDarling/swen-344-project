@@ -20,7 +20,7 @@ class Dashboard
   def submit_status
     @b.button.click
   end
-  # True if there is at least one wall post visiable (not just the container)
+  # True if there is at least one wall post visible (not just the container)
   def wall_post?
     @b.h4(:css => 'div#wall h4').exists?
   end
@@ -36,9 +36,6 @@ end
 class Facebook
   def initialize(browser)
     @b = browser
-  end
-  def on_page?
-    false
   end
 
   def login(email, password)
@@ -79,5 +76,28 @@ class Stocks
   end
   def has_chart?
     pending 'Not sure if this is table cell or what'
+  end
+end
+
+# Epic calendar
+class Calendar
+  def initialize(browser)
+    @b = browser
+  end
+  def on_page?
+    false
+  end
+  # Clicks the nth day div on the calendar
+  def select_day(day_index)
+    @b.div(:class => 'TODO').click
+  end
+  def set_start_time(start_time)
+    @b.text_field(:id => 'TODO').set start_time
+  end
+  def set_end_time(end_time)
+    @b.text_field(:id => 'TODO').set end_time
+  end
+  def set_description(desc)
+    @b.text_field(:id => 'TODO').set desc
   end
 end

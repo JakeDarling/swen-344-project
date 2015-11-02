@@ -33,3 +33,23 @@ end
 Then(/^I see the interactive chart$/) do
   expect(Stocks.new(@b).has_chart?)
 end
+
+Given(/^I have searched "([^"]*)"$/) do |arg|
+  step 'I search the symbol "' + arg + '"'
+end
+
+When(/^I choose the buy option$/) do
+  pending
+end
+
+When(/^I choose (\d+) shares$/) do |arg|
+  pending
+end
+
+When(/^I confirm the purchase$/) do
+  pending
+end
+
+Then(/^my transaction history shows the purchase$/) do
+  pending
+end

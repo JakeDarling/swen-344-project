@@ -11,10 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151025003217) do
+ActiveRecord::Schema.define(version: 20151026205222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "events", force: :cascade do |t|
+    t.datetime "start"
+    t.datetime "end1"
+    t.string   "description"
+    t.integer  "user_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.string   "title"
+  end
+
+  add_index "events", ["user_id"], name: "index_events_on_user_id", using: :btree
 
   create_table "stocks", force: :cascade do |t|
     t.string   "ticker_symbol"
@@ -48,6 +60,7 @@ ActiveRecord::Schema.define(version: 20151025003217) do
 
   add_index "users", ["fbUserId"], name: "index_users_on_fbUserId", unique: true, using: :btree
 
+  add_foreign_key "events", "users"
   add_foreign_key "stocks", "users"
   add_foreign_key "transactions", "users"
 end

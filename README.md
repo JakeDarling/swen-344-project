@@ -1,7 +1,20 @@
 # Epic (for SWEN-344)
-If you make changes to names or element types, update the test code in features/support/pages.rb
+
 
 # Testing
+## Getting your code tested and deployed
+PRs must include accompanying integration tests. These are largely already implemented. What
+you need to do is edit [features/support/pages.rb](https://github.com/JakeDarling/swen-344-project/blob/master/features/support/pages.rb)
+and fill in the element ids or selectors. *Do not hesitate to ask me (Jake) for help with this*
+
+For a more detailed explanation on how everything works, read the section on writing new tests.
+
+After your PR merges into the ```develop``` branch, you may run the appropriate promotion job
+[on jenkins](http://vm344a.se.rit.edu:8080/)
+Jenkins will push to our dev heroku app, run the appropriate tests, push to heroku staging, and then merge
+develop into master and push the new master.
+
+
 ## Running Integration Tests  
 ```cukes.rb``` is a custom script to aid in running tests. It is located in the project root.
 

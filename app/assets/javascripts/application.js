@@ -228,13 +228,41 @@ function validateBuyForm(){
     var shares = $('#buy-shares').val();
     var sReg = new RegExp('^[0-9]*$');
     var tReg = new RegExp('^[a-zA-Z]+$');
+    var invalid=false;
+    var invalidFields = {
+        ticker: false,
+        shares: false,
+        sharesMax: false,
+    };
 
     //validate inputs
-    if (ticker=='' || shares=='' || !sReg.test(shares) || !tReg.test(ticker)) {
-        alert("invalid field(s)");
+    if (ticker=='' || !tReg.test(ticker)) {
+        invalid = true;
+        invalidFields['ticker'] = true;
+    }
+    if (shares=='' || !sReg.test(shares)){
+        invalid = true;
+        invalidFields['shares'] = true;
+    } else if (parseInt(shares) > 1000000) {
+        invalid = true;
+        invalidFields['sharesMax'] = true;
+    }
+    
+    if(invalid){
+        $('#invalid-buy-modal p:first').empty();
+        $('#invalid-buy-modal').foundation('reveal', 'open');
+        if(invalidFields['ticker']){
+            $('#invalid-buy-modal p:first').append("<br>Invalid ticker");
+        }
+        if(invalidFields['shares']){
+            $('#invalid-buy-modal p:first').append("<br>Invalid shares");
+        }
+        if(invalidFields['sharesMax']){
+            $('#invalid-buy-modal p:first').append("<br>Shares cannot be greater than 1,000,000");
+        }
     } else {
-        getStockPrice(ticker, shares);
-        //alert("purchased");
+        $('#confirm-modal').foundation('reveal','open');
+        $('#confirm-modal p:first').html("Are you sure you want to buy " + shares + " share(s) of " + ticker + "?");
     }
 }
 
@@ -251,24 +279,17 @@ function postBuyForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                alert("Successfully purchased");
-
-                //refresh the datatable and stock buy form
-                clearChildren(document.getElementById('buy-form'));
-                window.stockTable.destroy();
-                $('#myTable tfoot tr').remove();
-                $('#myTable tbody').remove();
-                getUserStockData();
+                $('#buy-success-modal').foundation('reveal', 'open');
             }
         });
     } else {
-        alert("No such stock ticker");
+        $('#ticker-not-exist-modal').foundation('reveal', 'open');
     }
 
     
 }
 
-function getStockPrice(ticker, shares){
+function getStockPrice(ticker, shares, transType){
     var price;
     $.ajax({
         dataType: "xml",
@@ -282,7 +303,12 @@ function getStockPrice(ticker, shares){
         success: function (data) {
             //printTicker(data, 'ndaq');
             price = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
-            postBuyForm(ticker, shares, price);
+            if(transType == 'buy'){
+                postBuyForm(ticker, shares, price);
+            } else if(transType == 'sell'){
+                postSellForm(ticker, shares, price);
+            }
+            
         }
     });
 }
@@ -357,7 +383,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange){
         gain,
         gain_pc,
         days_gain,
-        '<button id="' + symbol +  '" class="button small radius" data-reveal-id="myModal">sell</button>'
+        '<button id="' + symbol +  '" class="button small radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>'
     ];
     sArr.push(row);
     if(index==numStocks){
@@ -426,6 +452,89 @@ function getUserStockData(){
         }
     });
 }
+
+function sellButtonClicked(symbol, shares){
+    var sym = symbol.id;
+    //alert(symbol.id + ' ' + shares);
+    $('#sell-modal').foundation('reveal', 'open');
+    $('#sell-modal h2').html('Sell ' + sym);
+    $('#sell-form-ticker').val(sym);
+    $('#sell-form-held').val(parseInt(shares));
+}
+
+function validateSellForm(){
+    var ticker = $('#sell-form-ticker').val().toUpperCase();
+    var shares = $('#sell-form-shares').val();
+    var sHeld = $('#sell-form-held').val();
+    var sReg = new RegExp('^[0-9]*$');
+    var invalid = false;
+    var invalidFields = {
+        shares: false,
+        sharesMax: false,
+        moreSharesThanHeld: false,
+        sharesNone: false,
+    };
+
+    if (shares=='' || !sReg.test(shares)){
+        invalid = true;
+        invalidFields['shares'] = true;
+    } else {
+        if(parseInt(shares) > 1000000) {
+            invalid = true;
+            invalidFields['sharesMax'] = true;
+        }
+        if(parseInt(shares) > parseInt($('#sell-form-held').val())){
+            invalid = true;
+            invalidFields['moreSharesThanHeld'] = true;
+        }
+        if(parseInt(shares) < 1){
+            invalid = true;
+            invalidFields['sharesNone'] = true;
+        }
+    }
+
+    if(invalid){
+        $('#invalid-sell-modal p:first').empty();
+        $('#invalid-sell-modal').foundation('reveal', 'open');
+        if(invalidFields['shares']){
+            $('#invalid-sell-modal p:first').append("<br>Invalid shares");
+        }
+        if(invalidFields['sharesMax']){
+            $('#invalid-sell-modal p:first').append("<br>Shares cannot be greater than 1,000,000");
+        }
+        if(invalidFields['moreSharesThanHeld']){
+            $('#invalid-sell-modal p:first').append("<br>Shares cannot be greater than the number of shares you hold.");
+        }
+        if(invalidFields['sharesNone']){
+            $('#invalid-sell-modal p:first').append("<br>Shares must be greater than 0");
+        }    
+    } else {
+        $('#confirm-sell-modal').foundation('reveal','open');
+        $('#confirm-sell-modal p:first').html("Are you sure you want to sell " + shares + " share(s) of " + ticker + "?");
+    }
+
+}
+
+function postSellForm(ticker, shares, price){
+    var pReg = new RegExp("^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*\.[0-9]{2}$");
+
+    if(pReg.test(price)) {
+        $.ajax({
+            type:'POST',
+            url:'/sell-stock',
+            data:{
+                'ticker_symbol': ticker,
+                'shares': shares,
+                'price': price,
+            },
+            success: function(){
+                $('#sell-success-modal').foundation('reveal', 'open');
+            }
+        });
+    } else {
+        $('#ticker-not-exist-modal').foundation('reveal', 'open');
+    }
+}
 /*****************************************************************************/
 /* END STOCKS*/
 /*****************************************************************************/
@@ -466,6 +575,10 @@ function fb_login() {
     e.async = true;
     document.getElementById('fb-root').appendChild(e);
 }());
+
+/*********************************************************/
+/* CALENDAR */
+/*********************************************************/
 
 /*****************************************************************************/
 /* HELPER*/

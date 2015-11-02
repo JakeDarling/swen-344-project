@@ -1,31 +1,116 @@
 <html>
 <style>
-    #wall {
-        background-color: #e9eaed;
-        border: 1px solid black;
-        padding: 5px;
-    }
+  #wall {
+    background-color: #e9eaed;
+    border: 1px solid black;
+    padding: 5px;
+    font-family: Helvetica, Arial, sans-serif;
+  }
 
-    .fbPost {
-        background-color: white;
-        border: 1px solid #303030;
-        margin: 10px;
-        padding: 5px;
-        max-width: 510px;
-    }
+  .fbPost {
+    margin: 0;
+    margin-top: 10px;
+    border: 1px solid #dfe0e4;
+    background-color: white;
+    padding: 10px;
+    max-width: 510px;
+  }
 
-    .fbPost a {
-        text-decoration: none;
-    }
+  .fbComments {
+    background-color: #f6f7f8;
+    border: 1px solid #dfe0e4;
+    border-top: none;
+    padding: 10px;
+    margin: 0;
+    max-width: 510px;
+    font-size: 12px;
+    line-height: 16px;
+  }
 
-    .fbComments {
-        background-color: #f6f7f8;
-        padding: 5px;
-    }
+  .fbPostButtonBox ul {
+    list-style: none;
+  }
 
-    .fbPostButtonBox ul {
-        list-style: none;
-    }
+  .addCommentField {
+    width: 450px;
+    height: 27px;
+    margin-top: 0;
+    margin-top: 11;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .addCommentPic {
+    float: left;
+    margin-right: 8px;
+    clear: left;
+  }
+
+  #wall a {
+    color: #3b5998;
+    text-decoration: none;
+  }
+
+  #wall a:hover {
+    text-decoration: underline;
+  }
+
+  #wall img {
+    border: 1px solid #aeacae;
+  }
+
+  .postProfilePic {
+    float: left;
+    margin-right: 5px;
+  }
+
+  .poster {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 19px;
+  }
+
+  .postStory {
+    font-size: 14px;
+    line-height: 19px;
+    margin-left: 4px;
+  }
+
+  #wall a.postTime {
+    font-size: 12px;
+    line-height: 16px;
+    float: left;
+    color: #9197a3;
+    margin-top: 3px;
+  }
+
+  #wall a.likePost, #wall a.commentPost, #wall a.sharePost {
+    color: #7f7f7f;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 14px;
+    margin-right: 30px;
+  }
+
+  .postMessage {
+    font-size: 14px;
+    line-height: 19px;
+  }
+
+  .commentPic {
+    float: left;
+    clear: left;
+    margin-right: 8px;
+  }
+
+  #wall a.commenter {
+    font-weight: bold;
+    margin-right: 3px;
+  }
+
+  .comment {
+    margin-bottom: 10px;
+  }
 </style>
 <script>
     $(document).ready(function () {
@@ -200,18 +285,21 @@
 
     function testAPI() {
         console.log('Welcome!  Fetching your information.... ');
-        FB.api('/me', function (response) {
-            name = response.name
+        FB.api('/me?fields=name,id', function (response) {
+            myName = response.name;
+            myId = response.id            
             console.log(response);
+
             //associate user in our database
             $.ajax({
-                type: 'POST',
-                url: '/associate-user',
-                data: {'idString': response.id},
-                success: function () {
+                type:'POST',
+                url:'/associate-user',
+                data:{'idString': response.id},
+                success: function(){
                     //alert("Successfully associated user with FB ID: " + response.id);
                 }
             });
+
             console.log('Successful login for: ' + response.name);
             document.getElementById('login-status').innerHTML =
                     'Thanks for logging in, ' + response.name + '!';
@@ -227,119 +315,246 @@
     }
 
     function showWall() {
-        FB.api(
-                '/me/feed?fields=story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link',
-                function (response) {
-                    if (response && !response.error) {
-                        postsData = response.data;
-                        for (i = 0; i < postsData.length; i++) {
-                            var post = postsData[i];
+    FB.api(
+      '/me/feed?fields=type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments', 
+      function(response) {
+        if (response && !response.error) {
+          postsData = response.data;
+          for (i = 0; i < postsData.length; i++) {
+            var post = postsData[i];
 
-                            // Post Time
-                            var fbTime = new Date(post.created_time.substring(0, (post.created_time.length - 5)));
-                            var monthNames = ["January", "February", "March", "April", "May", "June", "July",
-                                "August", "September", "October", "November", "December"];
-                            var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
-                            var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
+            // Profile Pic of Poster
+            var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
 
-                            // Post Message or Story
-                            if (post.message || post.story) {
-                                var postText = '';
-                                if (post.message) {
-                                    postText = post.message;
-                                } else if (post.story) {
-                                    postText = post.story;
-                                }
+            // Post Time
+            var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
+            var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
+                              "August", "September", "October", "November", "December"];
+            var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
+            var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
 
-                                // Post Picture
-                                var postPicture = '';
-                                if (post.picture) {
-                                    postPicture = post.picture;
-                                }
+            // Post Type
+            var postType = post.type;
 
-                                // Post Comments
-                                var comments = '';
-                                var commentPicURL = '';
-                                if (post.comments) {
-                                    var commentsData = post.comments.data;
-                                    for (j = 0; j < commentsData.length; j++) {
-                                        var comment = commentsData[j];
+            // Poster (from)
+            var from = post.from
 
-                                        comments +=
-                                            // Comment Image
-                                                '<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><img src="https://graph.facebook.com/' + comment.from.id + '/picture?fields=url&type=square" alt="Comment Pic" height="32px" width="32px"></a>' +
-                                                    // Comment Name
-                                                '<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><strong>' + comment.from.name + '</strong></a>' +
-                                                    // Comment Message
-                                                ' ' + comment.message + '<br>';
+            // Post ID
+            var postId = post.id;
 
-                                        // Like/Unlike Comment
-                                        if (comment.can_like) {
-                                            if (comment.user_likes == true) {
-                                                comments += '<a href="#">Unlike</a>';
-                                            } else {
-                                                comments += '<a href="#">Like</a>';
-                                            }
-                                        }
+            // Post Link
+            var postLink = 'https://www.facebook.com/' + from.id + '/posts/' + postId.split('_')[1];
 
-                                        // Reply to Comment
-                                        if (comment.can_comment) {
-                                            comments += '<a href="#"> · Reply</a><br>';
-                                        }
+            // Post Story
+            if (post.story) {
+              var postStory = ' ' + post.story.split(from.name + ' ')[1];
+            }
 
-                                        // Profile Pic of Poster
-                                        var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
-                                    }
-                                }
+            // Comments
+            if (post.comments) {
+              var comments = post.comments.data;
+            }
 
-                                // Display Post in Wall
-                                var wallText = document.getElementById('wall').innerHTML;
-                                document.getElementById('wall').innerHTML = wallText +
-                                        '<div name="fbPost" class="fbPost">' +
-                                        '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><img src="' + postProfilePic + '" alt="Post Profile Picture" height="40px" width="40px"></a>' +
-                                        '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><h4>' + post.from.name + '</h4></a>' +
-                                        '<a href="' + post.link + '" target="_blank"><p>' + strFbTime + '</p></a>' +
-                                        '<p>' + postText + '</p>' +
-                                        '<img src="' + postPicture + '" alt="Post Photo">' +
-                                        '<hr>' +
-                                        '<div class="fbPostButtonBox" name="fbPostButtonBox">' +
-                                        '<ul>' +
-                                        '<li><a href="#">Like</a></li>' +
-                                        '<li><a href="#">Comment</a></li>' +
-                                        '</ul>' +
-                                        '</div>' +
-                                        '<div name="fbComments" class="fbComments">' +
-                                        comments +
-                                        '</div>' +
-                                        '</div>';
-                            }
-                        }
-                    }
-                });
-    }
+            // Post
+            $('#wall').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + postId}));
 
-    function updateStatus(status) {
-        FB.api('/me/feed',
-                'post',
-                {
-                    message: status,
-                    privacy: {
-                        "value": $("#status_privacy").val()
-                    }
-                });
-    }
+            // Post Profile Pic Link
+            $('#post' + postId).append($('<a>', {
+              href: 'https://facebook.com/' + from.id,
+              target: '_blank',
+              id: 'pplink' + postId
+            }));
 
-    function uploadPhoto(status, url) {
-        FB.api("/me/photos",
-                "POST",
-                {
-                    "caption": status,
-                    "url": url,
-                    "privacy": {
-                        "value": $("#status_privacy").val()
-                    }
-                });
-    }
+            // Post Profile Pic
+            $('#pplink' + postId).append($('<img>', {
+              src: postProfilePic,
+              alt: 'Post Profile Picture',
+              class: 'postProfilePic',
+              height: '40px',
+              width: '40px'
+            }));
+
+            // Poster (from)
+            $('#post' + postId).append($('<a>', {
+              href: 'https://facebook.com/' + from.id,
+              class: 'poster',
+              target: '_blank',
+              text: from.name
+            }));
+
+            // Story
+            if (post.story) {
+              $('#post' + postId).append($('<span>', { class: 'postStory', text: postStory }));
+            }
+            $('#post' + postId).append($('</br>'));
+
+            // Post Time
+            $('#post' + postId).append($('<a>', { 
+              href: postLink,   
+              target: '_blank',  
+              class: 'postTime',
+              text: strFbTime
+            }));
+            $('#post' + postId).append($('</br>'));
+
+            // Post Message
+            if (post.message) {
+              $('#post' + postId).append($('<p>', { class: 'postMessage', text: post.message }));
+            }
+
+            // Attachments
+            if (post.attachments) {
+              if (postType == 'photo') {
+                if (post.attachments.data[0].type == 'album') {
+                  var attachments = post.attachments.data[0].subattachments.data;
+                  for (var n = 0; n < attachments.length; n++) {
+                    var attachment = attachments[n];
+                    // Image Link
+                    $('#post' + postId).append($('<a>', {
+                      href: attachment.target.url,
+                      target: '_blank',
+                      id: 'imglink' + attachment.target.id
+                    }));
+                    // Image
+                    $('#imglink' + attachment.target.id).append($('<img>', {
+                      src: attachment.media.image.src,
+                      alt: 'Post photo',
+                      height: attachment.media.image.height / 2,
+                      width: attachment.media.image.width / 2
+                    }));
+                  }
+                  $('#post' + postId).append($('</br>'));
+                } else if (post.attachments.data[0].type == 'photo') {
+                  var attachments = post.attachments.data;
+                  for (var m = 0; m < attachments.length; m++) {
+                    var attachment = attachments[m];
+                    // Image Link
+                    $('#post' + postId).append($('<a>', {
+                      href: attachment.target.url,
+                      target: '_blank',
+                      id: 'imglink' + attachment.target.id
+                    }));
+                    // Image
+                    $('#imglink' + attachment.target.id).append($('<img>', {
+                      src: attachment.media.image.src,
+                      alt: 'Post photo',
+                      height: attachment.media.image.height / 2,
+                      width: attachment.media.image.width / 2
+                    }));
+                    $('#post' + postId).append($('</br>'));
+                  }
+                }
+              }
+            }
+
+            // Like Post
+            $('#post' + postId).append($('<hr>'));
+            $('#post' + postId).append($('<a>', { href: '#', class: 'likePost', text: 'Like '}));
+
+            // Comment on Post
+            $('#post' + postId).append($('<a>', { href: '#', class: 'commentPost', text: 'Comment '  }));
+
+            // Share Post
+            if (postType == 'link') {
+              $('#post' + postId).append($('<a>', { href: '#', class: 'sharePost', text: 'Share '  }));
+            }
+
+            // Comments Box
+            $('#wall').append($('<div>', {
+              name: 'fbComments',
+              class: 'fbComments',
+              id: 'comments' + postId
+            }));
+
+            // Comments
+            if (comments) {
+              // Each Comment
+              for (var k = 0; k < comments.length; k++) {
+                var comment = comments[k];
+                // Comment Div
+                $('#comments' + postId).append($('<div>', {
+                  class: 'comment',
+                  id: 'comment' + comment.id
+                }));
+
+                // Comment Image
+                $('#comment' + comment.id).append($('<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><img src="https://graph.facebook.com/' + comment.from.id + '/picture?fields=url&type=square" alt="Comment Pic" class="commentPic" height="32px" width="32px"></a>'));
+                
+                // Comment Name
+                $('#comment' + comment.id).append($('<a>', {
+                  href: 'https://facebook.com/' + comment.from.id,
+                  target: '_blank',
+                  class: 'commenter',
+                  text: comment.from.name
+                }));
+
+                // Comment message
+                $('#comment' + comment.id).append($('<span>', { text: comment.message  }));
+                $('#comment' + comment.id).append($('</br>'));
+
+                // Like/Unlike Comment
+                if (comment.can_like) {
+                  if (comment.user_likes==true) {
+                    // Unlike Comment
+                    $('#comment' + comment.id).append($('<a>', { href: '#', text: 'Unlike ' }));
+                  } else {
+                    // Like Comment
+                    $('#comment' + comment.id).append($('<a>', { href: '#', text: 'Like ' }));
+                  }
+                  $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
+                }
+
+                // Reply to Comment
+                if (comment.can_comment) {
+                  $('#comment' + comment.id).append($('<a>', { href: '#', text: 'Reply ' }));
+                $('#comment' + comment.id).append($('</br>'));
+                }
+              }
+            }
+
+            // Add Comment Profile Pic
+            $('#comments' + postId).append($('<img>', {
+              src: 'https://graph.facebook.com/' + myId + '/picture?fields=url&type=square',
+              alt: 'Add Comment Profile Picture',
+              class: 'addCommentPic',
+              height: 32,
+              width: 32
+            }));
+
+            // Add Comment Input Field
+            $('#comments' + postId).append($('<input>', {
+              type: 'text',
+              class: 'addCommentField',
+              name: 'addComment' + postId,
+              placeholder: 'Write a comment...'
+            }));
+          }
+        }
+    });
+  }
+
+  function updateStatus(status) {
+      FB.api('/me/feed',
+              'post',
+              {
+                  message: status,
+                  privacy: {
+                      "value": $("#status_privacy").val()
+                  }
+              });
+  }
+
+  function uploadPhoto(status, url) {
+      FB.api("/me/photos",
+             "POST",
+             {
+              "caption": status,
+              "url": url,
+              "privacy": {
+                  "value": $("#status_privacy").val()
+              }
+             });
+  }
 
     function logout() {
         FB.logout();

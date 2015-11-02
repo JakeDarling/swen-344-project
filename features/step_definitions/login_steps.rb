@@ -15,10 +15,6 @@ When(/^I choose the login option$/) do
     Dashboard.new(@b).login
 end
 
-Then(/^I am redirected to Facebook$/) do
-  Facebook.new(@b).on_page?
-end
-
 When(/^I submit my username and password to Facebook$/) do
   Facebook.new(@b).login(@user[:email], @user[:password])
 end

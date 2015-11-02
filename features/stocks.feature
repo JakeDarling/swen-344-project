@@ -1,3 +1,4 @@
+@stocks
 Feature: Stocks
 
 Background:
@@ -13,4 +14,13 @@ Background:
         And I see the highest price of the year
         And I see the lowest price of the year
         And I see the interactive chart
-        
+
+    @p1
+    Scenario: Buy stocks
+        Given I have navigated to the stocks page
+        And I have searched "AAPL"
+        When I choose the buy option
+        And I choose 10 shares
+        And I confirm the purchase
+        Then my transaction history shows the purchase
+

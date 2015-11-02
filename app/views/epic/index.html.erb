@@ -1,31 +1,31 @@
 <html>
 <style>
-  #wall {
-    background-color: #e9eaed;
-    border: 1px solid black;
-    padding: 5px;
-  }
+    #wall {
+        background-color: #e9eaed;
+        border: 1px solid black;
+        padding: 5px;
+    }
 
-  .fbPost {
-    background-color: white;
-    border: 1px solid #303030;
-    margin: 10px;
-    padding: 5px;
-    max-width: 510px;
-  }
+    .fbPost {
+        background-color: white;
+        border: 1px solid #303030;
+        margin: 10px;
+        padding: 5px;
+        max-width: 510px;
+    }
 
-  .fbPost a {
-    text-decoration: none;
-  }
+    .fbPost a {
+        text-decoration: none;
+    }
 
-  .fbComments {
-    background-color: #f6f7f8;
-    padding: 5px;
-  }
+    .fbComments {
+        background-color: #f6f7f8;
+        padding: 5px;
+    }
 
-  .fbPostButtonBox ul {
-    list-style: none;
-  }
+    .fbPostButtonBox ul {
+        list-style: none;
+    }
 </style>
 <script>
     $(document).ready(function () {
@@ -203,6 +203,15 @@
         FB.api('/me', function (response) {
             name = response.name
             console.log(response);
+            //associate user in our database
+            $.ajax({
+                type: 'POST',
+                url: '/associate-user',
+                data: {'idString': response.id},
+                success: function () {
+                    //alert("Successfully associated user with FB ID: " + response.id);
+                }
+            });
             console.log('Successful login for: ' + response.name);
             document.getElementById('login-status').innerHTML =
                     'Thanks for logging in, ' + response.name + '!';
@@ -218,119 +227,119 @@
     }
 
     function showWall() {
-    FB.api(
-      '/me/feed?fields=story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link', 
-      function(response) {
-        if (response && !response.error) {
-          postsData = response.data;
-          for (i = 0; i < postsData.length; i++) {
-            var post = postsData[i];
+        FB.api(
+                '/me/feed?fields=story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link',
+                function (response) {
+                    if (response && !response.error) {
+                        postsData = response.data;
+                        for (i = 0; i < postsData.length; i++) {
+                            var post = postsData[i];
 
-            // Post Time
-            var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
-            var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
-                              "August", "September", "October", "November", "December"];
-            var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
-            var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
+                            // Post Time
+                            var fbTime = new Date(post.created_time.substring(0, (post.created_time.length - 5)));
+                            var monthNames = ["January", "February", "March", "April", "May", "June", "July",
+                                "August", "September", "October", "November", "December"];
+                            var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
+                            var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
 
-            // Post Message or Story
-            if (post.message || post.story) {
-              var postText = '';
-              if (post.message) {
-                postText = post.message;
-              } else if (post.story) {
-                postText = post.story;
-              }
+                            // Post Message or Story
+                            if (post.message || post.story) {
+                                var postText = '';
+                                if (post.message) {
+                                    postText = post.message;
+                                } else if (post.story) {
+                                    postText = post.story;
+                                }
 
-              // Post Picture
-              var postPicture = '';
-              if (post.picture) {
-                postPicture = post.picture;
-              }
+                                // Post Picture
+                                var postPicture = '';
+                                if (post.picture) {
+                                    postPicture = post.picture;
+                                }
 
-              // Post Comments
-              var comments = '';
-              var commentPicURL = '';
-              if (post.comments) {
-                var commentsData = post.comments.data;
-                for (j = 0; j < commentsData.length; j++) {
-                  var comment = commentsData[j];
+                                // Post Comments
+                                var comments = '';
+                                var commentPicURL = '';
+                                if (post.comments) {
+                                    var commentsData = post.comments.data;
+                                    for (j = 0; j < commentsData.length; j++) {
+                                        var comment = commentsData[j];
 
-                  comments += 
-                    // Comment Image
-                    '<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><img src="https://graph.facebook.com/' + comment.from.id + '/picture?fields=url&type=square" alt="Comment Pic" height="32px" width="32px"></a>' +
-                    // Comment Name
-                    '<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><strong>' + comment.from.name + '</strong></a>' + 
-                    // Comment Message
-                    ' ' + comment.message + '<br>';
+                                        comments +=
+                                            // Comment Image
+                                                '<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><img src="https://graph.facebook.com/' + comment.from.id + '/picture?fields=url&type=square" alt="Comment Pic" height="32px" width="32px"></a>' +
+                                                    // Comment Name
+                                                '<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><strong>' + comment.from.name + '</strong></a>' +
+                                                    // Comment Message
+                                                ' ' + comment.message + '<br>';
 
-                  // Like/Unlike Comment
-                  if (comment.can_like) {
-                    if (comment.user_likes==true) {
-                      comments += '<a href="#">Unlike</a>';
-                    } else {
-                      comments += '<a href="#">Like</a>';
+                                        // Like/Unlike Comment
+                                        if (comment.can_like) {
+                                            if (comment.user_likes == true) {
+                                                comments += '<a href="#">Unlike</a>';
+                                            } else {
+                                                comments += '<a href="#">Like</a>';
+                                            }
+                                        }
+
+                                        // Reply to Comment
+                                        if (comment.can_comment) {
+                                            comments += '<a href="#"> · Reply</a><br>';
+                                        }
+
+                                        // Profile Pic of Poster
+                                        var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
+                                    }
+                                }
+
+                                // Display Post in Wall
+                                var wallText = document.getElementById('wall').innerHTML;
+                                document.getElementById('wall').innerHTML = wallText +
+                                        '<div name="fbPost" class="fbPost">' +
+                                        '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><img src="' + postProfilePic + '" alt="Post Profile Picture" height="40px" width="40px"></a>' +
+                                        '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><h4>' + post.from.name + '</h4></a>' +
+                                        '<a href="' + post.link + '" target="_blank"><p>' + strFbTime + '</p></a>' +
+                                        '<p>' + postText + '</p>' +
+                                        '<img src="' + postPicture + '" alt="Post Photo">' +
+                                        '<hr>' +
+                                        '<div class="fbPostButtonBox" name="fbPostButtonBox">' +
+                                        '<ul>' +
+                                        '<li><a href="#">Like</a></li>' +
+                                        '<li><a href="#">Comment</a></li>' +
+                                        '</ul>' +
+                                        '</div>' +
+                                        '<div name="fbComments" class="fbComments">' +
+                                        comments +
+                                        '</div>' +
+                                        '</div>';
+                            }
+                        }
                     }
-                  }
+                });
+    }
 
-                  // Reply to Comment
-                  if (comment.can_comment) {
-                    comments += '<a href="#"> · Reply</a><br>';
-                  }
+    function updateStatus(status) {
+        FB.api('/me/feed',
+                'post',
+                {
+                    message: status,
+                    privacy: {
+                        "value": $("#status_privacy").val()
+                    }
+                });
+    }
 
-                  // Profile Pic of Poster
-                  var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
-                }
-              }
-
-              // Display Post in Wall
-              var wallText = document.getElementById('wall').innerHTML;
-              document.getElementById('wall').innerHTML = wallText + 
-                '<div name="fbPost" class="fbPost">' +
-                  '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><img src="' + postProfilePic + '" alt="Post Profile Picture" height="40px" width="40px"></a>' +  
-                  '<a href="https://facebook.com/' + post.from.id + '" target="_blank"><h4>' + post.from.name + '</h4></a>' +
-                  '<a href="' + post.link + '" target="_blank"><p>' + strFbTime + '</p></a>' +
-                  '<p>' + postText + '</p>' + 
-                  '<img src="' + postPicture + '" alt="Post Photo">' +
-                  '<hr>' + 
-                  '<div class="fbPostButtonBox" name="fbPostButtonBox">' + 
-                    '<ul>' + 
-                      '<li><a href="#">Like</a></li>' + 
-                      '<li><a href="#">Comment</a></li>' + 
-                    '</ul>' +
-                  '</div>' +
-                  '<div name="fbComments" class="fbComments">' + 
-                    comments +
-                  '</div>' +
-                '</div>';
-            }
-          }
-        }
-    });
-  }
-
-  function updateStatus(status) {
-      FB.api('/me/feed',
-              'post',
-              {
-                  message: status,
-                  privacy: {
-                      "value": $("#status_privacy").val()
-                  }
-              });
-  }
-
-  function uploadPhoto(status, url) {
-      FB.api("/me/photos",
-             "POST",
-             {
-              "caption": status,
-              "url": url,
-              "privacy": {
-                  "value": $("#status_privacy").val()
-              }
-             });
-  }
+    function uploadPhoto(status, url) {
+        FB.api("/me/photos",
+                "POST",
+                {
+                    "caption": status,
+                    "url": url,
+                    "privacy": {
+                        "value": $("#status_privacy").val()
+                    }
+                });
+    }
 
     function logout() {
         FB.logout();
@@ -339,54 +348,54 @@
 <body>
 <div class="row">
   <!-- FACEBOOK INFO-->
-    <div data-alert class="alert-box">
-      <div id="login-status" name="login-status"></div>
-      <a href="#" class="close">&times;</a>
-    </div>
+  <div data-alert class="alert-box">
+    <div id="login-status" name="login-status"></div>
+    <a href="#" class="close">&times;</a>
+  </div>
 
-    <div id="facebook-post-status" name="facebook-post-status">
-    </div>
+  <div id="facebook-post-status" name="facebook-post-status">
+  </div>
 
-    <div id="wall" class="large-6 small-12 columns" name="wall">
-    </div>
+  <div id="wall" class="large-6 small-12 columns" name="wall">
+  </div>
 
-    <!-- STOCK INFO -->
-    <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
-      <div class="row">
-        <div class="large-12 small-12 columns">
-          <div id='ndaq' name='ndaq'>
-            <div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
-            <div name='price' class='one-line last-trade-price quote-info'></div>
-            <div name='change' class='one-line quote-info'></div>
-          </div>
-          <div id="nyse" name='nyse'>
-            <div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
-            <div name='price' class='one-line last-trade-price quote-info'></div>
-            <div name='change' class='one-line quote-info'></div>
-          </div>
-          <div id="dow" name='dow'>
-            <div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
-            <div name='price' class='one-line last-trade-price quote-info'></div>
-            <div name='change' class='one-line quote-info'></div>
-          </div>
-          <div id="googl" name='googl'>
-            <div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
-            <div name='price' class='one-line last-trade-price quote-info'></div>
-            <div name='change' class='one-line quote-info'></div>
-          </div>
-          <div id="xrx" name='xrx'>
-            <div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
-            <div name='price' class='one-line last-trade-price quote-info'></div>
-            <div name='change' class='one-line quote-info'></div>
-          </div>
-          <div id="xom" name='xom'>
-            <div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
-            <div name='price' class='one-line last-trade-price quote-info'></div>
-            <div name='change' class='one-line quote-info'></div>
-          </div>
+  <!-- STOCK INFO -->
+  <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
+    <div class="row">
+      <div class="large-12 small-12 columns">
+        <div id='ndaq' name='ndaq'>
+          <div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="nyse" name='nyse'>
+          <div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="dow" name='dow'>
+          <div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="googl" name='googl'>
+          <div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="xrx" name='xrx'>
+          <div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
+        </div>
+        <div id="xom" name='xom'>
+          <div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
+          <div name='price' class='one-line last-trade-price quote-info'></div>
+          <div name='change' class='one-line quote-info'></div>
         </div>
       </div>
     </div>
+  </div>
 </div>
 </div>
 </body>

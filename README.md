@@ -3,11 +3,7 @@
 
 # Testing
 ## Getting your code tested and deployed
-PRs must include accompanying integration tests. These are largely already implemented. What
-you need to do is edit [features/support/pages.rb](https://github.com/JakeDarling/swen-344-project/blob/master/features/support/pages.rb)
-and fill in the element ids or selectors. *Do not hesitate to ask me (Jake) for help with this*
-
-For a more detailed explanation on how everything works, read the section on writing new tests.
+PRs should now include accompanying integration tests before merging. *After you open a PR, Jake will begin writing tests and merging to your branch*
 
 After your PR merges into the ```develop``` branch, you may run the promote-stage job
 [on jenkins](http://vm344a.se.rit.edu:8080/)

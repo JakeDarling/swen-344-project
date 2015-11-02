@@ -8,13 +8,36 @@
 		$('#buy-submit').click(function(){
 			var ticker = $('#buy-ticker').val().toUpperCase();
 			var shares = $('#buy-shares').val();
-			getStockPrice(ticker, shares);
+			getStockPrice(ticker, shares, 'buy');
 			
 		});
 
 		$('#buy-success-close').click(function(){
 			//refresh the datatable and stock buy form
 			clearChildren(document.getElementById('buy-form'));
+            window.stockTable.destroy();
+            $('#myTable tfoot tr').remove();
+            $('#myTable tbody').remove();
+            getUserStockData();
+		});
+
+		$('#sell-submit').click(function(){
+			//var ticker = $('#sell-form-ticker').val().toUpperCase();
+			//var shares = $('#sell-form-shares').val();
+			//alert(ticker + ' ' + shares);
+			validateSellForm();
+		});
+
+		$('#sell-confirm').click(function(){
+			var ticker = $('#sell-form-ticker').val().toUpperCase();
+			var shares = $('#sell-form-shares').val();
+			getStockPrice(ticker, shares, 'sell')
+		});
+
+		$('#sell-success-close').click(function(){
+			//refresh the datatable and stock buy form
+			clearChildren(document.getElementById('buy-form'));
+			clearChildren(document.getElementById('sell-modal'));
             window.stockTable.destroy();
             $('#myTable tfoot tr').remove();
             $('#myTable tbody').remove();
@@ -37,7 +60,6 @@
 			margin-right: 0px;
 			margin-left: 0px;
 		}
-
 	</style>
 	<body>
 		<div id="debug-output">
@@ -59,7 +81,7 @@
 		<div id="confirm-modal" class="reveal-modal" data-reveal aria-labelledby="confirm-modal-title" aria-hidden="true" role="dialog">
 		  <h2 id="confirm-modal-title">Confirm Purchase</h2>
 		  <p></p>
-		  <p><a href="javascript:void(0);" id="buy-submit" data-reveal-id="secondModal" class="secondary button">Confirm</a></p>
+		  <p><a href="javascript:void(0);" id="buy-submit" data-reveal-id class="secondary button">Confirm</a></p>
 		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
 
@@ -68,15 +90,36 @@
 		  <p class="invalid"></p>
 		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
-
 		<div id="buy-success-modal" class="reveal-modal" data-reveal aria-labelledby="buy-success-modal-title" aria-hidden="true" role="dialog">
 		  <h2 id="buy-success-modal-title" class="success">Purchase Successful</h2>
 		  <a id="buy-success-close"class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
-		<div id="myModal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
-		  <h2 id="modalTitle">Awesome. I have it.</h2>
-		  <p class="lead">Your couch.  It is mine.</p>
-		  <p>I'm a cool paragraph that lives inside of an even cooler modal. Wins!</p>
+		<div id="sell-modal" class="reveal-modal" data-reveal aria-labelledby="sell-modal-title" aria-hidden="true" role="dialog">
+		  <h2 id="sell-modal-title"></h2>
+		  <input type="hidden" id="sell-form-ticker" name="sell-form-ticker"> 
+		  <input type="hidden" id="sell-form-held" name="sell-form-held">
+		  <input type="text" id="sell-form-shares" name="sell-form-shares" placeholder="shares" style="display:inline;width:100px;">
+		  <a href="javascript:void(0);" id="sell-submit" data-reveal-id class="radius button tiny ">Sell</a>
+		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+		</div>
+		<div id="invalid-sell-modal" class="reveal-modal" data-reveal aria-labelledby="invalid-sell-modal-title" aria-hidden="true" role="dialog">
+		  <h2 id="invalid-sell-modal-title">Invalid Field(s)</h2>
+		  <p class="invalid"></p>
+		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+		</div>
+		<div id="confirm-sell-modal" class="reveal-modal" data-reveal aria-labelledby="confirm-sell-modal-title" aria-hidden="true" role="dialog">
+		  <h2 id="confirm-sell-modal-title">Confirm Purchase</h2>
+		  <p></p>
+		  <p><a href="javascript:void(0);" id="sell-confirm" data-reveal-id class="secondary button">Confirm</a></p>
+		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+		</div>
+		<div id="sell-success-modal" class="reveal-modal" data-reveal aria-labelledby="sell-success-modal-title" aria-hidden="true" role="dialog">
+		  <h2 id="sell-success-modal-title" class="success">Sale Successful</h2>
+		  <a id="sell-success-close"class="close-reveal-modal" aria-label="Close">&#215;</a>
+		</div>
+		<div id="ticker-not-exist-modal" class="reveal-modal" data-reveal aria-labelledby="ticker-not-exist-modal-title" aria-hidden="true" role="dialog">
+		  <h2 id="ticker-not-exist-modal-title">Invalid Field(s)</h2>
+		  <p class="invalid">Ticker symbol does not exist</p>
 		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
 	</body>

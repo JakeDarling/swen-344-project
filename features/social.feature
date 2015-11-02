@@ -1,3 +1,4 @@
+@social
 Feature: Social integration
 
 Background:

@@ -36,6 +36,19 @@ class StocksController < ApplicationController
     price = params[:price]
     user = User.find_by(fbUserId:session[:user])
 
+    #input validation
+    sReg = /^[0-9]*$/
+    tReg = /^[a-zA-Z]+$/
+    pReg = /^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*\.[0-9]{2}$/
+
+    if ticker == '' or !tReg.match(ticker) or shares == '' or !sReg.match(shares) or pReg == '' or !pReg.match(price)
+      puts "============================="
+      puts "invalid inputs. return false"
+      puts "============================="
+      render:nothing => true
+      return false
+    end
+
     #record the transaction
     tran = Transaction.new( ticker_symbol:ticker, \
                             user_id:user.id, \

@@ -16,6 +16,7 @@
  *= require foundation
  *= require_self
  *= require fullcalendar
+ *= require dataTables/jquery.dataTables.foundation
  */
 
 @import "settings";
@@ -24,3 +25,11 @@
 @import "stocks";
 
 /* Add imports of custom sass/scss files here */
+
+.invalid {
+	color: red;
+}
+
+.success {
+	color: green;
+}

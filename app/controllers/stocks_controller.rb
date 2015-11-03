@@ -168,12 +168,14 @@ class StocksController < ApplicationController
         puts "=========================================="
       end
 
+=begin
       if stock.shares <= 0
         stock.destroy()
         puts "==========================================================="
         puts "User no longer owns any shares of this stock. destroying..."
         puts "==========================================================="
       end
+=end
 
     else
       puts "============================="

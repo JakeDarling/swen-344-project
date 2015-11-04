@@ -321,123 +321,93 @@ function buildStockTable(data){
     var numStocks = Object.keys(stocks).length
     var index = 0;
 
-    $.each(stocks, function(index, value){
-        index ++;
-        $.ajax({
-            async: false,
-            dataType: "xml",
-            type: 'GET',
-            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-            data: {
-                diagnostics: 'true',
-                env: 'store://datatables.org/alltableswithkeys',
-                symbol: value['ticker_symbol'],
-            },
-            success: function (data) {
-                buildRows(data, value, sArr, index, numStocks, totalChange);
-            },
+    if(stocks.length == 0){
+        dataTable([]);
+    } else {
+        $.each(stocks, function(index, value){
+            index ++;
+            if(parseInt(value['shares']) > 0){
+                $.ajax({
+                    async: false,
+                    dataType: "xml",
+                    type: 'GET',
+                    url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                    data: {
+                        diagnostics: 'true',
+                        env: 'store://datatables.org/alltableswithkeys',
+                        symbol: value['ticker_symbol'],
+                    },
+                    success: function (data) {
+                        buildRows(data, value, sArr, index, numStocks, totalChange, false);
+                    },
+                });
+            } else {
+                buildRows(data, value, sArr, index, numStocks, totalChange, true);
+            }
+            
         });
-        
-    });
+    }
 }
 
-function buildRows(data, value, sArr, index, numStocks, totalChange){
-    var avgDailyVol = $(data).find('AverageDailyVolume').text();
-    var change = $(data).find('Change').text();
-    var sign = change.substring(0, 1);
-    change = change.substring(1);
-    var changeStr = sign + change;
-    if(sign=="-"){
-        change *= -1;
+function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
+    var change;
+    var marketCap;
+    var gain;
+    var gain_pc;
+    if(noShares){
+        change = 0;
+        marketCap = 0;
+        gain = value['base_cost'] * -1;
+        gain_pc = (gain/value['base_cost'] * 100).toFixed(2);
+    } else {
+        var avgDailyVol = $(data).find('AverageDailyVolume').text();
+        change = $(data).find('Change').text();
+        var sign = change.substring(0, 1);
+        change = change.substring(1);
+        var changeStr = sign + change;
+        if(sign=="-"){
+            change *= -1;
+        }
+        var daysLow = $(data).find('DaysLow').text();
+        var daysHigh = $(data).find('DaysHigh').text();
+        var yearLow = $(data).find('YearLow').text();
+        var yearHigh = $(data).find('YearHigh').text();
+        marketCap = parseFloat($(data).find('MarketCapitalization').text()).toFixed(2);
+        var lastTradePrice = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
+        var daysRange = $(data).find('DaysRange').text();
+        var name = $(data).find('Name').text();
+        var symbol = $(data).find('Symbol').text();
+        var volume = $(data).find('Volume').text();
+        var stockxchange = $(data).find('StockExchange').text();
+
+        gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
+        gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
+        days_gain = 'TBD'//change * value['shares'];
+        
+        row = [
+            name,
+            symbol,
+            lastTradePrice,
+            changeStr,
+            value['shares'],
+            marketCap,
+            gain,
+            gain_pc,
+            days_gain,
+            '<button id="' + symbol +  '" class="button small radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>'
+        ];
+        sArr.push(row);
     }
-    var daysLow = $(data).find('DaysLow').text();
-    var daysHigh = $(data).find('DaysHigh').text();
-    var yearLow = $(data).find('YearLow').text();
-    var yearHigh = $(data).find('YearHigh').text();
-    var marketCap = parseFloat($(data).find('MarketCapitalization').text()).toFixed(2);
-    var lastTradePrice = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
-    var daysRange = $(data).find('DaysRange').text();
-    var name = $(data).find('Name').text();
-    var symbol = $(data).find('Symbol').text();
-    var volume = $(data).find('Volume').text();
-    var stockxchange = $(data).find('StockExchange').text();
-    
-    var gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
-    var gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
-    var days_gain = 'TBD'//change * value['shares'];
 
     //update totals
-
     window.totalChange = (parseFloat(window.totalChange) + parseFloat(change)).toFixed(2);
     window.totalMarketCap = (parseFloat(window.totalMarketCap) + parseFloat(marketCap)).toFixed(2);
     window.totalGain = (parseFloat(window.totalGain) + parseFloat(gain)).toFixed(2);
     window.totalGainPc = (parseFloat(window.totalGainPc) + parseFloat(gain_pc)).toFixed(2);
     window.totalDaysGain = "TBD";
-    row = [
-        name,
-        symbol,
-        lastTradePrice,
-        changeStr,
-        value['shares'],
-        marketCap,
-        gain,
-        gain_pc,
-        days_gain,
-        '<button id="' + symbol +  '" class="button small radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>'
-    ];
-    sArr.push(row);
+
     if(index==numStocks){
-        var options = {}
-        options.data = sArr;
-        options.columns = [
-                { title: "Name" },
-                { title: "Symbol" },
-                { title: "Last Trade Price" },
-                { title: "Change" },
-                { title: "Shares" },
-                { title: "Market Cap." },
-                { title: "Gain" },
-                { title: "Gain %" },
-                { title: "Day's Gain" },
-                { title: "" }
-            ];
-        options.fnInitComplete = function(){
-            $('#myTable tfoot').prepend(                
-                '<tr>' +
-                    '<th>' +
-                        'Portfolio Value' +
-                    '</th>' +
-                    '<th></th><th></th>' + 
-                    '<th>' +
-                        window.totalChange +
-                    '</th>' +
-                    '<th>' +
-                    '</th>' +
-                    '<th>' +
-                        window.totalMarketCap +
-                    '</th>' +
-                    '<th>' +
-                        window.totalGain +
-                    '</th>' +
-                    '<th>' +
-                        window.totalGainPc +
-                    '</th>' +
-                    '<th>' +
-                        window.totalDaysGain +
-                    '</th>' +
-                '</tr>'
-            );
-        };
-
-        options.aoColumnDefs = [
-
-            { "bSortable": false, 'aTargets': [ -1 ]},
-        ];
-
-        options.lengthMenu = [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]];
-        options.pageLength = 5;
-
-        window.stockTable = $('#myTable').DataTable(options);
+        dataTable(sArr);
     }
 }
 
@@ -534,6 +504,60 @@ function postSellForm(ticker, shares, price){
     } else {
         $('#ticker-not-exist-modal').foundation('reveal', 'open');
     }
+}
+
+function dataTable(sArr){
+    var options = {}
+    options.data = sArr;
+    options.columns = [
+            { title: "Name" },
+            { title: "Symbol" },
+            { title: "Last Trade Price" },
+            { title: "Change" },
+            { title: "Shares" },
+            { title: "Market Cap." },
+            { title: "Gain" },
+            { title: "Gain %" },
+            { title: "Day's Gain" },
+            { title: "" }
+        ];
+    options.fnInitComplete = function(){
+        $('#myTable tfoot').prepend(                
+            '<tr>' +
+                '<th>' +
+                    'Portfolio Value' +
+                '</th>' +
+                '<th></th><th></th>' + 
+                '<th>' +
+                    window.totalChange +
+                '</th>' +
+                '<th>' +
+                '</th>' +
+                '<th>' +
+                    window.totalMarketCap +
+                '</th>' +
+                '<th>' +
+                    window.totalGain +
+                '</th>' +
+                '<th>' +
+                    window.totalGainPc +
+                '</th>' +
+                '<th>' +
+                    window.totalDaysGain +
+                '</th>' +
+            '</tr>'
+        );
+    };
+
+    options.aoColumnDefs = [
+
+        { "bSortable": false, 'aTargets': [ -1 ]},
+    ];
+
+    options.lengthMenu = [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]];
+    options.pageLength = 5;
+
+    window.stockTable = $('#myTable').DataTable(options);
 }
 /*****************************************************************************/
 /* END STOCKS*/

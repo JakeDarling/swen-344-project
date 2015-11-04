@@ -111,6 +111,22 @@
   .comment {
     margin-bottom: 10px;
   }
+
+  .likesMessage {
+    font-size: 12px;
+    line-height: 19px;
+    margin: 0;
+    margin-bottom: 8px;
+    padding: 0;
+  }
+
+  #wall a.liked {
+    color: #5890ff;
+  }
+
+  #wall a.notLiked {
+    color: #7f7f7f;
+  }
 </style>
 <script>
     $(document).ready(function () {
@@ -314,9 +330,10 @@
         });
     }
 
-    function showWall() {
+  function showWall() {
+        
     FB.api(
-      '/me/feed?fields=type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments', 
+      '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id', 
       function(response) {
         if (response && !response.error) {
           postsData = response.data;
@@ -447,9 +464,26 @@
               }
             }
 
+            // Likes
+            var iLike = false;
+            var postLikes = [];
+            if (post.likes) {       
+              postLikes = post.likes.data;
+              for (var l = 0; l < postLikes.length; l++) {
+                if (postLikes[l].id == myId) {
+                  iLike = true;
+                }
+              }
+            }
+
             // Like Post
             $('#post' + postId).append($('<hr>'));
-            $('#post' + postId).append($('<a>', { href: '#', class: 'likePost', text: 'Like '}));
+
+            if (iLike) {
+              $('#post' + postId).append($('<a>', { href: '#', class: 'likePost liked', id: post.id, text: 'Like '}));
+            } else {
+              $('#post' + postId).append($('<a>', { href: '#', class: 'likePost notLiked', id: post.id, text: 'Like '}));
+            }
 
             // Comment on Post
             $('#post' + postId).append($('<a>', { href: '#', class: 'commentPost', text: 'Comment '  }));
@@ -465,6 +499,35 @@
               class: 'fbComments',
               id: 'comments' + postId
             }));
+
+
+            // 1 person likes Post
+            if (postLikes.length == 1) {
+              var likesMessage;
+              if (iLike == true) {
+                likesMessage = 'You like this.';
+              } else {
+                likesMessage = postLikes[0].name + ' likes this.';
+              }
+              $('#comments' + postId).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+            }
+
+            // 2 people like this.
+            if (postLikes.length == 2) {
+              var likesMessage;
+              if (iLike == true) {
+                var otherPerson;
+                for (var u = 0; u < postLikes.length; u++) {
+                  if (postLikes[u].id != myId) {
+                    otherPerson = postLikes[u].name;
+                  }
+                }
+                likesMessage = 'You and ' + otherPerson + ' like this.';
+              } else {
+                likesMessage = postLikes[0].name + ' and ' + postLikes[1].name + ' like this.';
+              }
+              $('#comments' + postId).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+            }
 
             // Comments
             if (comments) {
@@ -530,8 +593,42 @@
             }));
           }
         }
+
+        // Click to Like
+        $('#wall a.notLiked').click(function() {
+          FB.api(
+            "/" + $(this).attr('id') + "/likes",
+            "POST",
+            function (response) {
+              if (response && !response.error) {
+                console.log('liked!');
+              } else {
+                console.log('error');
+              }
+            }
+          );
+          $(this).attr('class', 'likePost liked');
+          location.reload();
+        });
+
+        // Click to Unlike
+        $('#wall a.liked').click(function() {
+          FB.api(
+            "/" + $(this).attr('id') + "/likes",
+            "DELETE",
+            function (response) {
+              if (response && !response.error) {
+                console.log('unliked');
+              } else {
+                console.log('error');
+              }
+            }
+          );
+          $(this).attr('class', 'likePost notLiked');
+          location.reload();
+        });
     });
-  }
+  }   
 
   function updateStatus(status) {
       FB.api('/me/feed',

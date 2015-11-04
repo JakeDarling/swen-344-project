@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
 
+  get '/get-my-events' => 'calendar#get_my_events'
+
   #stocks actions
   post '/buy-stock' => 'stocks#buy_stock'
   post '/sell-stock' => 'stocks#sell_stock'

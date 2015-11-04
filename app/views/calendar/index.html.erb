@@ -10,33 +10,67 @@
 
   	$('#removeBtn').hide();
 
-    $('#calendar').fullCalendar({
-    	header: {
-				left: 'prev,next today',
-				center: 'title',
-				right: 'month,agendaWeek,agendaDay'
-			},
-			defaultView: 'agendaWeek',
-			selectable: true,
-			selectHelper: true,
-			editable: true,
+  	var events = [
+				{
+					title: 'Long Event',
+					start: '2015-11-11',
+					end: '2015-11-11'
+				},
+				{
+					title: 'Other Event',
+					start: '2015-11-07',
+					end: '2015-11-07'
+				}
+			];
 
-			// Adding an event
-		  select: function(start, end) {
-		  	eventStartDate = start.format('MMM DD, YYYY');
-		  	eventStartTime = start.format('hh:mm A');
-		  	eventEndDate = end.format('MMM DD, YYYY');
-		  	eventEndTime = end.format('hh:mm A');
+		console.log(events);
 
-		  	$('#myModal').foundation('reveal', 'open');
-			},
+		// Load Events from Database
+  	$.ajax({
+        type:'GET',
+        url:'/get-my-events',
+        dataType:'json',
+        success: function(data){
+            for (var z = 0; z < data.events.length; z++) {
+            	var event = {};
 
-		  // Show event info
-		  eventClick: function(calEvent, jsEvent, view) {
-  			$('#removeBtn').show();
-  			selectedEvent = calEvent;
-		  },
-		});
+            	event.title = data.events[z].title;
+            	event.start = data.events[z].start;
+            	event.end = data.events[z].end1;
+
+            	events.push(event);
+            }
+
+				    $('#calendar').fullCalendar({
+				    	header: {
+								left: 'prev,next today',
+								center: 'title',
+								right: 'month,agendaWeek,agendaDay'
+							},
+							defaultView: 'agendaWeek',
+							selectable: true,
+							selectHelper: true,
+							editable: true,
+							events: events,
+
+							// Adding an event
+						  select: function(start, end) {
+						  	eventStartDate = start.format('MMM DD, YYYY');
+						  	eventStartTime = start.format('hh:mm A');
+						  	eventEndDate = end.format('MMM DD, YYYY');
+						  	eventEndTime = end.format('hh:mm A');
+
+						  	$('#myModal').foundation('reveal', 'open');
+							},
+							
+						  // Show event info
+						  eventClick: function(calEvent, jsEvent, view) {
+				  			$('#removeBtn').show();
+				  			selectedEvent = calEvent;
+						  }
+						});
+        }
+    });
 
 		$('#removeBtn').click(function() {
 		  $('#calendar').fullCalendar('removeEvents', selectedEvent._id);

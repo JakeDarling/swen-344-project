@@ -2,10 +2,17 @@ class CalendarController < ApplicationController
 	def index
 	end
 
+	def get_my_events
+	    user = User.find_by(fbUserId:session[:user])
+	    events = Event.where(user_id:user.id)
+
+	    render :json => {events:events}
+	  end
+
 	def store_event
 		title = params[:title]
 		start = params[:start]
-		end1 = params[:end]
+		end1 = params[:end1]
 
 		user = User.find_by(fbUserId:session[:user])
 

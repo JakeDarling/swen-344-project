@@ -127,14 +127,6 @@
   #wall a.notLiked {
     color: #7f7f7f;
   }
-
-  #wall img.thumbsUpIcon, #wall img.commentIcon, #wall img.shareIcon {
-    height: 17px;
-    width: 17px;
-    border: none;
-    margin-bottom: -4px;
-    margin-right: 4px;
-  }
 </style>
 <script>
     $(document).ready(function () {
@@ -487,13 +479,6 @@
             // Like Post
             $('#post' + postId).append($('<hr>'));
 
-            $('#post' + postId).append($('<img src="like.png" alt="like" class="thumbsUpIcon">'));
-            $('post' + postId).append($('img'), {
-              src: '../assets/images/like.png',
-              alt: 'like',
-              width: 17,
-              height: 17
-            });
             if (iLike) {
               $('#post' + postId).append($('<a>', { href: '#', class: 'likePost liked', id: post.id, text: 'Like '}));
             } else {
@@ -501,7 +486,6 @@
             }
 
             // Comment on Post
-            $('#post' + postId).append($('<img src="comment.png" alt="comment" class="commentIcon">'));
             $('#post' + postId).append($('<a>', { 
               class: 'commentPost',
               id: 'commentPost' + post.id, 
@@ -510,7 +494,6 @@
 
             // Share Post
             if (postType == 'link') {
-              $('#post' + postId).append($('<img src="share.png" alt="share" class="shareIcon">'));
               $('#post' + postId).append($('<a>', { href: '#', class: 'sharePost', text: 'Share '  }));
             }
 
@@ -552,9 +535,8 @@
 
             // Comments
             if (post.comments) {
-              // Each Comment
-              for (var k = 0; k < post.comments.length; k++) {
-                var comment = post.comments[k];
+              for (var k = 0; k < post.comments.data.length; k++) {
+                var comment = post.comments.data[k];
                 // Comment Div
                 $('#comments' + postId).append($('<div>', {
                   class: 'comment',

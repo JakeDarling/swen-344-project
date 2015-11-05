@@ -127,6 +127,14 @@
   #wall a.notLiked {
     color: #7f7f7f;
   }
+
+  #wall img.thumbsUpIcon, #wall img.commentIcon {
+    height: 17px;
+    width: 17px;
+    border: none;
+    margin-bottom: -4px;
+    margin-right: 4px;
+  }
 </style>
 <script>
     $(document).ready(function () {
@@ -479,6 +487,13 @@
             // Like Post
             $('#post' + postId).append($('<hr>'));
 
+            $('#post' + postId).append($('<img src="like.png" alt="like" class="thumbsUpIcon">'));
+            $('post' + postId).append($('img'), {
+              src: '../assets/images/like.png',
+              alt: 'like',
+              width: 17,
+              height: 17
+            });
             if (iLike) {
               $('#post' + postId).append($('<a>', { href: '#', class: 'likePost liked', id: post.id, text: 'Like '}));
             } else {
@@ -486,6 +501,7 @@
             }
 
             // Comment on Post
+            $('#post' + postId).append($('<img src="comment.png" alt="comment" class="commentIcon">'));
             $('#post' + postId).append($('<a>', { 
               class: 'commentPost',
               id: 'commentPost' + post.id, 
@@ -697,6 +713,7 @@
   <div id="facebook-post-status" name="facebook-post-status">
   </div>
 
+  <i class="general foundicon-edit"><p>edit</p></i>
   <div id="wall" class="large-6 small-12 columns" name="wall">
   </div>
 

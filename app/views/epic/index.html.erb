@@ -337,7 +337,7 @@
       function(response) {
         if (response && !response.error) {
           postsData = response.data;
-          for (i = 0; i < postsData.length; i++) {
+          for (var i = 0; i < postsData.length; i++) {
             var post = postsData[i];
 
             // Profile Pic of Poster
@@ -486,7 +486,11 @@
             }
 
             // Comment on Post
-            $('#post' + postId).append($('<a>', { href: '#', class: 'commentPost', text: 'Comment '  }));
+            $('#post' + postId).append($('<a>', { 
+              class: 'commentPost',
+              id: 'commentPost' + post.id, 
+              text: 'Comment '  
+            }));
 
             // Share Post
             if (postType == 'link') {
@@ -530,10 +534,10 @@
             }
 
             // Comments
-            if (comments) {
+            if (post.comments) {
               // Each Comment
-              for (var k = 0; k < comments.length; k++) {
-                var comment = comments[k];
+              for (var k = 0; k < post.comments.length; k++) {
+                var comment = post.comments[k];
                 // Comment Div
                 $('#comments' + postId).append($('<div>', {
                   class: 'comment',
@@ -588,6 +592,7 @@
             $('#comments' + postId).append($('<input>', {
               type: 'text',
               class: 'addCommentField',
+              id: 'addCommentField' + post.id,
               name: 'addComment' + postId,
               placeholder: 'Write a comment...'
             }));
@@ -626,6 +631,30 @@
           );
           $(this).attr('class', 'likePost notLiked');
           location.reload();
+        });
+
+        // Click to Add Comment
+        $('#wall a.commentPost').click(function() {
+          $('#addCommentField' + $(this).attr('id').substring('commentPost'.length)).focus();
+        });
+
+        // Submit Post Comment
+        $('.addCommentField').keypress(function(event) {
+          if (event.keyCode == 13) { // Enter key
+            FB.api(
+              "/" + $(this).attr('id').substring('addCommentField'.length) + "/comments",
+              "POST",
+              {"message":$(this).val()},
+              function (response) {
+                if (response && !response.error) {
+                  // Added comment
+                } else {
+                  console.log('error');
+                }
+              }
+            );
+            location.reload();
+          }
         });
     });
   }   

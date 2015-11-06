@@ -3,16 +3,12 @@
 
 # Testing
 ## Getting your code tested and deployed
-PRs must include accompanying integration tests. These are largely already implemented. What
-you need to do is edit [features/support/pages.rb](https://github.com/JakeDarling/swen-344-project/blob/master/features/support/pages.rb)
-and fill in the element ids or selectors. *Do not hesitate to ask me (Jake) for help with this*
+PRs should now include accompanying integration tests before merging. *After you open a PR, Jake will begin writing tests and merging to your branch*
 
-For a more detailed explanation on how everything works, read the section on writing new tests.
-
-After your PR merges into the ```develop``` branch, you may run the appropriate promotion job
+After your PR merges into the ```develop``` branch, you may run the promote-stage job
 [on jenkins](http://vm344a.se.rit.edu:8080/)
 Jenkins will push to our dev heroku app, run the appropriate tests, push to heroku staging, and then merge
-develop into master and push the new master.
+develop into master and push the new master. Credentials for Jenkins are in the Google Drive "VM and Jenkins Creds" 
 
 
 ## Running Integration Tests  

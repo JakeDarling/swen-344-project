@@ -24,6 +24,9 @@
 //= require fullcalendar
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.foundation
+//= require dataTables/extras/dataTables.fixedHeader
+//= require dataTables/extras/dataTables.tableTools
+//= require dataTables/extras/dataTables.responsive
 $(document).foundation();
 
 $(function() {
@@ -556,6 +559,7 @@ function dataTable(sArr){
 
     options.lengthMenu = [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]];
     options.pageLength = 5;
+    options.responsive = true;
 
     window.stockTable = $('#myTable').DataTable(options);
 }
@@ -573,6 +577,7 @@ function dataTableTrans(sArr){
         "data": sArr,
         "order": [[ 4, "desc" ]],
         "fixedHeader": true,
+        "responsive": true,
         "aoColumnDefs": [
             {
                 "aTargets":[3],
@@ -586,6 +591,18 @@ function dataTableTrans(sArr){
                 }
             }
         ],
+        /*"oTableTools": {
+            "sSwfPath": "dataTables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf",
+            "aButtons": ["copy", "print", {
+                 "sExtends": "collection",
+                 "sButtonText": "Save <span class=\"caret\" />",
+                 "aButtons": ["csv", "xls", "pdf"]
+            }]
+        },*/
+        "dom": 'T<"clear">lfrtip',
+        "tableTools": {
+            "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
+        },
     } );
 }
 

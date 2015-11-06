@@ -318,7 +318,7 @@ function buildStockTable(data){
     var stocks = data['stocks'];
     var sArr = [];
     var row;
-    var numStocks = Object.keys(stocks).length
+    var numStocks = Object.keys(stocks).length;
     var index = 0;
 
     if(stocks.length == 0){
@@ -558,6 +558,89 @@ function dataTable(sArr){
     options.pageLength = 5;
 
     window.stockTable = $('#myTable').DataTable(options);
+}
+
+function dataTableTrans(sArr){
+    $('#trans-table').DataTable( {
+
+        "columns": [
+            {title: "Symbol"},
+            {title: "Price"},
+            {title: "Shares"},
+            {title: "Buy/Sell"},
+            {title: "Date"},
+        ],
+        "data": sArr,
+        "order": [[ 4, "desc" ]],
+        "fixedHeader": true,
+        "aoColumnDefs": [
+            {
+                "aTargets":[3],
+                "fnCreatedCell": function(nTd, sData, oData, iRow, iCol)
+                {
+                    if(sData == 'sell' ) {
+                         $(nTd).css('color', 'red');
+                    } else if(sData == 'buy'){
+                        $(nTd).css('color', 'green');
+                    }
+                }
+            }
+        ],
+    } );
+}
+
+function getUserTransactions(){
+    $.ajax({
+        type:'GET',
+        url:'/get-my-transactions',
+        dataType:'json',
+
+        success: function(data){
+            buildTransTable(data);
+        }
+    });
+}
+
+function buildTransTable(data){
+        //$('#debug-output').html(JSON.stringify(data));
+    var ts = data['transactions'];
+    var sArr = [];
+    var row;
+    var numTrans = Object.keys(ts).length;
+    var index = 0;
+    var price;
+    var tType;
+    var datetime;
+
+    if(ts.length == 0){
+        dataTable([]);
+    } else {
+        $.each(ts, function(index, value){
+            price = parseFloat(value['price']);
+            shares = parseInt(value['shares']);
+            tType = 'buy'
+            datetime = new Date(value['timestamp']);
+            index ++;
+            if(shares < 0.0){
+                tType = 'sell';
+                shares *= -1;
+            }
+            sArr.push([value['ticker_symbol'], price, shares, tType, formatDate(datetime)])
+            
+        });
+        dataTableTrans(sArr);
+    }
+}
+
+function formatDate(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
 }
 /*****************************************************************************/
 /* END STOCKS*/

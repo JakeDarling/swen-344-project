@@ -603,6 +603,18 @@ function dataTableTrans(sArr){
         "tableTools": {
             "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
         },
+        aButtons: [
+            { sExtends: "csv",
+              sFileName: 'download.csv',
+              sFieldSeperator: "," //<--- example of how to set the delimiter
+            },
+            { sExtends: "xls",
+              sFileName: 'download.xls'
+            },
+            { sExtends: "pdf",
+              sFileName: 'download.pdf'
+            }   
+        ], 
     } );
 }
 

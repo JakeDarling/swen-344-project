@@ -41,6 +41,8 @@
                 success: function (data) {
                     quoteFormData = data;
                     printQuote(data);
+                    d3.select("svg").remove();
+                    $('#chart').html("<svg></svg>");
                     genChart(data, 30, 'chart');
                     $('#chartDateButtons').css('visibility', 'visible');
                     $('#1month').focus();

@@ -337,7 +337,7 @@
       function(response) {
         if (response && !response.error) {
           postsData = response.data;
-          for (i = 0; i < postsData.length; i++) {
+          for (var i = 0; i < postsData.length; i++) {
             var post = postsData[i];
 
             // Profile Pic of Poster
@@ -480,17 +480,21 @@
             $('#post' + postId).append($('<hr>'));
 
             if (iLike) {
-              $('#post' + postId).append($('<a>', { href: '#', class: 'likePost liked', id: post.id, text: 'Like '}));
+              $('#post' + postId).append($('<a>', { class: 'likePost liked', id: post.id, text: 'Like '}));
             } else {
-              $('#post' + postId).append($('<a>', { href: '#', class: 'likePost notLiked', id: post.id, text: 'Like '}));
+              $('#post' + postId).append($('<a>', { class: 'likePost notLiked', id: post.id, text: 'Like '}));
             }
 
             // Comment on Post
-            $('#post' + postId).append($('<a>', { href: '#', class: 'commentPost', text: 'Comment '  }));
+            $('#post' + postId).append($('<a>', { 
+              class: 'commentPost',
+              id: 'commentPost' + post.id, 
+              text: 'Comment '  
+            }));
 
             // Share Post
             if (postType == 'link') {
-              $('#post' + postId).append($('<a>', { href: '#', class: 'sharePost', text: 'Share '  }));
+              $('#post' + postId).append($('<a>', { class: 'sharePost', text: 'Share '  }));
             }
 
             // Comments Box
@@ -530,10 +534,9 @@
             }
 
             // Comments
-            if (comments) {
-              // Each Comment
-              for (var k = 0; k < comments.length; k++) {
-                var comment = comments[k];
+            if (post.comments) {
+              for (var k = 0; k < post.comments.data.length; k++) {
+                var comment = post.comments.data[k];
                 // Comment Div
                 $('#comments' + postId).append($('<div>', {
                   class: 'comment',
@@ -559,17 +562,17 @@
                 if (comment.can_like) {
                   if (comment.user_likes==true) {
                     // Unlike Comment
-                    $('#comment' + comment.id).append($('<a>', { href: '#', text: 'Unlike ' }));
+                    $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
                   } else {
                     // Like Comment
-                    $('#comment' + comment.id).append($('<a>', { href: '#', text: 'Like ' }));
+                    $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
                   }
                   $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
                 }
 
                 // Reply to Comment
                 if (comment.can_comment) {
-                  $('#comment' + comment.id).append($('<a>', { href: '#', text: 'Reply ' }));
+                  $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
                 $('#comment' + comment.id).append($('</br>'));
                 }
               }
@@ -588,6 +591,7 @@
             $('#comments' + postId).append($('<input>', {
               type: 'text',
               class: 'addCommentField',
+              id: 'addCommentField' + post.id,
               name: 'addComment' + postId,
               placeholder: 'Write a comment...'
             }));
@@ -626,6 +630,30 @@
           );
           $(this).attr('class', 'likePost notLiked');
           location.reload();
+        });
+
+        // Click to Add Comment
+        $('#wall a.commentPost').click(function() {
+          $('#addCommentField' + $(this).attr('id').substring('commentPost'.length)).focus();
+        });
+
+        // Submit Post Comment
+        $('.addCommentField').keypress(function(event) {
+          if (event.keyCode == 13) { // Enter key
+            FB.api(
+              "/" + $(this).attr('id').substring('addCommentField'.length) + "/comments",
+              "POST",
+              {"message":$(this).val()},
+              function (response) {
+                if (response && !response.error) {
+                  // Added comment
+                } else {
+                  console.log('error');
+                }
+              }
+            );
+            location.reload();
+          }
         });
     });
   }   
@@ -668,6 +696,7 @@
   <div id="facebook-post-status" name="facebook-post-status">
   </div>
 
+  <i class="general foundicon-edit"><p>edit</p></i>
   <div id="wall" class="large-6 small-12 columns" name="wall">
   </div>
 

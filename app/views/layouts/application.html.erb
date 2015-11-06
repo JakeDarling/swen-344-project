@@ -13,25 +13,27 @@
 </head>
 
 <script>
-  $(document).ready(function(){
-    $('#fbSubmit').click(function(){
-      $.ajax({
-        type:'POST',
-        url:'/associate-user',
-        data:{'idString': $('#fbIdTextBox').val()},
-        success: function(){
-            //alert("Successfully associated user with FB ID: " + $('#fbIdTextBox').val());
-            window.location.reload();
-        }
-      });
-    });
-  });
+    /*
+    $(document).ready(function () {
+
+        $('#fbSubmit').click(function () {
+            $.ajax({
+                type: 'POST',
+                url: '/associate-user',
+                data: {'idString': $('#fbIdTextBox').val()},
+                success: function () {
+                    //alert("Successfully associated user with FB ID: " + $('#fbIdTextBox').val());
+                    window.location.reload();
+                }
+            });
+        });
+    });*/
 </script>
 <body>
 <nav class="top-bar" data-topbar role="navigation">
   <ul class="title-area">
     <li class="name">
-      <h1><a href="#">EPIC</a></h1>
+      <a href="/"> <%= image_tag('epic_banner.png', :alt => 'epic application') %></a>
     </li>
     <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
     <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
@@ -40,39 +42,29 @@
   <section class="top-bar-section">
     <!-- Right Nav Section -->
     <ul class="right">
-      <li><a href="/calendar">Calendar</a></li>
-      <li><a href="/stocks">Stocks</a></li>
+      <li><a href="/"><%= image_tag('dash_button.png', :alt => 'Dashboard') %></a></li>
+      <li><a href="/calendar"><%= image_tag('calendar_button.png', :alt => 'calendar page') %></a></li>
+      <li><a href="/stocks"><%= image_tag('stock_button.png', :alt => 'stocks page') %></a></li>
       <li><a href="/my-stocks">My Stocks</a></li>
-      <li><input type="text" id="fbIdTextBox" name="fbIdTextBox"/></li>
-      <li><input type="submit" id="fbSubmit" name="fbSubmit"/></li>
+      <!--<li><input type="text" id="fbIdTextBox" name="fbIdTextBox"/></li>
+      <li><input type="submit" id="fbSubmit" name="fbSubmit"/></li>-->
       <li>
         <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logon.png', :alt => 'facebook logon') %></a>
-        </div>
       </li>
-    </ul>
-
-    <!-- Left Nav Section -->
-    <ul class="left">
-      <li><a class="dash" href="/"><%= image_tag('dash_button.png', :alt => 'Dashboard') %></a></li>
     </ul>
   </section>
 </nav>
-<div id="main_wrap" class="large-12 small-12 columns">
-  <div>Session User FB ID: <%= session[:user] %></div>
-  <%= yield %>
-</div>
-<div class="row">
-  <div class="large-12 columns">
-    <div class="row">
-      <div class="large-6 columns">
-        <p>&copy; Copyright EPIC development-team 2015</p>
-      </div>
-      <div class="large-6 columns">
-        <ul class="inline-list right">
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/">Calendar</a></li>
-          <li><a href="/stocks">Stocks</a></li>
-        </ul>
+<div id="main_wrap" class="row full_width">
+  <div id="main_wrap" class="large-12 small-12 columns">
+    <!--<div>Session User FB ID: <%= session[:user] %></div>-->
+    <%= yield %>
+  </div>
+  <div class="row">
+    <div class="large-12 columns">
+      <div class="row">
+        <div class="large-6 columns">
+          <p>&copy; Copyright EPIC development-team 2015</p>
+        </div>
       </div>
     </div>
   </div>

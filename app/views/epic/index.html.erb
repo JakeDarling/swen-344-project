@@ -217,20 +217,30 @@
             console.log('Successful login for: ' + response.name);
             document.getElementById('login-status').innerHTML =
                     'Thanks for logging in, ' + response.name + '!';
-            document.getElementById('facebook-post-status').innerHTML =
-                    '<select id="status_privacy"><option value="EVERYONE">Public</option><option value="ALL_FRIENDS">Friends</option>' +
-                    '<option value="FRIENDS_OF_FRIENDS">Friends of Friends</option><option value="SELF">Only Me</option></select>';
-            document.getElementById('facebook-post-status').innerHTML +=
-                    '<form onsubmit="updateStatus(this.status.value)">Post Status: <input type="text" name="status" /><input type="submit" /></form>';
-            document.getElementById('facebook-post-status').innerHTML +=
-                    '<form onsubmit="uploadPhoto(this.caption.value, this.url.value)">Post Photo (Enter URL): <input type="text" name="url" />Caption: <input type="text" name="caption" /><input type="submit" /></form>';
             document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
+
+            displayPostStatus();
         });
+    }
+
+    function displayPostStatus() {
+        $("#facebook-post-status").append(
+            '<select id="status_privacy"><option value="EVERYONE">Public</option><option value="ALL_FRIENDS">Friends</option>' +
+            '<option value="FRIENDS_OF_FRIENDS">Friends of Friends</option><option value="SELF">Only Me</option></select>');
+
+        $("#facebook-post-status").append('<ul class="tabs" data-tab><li class="tab-title active"><a href="#panel1">Post Status</a></li><li class="tab-title"><a href="#panel2">Post Photo</a></li></ul>');
+        $("#facebook-post-status").append(
+            '<div class="tabs-content"><div class="content active" id="panel1">' +
+            '<form onsubmit="updateStatus(this.status.value)"><input type="text" name="status" placeholder="What\'s on your mind?" /><input type="submit" style="visibility: hidden;" /></form>' +
+            '</div><div class="content" id="panel2">' +
+            '<form onsubmit="uploadPhoto(this.caption.value, this.url.value)"><input type="text" name="url" placeholder="Enter URL" /><input type="text" name="caption" placeholder="Caption" /><input type="submit" style="visibility: hidden;" /></form>' +
+            '</div></div>');
+        $(document).foundation();
     }
 
     function showWall() {
     FB.api(
-      '/me/feed?fields=type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments', 
+      '/me/feed?fields=type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments',
       function(response) {
         if (response && !response.error) {
           postsData = response.data;
@@ -242,7 +252,7 @@
 
             // Post Time
             var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
-            var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
+            var monthNames = ["January", "February", "March", "April", "May", "June", "July",
                               "August", "September", "October", "November", "December"];
             var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
             var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
@@ -377,7 +387,7 @@
                 var comment = comments[k];
                 // Comment Image
                 $('#comments' + postId).append($('<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><img src="https://graph.facebook.com/' + comment.from.id + '/picture?fields=url&type=square" alt="Comment Pic" height="32px" width="32px"></a>'));
-                
+
                 // Comment Name
                 $('#comments' + postId).append($('<a>', {
                   href: 'https://facebook.com/' + comment.from.id,

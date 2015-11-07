@@ -31,7 +31,7 @@ class StocksController < ApplicationController
     price - the price of the stock at purchase time
 =end  
   def buy_stock
-    ticker = params[:ticker_symbol]
+    ticker = params[:ticker_symbol].upcase
     shares = params[:shares]
     price = params[:price]
     user = User.find_by(fbUserId:session[:user])
@@ -106,7 +106,7 @@ class StocksController < ApplicationController
     price - the price of the stock at purchase time
 =end
   def sell_stock
-    ticker = params[:ticker_symbol]
+    ticker = params[:ticker_symbol].upcase
     shares = params[:shares]
     price = params[:price]
     user = User.find_by(fbUserId:session[:user])

@@ -87,17 +87,30 @@ class Calendar
   def on_page?
     false
   end
-  # Clicks the nth day div on the calendar
-  def select_day(day_index)
-    @b.div(:class => 'TODO').click
+  def set_title(title)
+    @b.text_field(:id => 'titleField').set title
   end
-  def set_start_time(start_time)
-    @b.text_field(:id => 'TODO').set start_time
+  # Fullcalendar makes this odd, so this just clicks the first entry
+  def add_event
+    @b.div(:class => 'fc-widget-content').click
   end
-  def set_end_time(end_time)
-    @b.text_field(:id => 'TODO').set end_time
+  def set_start_time(time)
+    @b.text_field(:id => 'startTimeField').set time
   end
-  def set_description(desc)
-    @b.text_field(:id => 'TODO').set desc
+  def set_end_time(time)
+    @b.text_field(:id => 'endTimeField').set time
+  end
+  def set_start_day(day)
+    @b.text_field(:id => 'startDateField').set day
+  end
+  def set_end_day(day)
+    @b.text_field(:id => 'endDateField').set day
+  end
+  def save_event
+    @b.link(:class => 'closeModal').click
+  end
+  # True is at least one event exists
+  def has_events?
+    @b.div(:class => 'fc-event').exists?
   end
 end

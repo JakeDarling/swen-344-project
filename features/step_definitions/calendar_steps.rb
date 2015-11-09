@@ -3,31 +3,29 @@ require 'rspec/expectations'
 require_relative '../support/pages.rb'
 
 And(/^I have navigated to the calendar page$/) do
-  pending # express the regexp above with the code you wish you had
+  @b.goto CALENDAR_URL
 end
 
 When(/^I choose to add a new calendar event$/) do
-  pending # express the regexp above with the code you wish you had
+  Calendar.new(@b).add_event
 end
 
-And(/^I set the date$/) do
-  pending # express the regexp above with the code you wish you had
+And(/^I set the start and end day$/) do
+  Calendar.new(@b).set_start_day 'Nov 06, 2015'
+  Calendar.new(@b).set_end_day 'Nov 06, 2015'
 end
 
 And(/^I set the start and end time$/) do
-  pending # express the regexp above with the code you wish you had
-end
-
-And(/^I add a description$/) do
-  pending # express the regexp above with the code you wish you had
+  Calendar.new(@b).set_start_time '6:30 AM'
+  Calendar.new(@b).set_end_time '7:30 AM'
 end
 
 And(/^I confirm the event$/) do
-  pending # express the regexp above with the code you wish you had
+  Calendar.new(@b).save_event
 end
 
 Then(/^the event is displayed on my calendar$/) do
-  pending # express the regexp above with the code you wish you had
+  expect(Calendar.new(@b).has_events?)
 end
 
 Given(/^I have created a calendar event$/) do
@@ -46,7 +44,7 @@ And(/^I change the end time$/) do
   pending # express the regexp above with the code you wish you had
 end
 
-And(/^I change the description$/) do
+And(/^I change the title/) do
   pending # express the regexp above with the code you wish you had
 end
 
@@ -60,4 +58,8 @@ end
 
 Then(/^my calendar does not display any events$/) do
   pending
+end
+
+And(/^I set the event title$/) do
+  Calendar.new(@b).set_title 'Test Event'
 end

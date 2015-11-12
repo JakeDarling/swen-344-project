@@ -1,7 +1,7 @@
 <script>
 
   $(document).ready(function () {
-  	var selectedEvent = '';
+  	var selectedEvent;
   	var eventTitle = '';
   	var eventStartDate = '';
   	var eventStartTime = '';
@@ -61,6 +61,17 @@
 
 		$('#removeBtn').click(function() {
 		  $('#calendar').fullCalendar('removeEvents', selectedEvent._id);
+	    $.ajax({
+        type:'POST',
+        url:'/remove-event',
+        data:{
+          'selectedEvent': selectedEvent
+        },
+        success: function() {
+        	console.log('asdffdas;');
+          alert('event removed');
+        }
+      });
 		});
 
 		// Model is open

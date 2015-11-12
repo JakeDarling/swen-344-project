@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   get '/calendar' => 'calendar#index'
   post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
-
+  post '/remove-event' => 'calendar#remove_event'
   get '/get-my-events' => 'calendar#get_my_events'
 
   #stocks actions

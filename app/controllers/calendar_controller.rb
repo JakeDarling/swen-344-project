@@ -28,4 +28,13 @@ class CalendarController < ApplicationController
 
 		render:nothing => true
 	end
+
+	def remove_event
+		user = User.find_by(fbUserId:session[:user])
+    var event = params[:selectedEvent];
+
+    Event.find_by(user: user, title:event.title, start:event.start, end1:event.end).destroy()
+
+    render:nothing => true
+  end
 end

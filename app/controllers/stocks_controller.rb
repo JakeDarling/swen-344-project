@@ -196,4 +196,20 @@ class StocksController < ApplicationController
       return true
     end
   end
+
+=begin
+  render the transactions page
+=end
+  def render_transactions
+    render :template => "stocks/transactions"
+  end
+
+=begin
+  return all transactions for the associated user
+=end
+  def get_my_transactions
+    user = User.find_by(fbUserId:session[:user])
+    ts = Transaction.where(user_id:user.id)
+    render :json => {transactions:ts}
+  end
 end

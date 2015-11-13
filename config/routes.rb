@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   get '/get-my-stocks' => 'stocks#get_my_stocks'
 
   #transactions actions
+  post 'upload-transactions' => 'stocks#upload_transactions'
   get '/get-my-transactions' => 'stocks#get_my_transactions'
 
   # The priority is based upon order of creation: first created -> highest priority.

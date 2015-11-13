@@ -9,12 +9,19 @@
 			</tfoot>
 		</table>
 
+		<div id="dvImportSegments" class="fileupload ">
+		    <fieldset>
+		        <legend>Upload your CSV File</legend>
+		            <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+		   </fieldset>
+		</div>
+		<script src="http://jquery-csv.googlecode.com/files/jquery.csv-0.71.js"></script>
 		<script>
 			$(document).ready(function(){
 				getUserTransactions();
-				
+				    // The event listener for the file upload
+    			document.getElementById('txtFileUpload').addEventListener('change', upload, false);
 			});
-
 		</script>
 		<style type="text/css">
 

@@ -212,4 +212,14 @@ class StocksController < ApplicationController
     ts = Transaction.where(user_id:user.id)
     render :json => {transactions:ts}
   end
+
+  def upload_transactions
+    data = JSON.parse(params[:data])
+    #puts data.inspect
+    puts "=========================="
+    puts data[1].inspect
+    puts data[1][0]
+    puts data[1][1]
+    render :json => { :ok => true }, :status => :ok
+  end
 end

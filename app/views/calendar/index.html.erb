@@ -37,7 +37,6 @@
 
 			// Adding an event
 		  select: function(start, end) {
-		  	console.log(start.format('h'));
 		  	eventStartDate = start.format('l');
 		  	eventStartTime = start.format('hh:mm A');
 		  	eventEndDate = end.format('l');
@@ -101,7 +100,6 @@
 					start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
 					end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
 				};
-				console.log(eventData.start);
 
 				// Store event in database
 				if (eventData.title && eventData.start && eventData.end) {
@@ -114,7 +112,6 @@
 	            'end1': eventData.end,
 	          },
 	          success: function(){
-	          	console.log(eventData.start);
 	            console.log('Event stored');
 							$('#calendar').fullCalendar('renderEvent', eventData, true);
 					  	$('#myModal').foundation('reveal', 'close');

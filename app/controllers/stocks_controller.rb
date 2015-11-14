@@ -42,7 +42,9 @@ class StocksController < ApplicationController
         timestamp = DateTime.now
       else
         puts params[:timestamp]
-        timestamp = DateTime.strptime(params[:timestamp], '%m/%d/%Y  %H:%M:%S %p')
+        timestamp = DateTime.strptime(params[:timestamp], '%m/%d/%Y %H:%M:%S %p')
+        now = DateTime.now
+        timestamp = timestamp.change(:offset => now.zone)
       end
 
       #update Stock table
@@ -126,7 +128,9 @@ class StocksController < ApplicationController
       if params[:timestamp] == nil
         timestamp = DateTime.now
       else
-        timestamp = DateTime.strptime(params[:timestamp], '%m/%d/%Y  %H:%M:%S %p')
+        timestamp = DateTime.strptime(params[:timestamp], '%m/%d/%Y %H:%M:%S %p')
+        now = DateTime.now
+        timestamp = timestamp.change(:offset => now.zone)
       end
 
       shares = shares.to_i * -1
@@ -208,10 +212,16 @@ class StocksController < ApplicationController
     sReg = /^[0-9]*$/
     tReg = /^[a-zA-Z]+$/
     pReg = /^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*\.[0-9]{2}$/
+    tsReg = /^((?:[0]?[1-9]|[1][012])[-:\/.](?:(?:[0-2]?\d{1})|(?:[3][01]{1}))[-:\/.](?:(?:[1]{1}\d{1}\d{1}\d{1})|(?:[2]{1}\d{3})))(?![\d])(\s+)((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\s?(?:am|AM|pm|PM))?)$/
 
     if ticker == '' or !tReg.match(ticker) or shares == '' or !sReg.match(shares) or pReg == '' or !pReg.match(price)
       return false
     else
+      if timestamp != nil
+        if !tsReg.match(timestamp)
+          return false
+        end
+      end
       return true
     end
   end

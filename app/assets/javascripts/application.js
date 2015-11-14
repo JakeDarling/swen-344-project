@@ -580,7 +580,7 @@ function dataTable(sArr){
 }
 
 function dataTableTrans(sArr){
-    $('#trans-table').DataTable( {
+    window.transTable = $('#trans-table').DataTable( {
 
         "columns": [
             {title: "Symbol"},
@@ -705,6 +705,7 @@ function browserSupportFileUpload() {
 
 // Method that reads and processes the selected file
 function upload(evt) {
+    $('#upload-alert').hide();
     if (!browserSupportFileUpload()) {
         alert('The File APIs are not fully supported in this browser!');
     } else {
@@ -725,7 +726,10 @@ function upload(evt) {
                         'data': JSON.stringify(data),
                     },
                     success: function(){
-                        alert('adsfadsflk');
+                        $('#upload-alert').show();
+                        //refresh the transaction datatable
+                        window.transTable.destroy();
+                        getUserTransactions();
                     },
                 });
             } else {

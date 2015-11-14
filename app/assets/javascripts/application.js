@@ -24,6 +24,7 @@
 //= require fullcalendar
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.foundation
+//= require jquery-ui
 $(document).foundation();
 
 $(function() {

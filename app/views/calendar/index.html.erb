@@ -1,3 +1,11 @@
+<style>
+#ui-datepicker-div {
+	background-color: white;
+	padding: 3px;
+	border: 1px solid black;
+}
+</style>
+
 <script>
 
   $(document).ready(function () {
@@ -9,6 +17,9 @@
   	var eventEndTime = '';
 
   	$('#removeBtn').hide();
+
+  	$('#startDateField').datepicker();	
+  	$('#endDateField').datepicker();	
 
   	var events = [];
 

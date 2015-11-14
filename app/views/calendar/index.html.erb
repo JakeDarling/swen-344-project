@@ -33,12 +33,14 @@
 			selectable: true,
 			selectHelper: true,
 			editable: true,
+			timezone: 'local',
 
 			// Adding an event
 		  select: function(start, end) {
-		  	eventStartDate = start.format('MMM DD, YYYY');
+		  	console.log(start.format('h'));
+		  	eventStartDate = start.format('l');
 		  	eventStartTime = start.format('hh:mm A');
-		  	eventEndDate = end.format('MMM DD, YYYY');
+		  	eventEndDate = end.format('l');
 		  	eventEndTime = end.format('hh:mm A');
 
 		  	$('#myModal').foundation('reveal', 'open');
@@ -99,6 +101,7 @@
 					start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
 					end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
 				};
+				console.log(eventData.start);
 
 				// Store event in database
 				if (eventData.title && eventData.start && eventData.end) {
@@ -111,6 +114,7 @@
 	            'end1': eventData.end,
 	          },
 	          success: function(){
+	          	console.log(eventData.start);
 	            console.log('Event stored');
 							$('#calendar').fullCalendar('renderEvent', eventData, true);
 					  	$('#myModal').foundation('reveal', 'close');

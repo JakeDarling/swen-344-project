@@ -37,24 +37,13 @@ class StocksController < ApplicationController
     user = User.find_by(fbUserId:session[:user])
 
     #input validation
-    if validate_stock_input(shares, ticker, price)
-
-      #record the transaction
-      tran = Transaction.new( ticker_symbol:ticker, \
-                              user_id:user.id, \
-                              timestamp:DateTime.now, \
-                              price:price.to_f.round(2), \
-                              shares:shares \
-                            )
-      if tran.valid?
-        tran.save()
+    if validate_stock_input(shares, ticker, price, params[:timestamp])
+      if params[:timestamp] == nil
+        timestamp = DateTime.now
       else
-        #TODO: render failure template but this shouldn't happen since client validates
-        puts "=========================================="
-        puts "Transaction failed. transaction entry invalid."
-        puts "=========================================="
+        puts params[:timestamp]
+        timestamp = DateTime.strptime(params[:timestamp], '%m/%d/%Y  %H:%M:%S %p')
       end
-      puts tran.inspect
 
       #update Stock table
       stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
@@ -69,6 +58,21 @@ class StocksController < ApplicationController
       if stock.valid?
         stock.save()
 
+      else
+        puts "=========================================="
+        puts "Transaction failed. stock entry invalid."
+        puts "=========================================="
+      end
+
+      #record the transaction
+      tran = Transaction.new( ticker_symbol:ticker, \
+                              user_id:user.id, \
+                              timestamp:timestamp, \
+                              price:price.to_f.round(2), \
+                              shares:shares.to_i \
+                            )
+      if tran.valid?
+        tran.save()
         #log to console
         puts "==================================="
         puts "Transaction Complete"
@@ -82,17 +86,23 @@ class StocksController < ApplicationController
         puts "base cost: #{stock.base_cost}"
         puts "==================================="
       else
+        #TODO: render failure template but this shouldn't happen since client validates
         puts "=========================================="
-        puts "Transaction failed. stock entry invalid."
+        puts "Transaction failed. transaction entry invalid."
         puts "=========================================="
+        return false
       end
+      puts tran.inspect
+
     else
       puts "============================="
       puts "invalid inputs. return false"
       puts "============================="
     end
-
-    render:nothing => true
+    if !params[:internal]
+      render:nothing => true
+    end
+    
   end
 
 =begin
@@ -112,32 +122,20 @@ class StocksController < ApplicationController
     user = User.find_by(fbUserId:session[:user])
 
     #input validation
-    if validate_stock_input(shares, ticker, price)
+    if validate_stock_input(shares, ticker, price, params[:timestamp])
+      if params[:timestamp] == nil
+        timestamp = DateTime.now
+      else
+        timestamp = DateTime.strptime(params[:timestamp], '%m/%d/%Y  %H:%M:%S %p')
+      end
 
       shares = shares.to_i * -1
       price = price.to_f.round(2)
 
-      #record the transaction
-      tran = Transaction.new( ticker_symbol:ticker, \
-                              user_id:user.id, \
-                              timestamp:DateTime.now, \
-                              price:price, \
-                              shares:shares \
-                            )
-      if tran.valid?
-        tran.save()
-      else
-        #TODO: render failure template but this shouldn't happen since client validates
-        puts "=========================================="
-        puts "Transaction failed. transaction entry invalid."
-        puts "=========================================="
-      end
-      puts tran.inspect
-
       #update Stock table
       stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
       cost = (shares * price).round(2)
-      if stock != nil
+      if stock != nil and (shares * -1 <= stock.shares)
         stock.shares += shares
         stock.base_cost += cost
       else
@@ -146,11 +144,27 @@ class StocksController < ApplicationController
         puts "=========================================="
         puts "Transaction failed. transaction entry invalid."
         puts "=========================================="
+        return false
       end
       
       if stock.valid?
         stock.save()
-              #log to console
+      else
+        puts "=========================================="
+        puts "Transaction failed. stock entry invalid."
+        puts "=========================================="
+      end
+
+      #record the transaction
+      tran = Transaction.new( ticker_symbol:ticker, \
+                              user_id:user.id, \
+                              timestamp:timestamp, \
+                              price:price, \
+                              shares:shares \
+                            )
+      if tran.valid?
+        tran.save()
+        #log to console
         puts "==================================="
         puts "Transaction Complete"
         puts "user id: #{user.id}"
@@ -163,10 +177,13 @@ class StocksController < ApplicationController
         puts "base cost: #{stock.base_cost}"
         puts "==================================="
       else
+        #TODO: render failure template but this shouldn't happen since client validates
         puts "=========================================="
-        puts "Transaction failed. stock entry invalid."
+        puts "Transaction failed. transaction entry invalid."
         puts "=========================================="
+        return false
       end
+      puts tran.inspect
 
 =begin
       if stock.shares <= 0
@@ -182,10 +199,12 @@ class StocksController < ApplicationController
       puts "invalid inputs. return false"
       puts "============================="
     end
-    render:nothing => true
+    if !params[:internal]
+      render:nothing => true
+    end
   end
 
-  def validate_stock_input(shares, ticker, price)
+  def validate_stock_input(shares, ticker, price, timestamp)
     sReg = /^[0-9]*$/
     tReg = /^[a-zA-Z]+$/
     pReg = /^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*\.[0-9]{2}$/
@@ -214,12 +233,41 @@ class StocksController < ApplicationController
   end
 
   def upload_transactions
-    data = JSON.parse(params[:data])
-    #puts data.inspect
-    puts "=========================="
-    puts data[1].inspect
-    puts data[1][0]
-    puts data[1][1]
+    data = JSON.parse(params[:data]).reverse
+    data.each do |row|
+      ticker = row[0]
+      price = row[1]
+      shares = row[2]
+      tType = row[3]
+      timestamp = row[4]
+      index = 0
+      successful = 0
+
+      if validate_stock_input(shares, ticker, price, timestamp)
+        params[:ticker_symbol] = ticker
+        params[:shares] = shares
+        params[:price] = price
+        params[:timestamp] = timestamp
+        params[:internal] = true
+        if tType == "buy"
+          buy_stock()
+        elsif tType == "sell"
+          sell_stock()
+        else
+          puts "========================================"
+          puts "invalid transaction type. skipping row"
+          puts "========================================" 
+        end
+      else
+        puts "==========================================="
+        puts "invalid value(s) in this row. skipping row"
+        puts "==========================================="
+      end
+    end
+    puts "========================================"
+    puts "Upload complete"
+    puts "========================================"
+    puts index
     render :json => { :ok => true }, :status => :ok
   end
 end

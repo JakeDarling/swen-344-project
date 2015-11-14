@@ -7,7 +7,7 @@ Given(/^I have navigated to the stocks page$/) do
 end
 
 When(/^I search the symbol "(.*?)"$/) do |arg1|
-  Stocks.search_symbol arg1
+  Stocks.new(@b).search_symbol arg1
 end
 
 Then(/^I see the current stock price$/) do
@@ -34,22 +34,30 @@ Then(/^I see the interactive chart$/) do
   expect(Stocks.new(@b).has_chart?)
 end
 
-Given(/^I have searched "([^"]*)"$/) do |arg|
-  step 'I search the symbol "' + arg + '"'
+Given(/^I enter the ticker "([^"]*)"$/) do |arg|
+  MyStocks.new(@b).set_ticker arg
 end
 
 When(/^I choose the buy option$/) do
-  pending
+  MyStocks.new(@b).buy
 end
 
 When(/^I choose (\d+) shares$/) do |arg|
-  pending
+  MyStocks.new(@b).set_shares arg
 end
 
 When(/^I confirm the purchase$/) do
-  pending
+  MyStocks.new(@b).confirm_purchase
 end
 
 Then(/^my transaction history shows the purchase$/) do
-  pending
+  Transactions.new(@b).num_shares(1)
+end
+
+And(/^I navigate to my transaction history$/) do
+  MyStocks.new(@b).transaction_history
+end
+
+Given(/^I have navigated to the my stocks page$/) do
+  Navigation.new(@b).my_stocks
 end

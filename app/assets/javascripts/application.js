@@ -282,7 +282,14 @@ function postBuyForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                $('#buy-success-modal').foundation('reveal', 'open');
+                $('#sell-success-alert').hide();
+                $('#buy-success-alert').show();
+                //refresh the datatable and stock buy form
+                clearChildren(document.getElementById('buy-form'));
+                window.stockTable.destroy();
+                $('#myTable tfoot tr').remove();
+                $('#myTable tbody').remove();
+                getUserStockData();
             }
         });
     } else {
@@ -501,7 +508,15 @@ function postSellForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                $('#sell-success-modal').foundation('reveal', 'open');
+                $('#buy-success-alert').hide();
+                $('#sell-success-alert').show();
+                //refresh the datatable and stock buy form
+                clearChildren(document.getElementById('buy-form'));
+                clearChildren(document.getElementById('sell-modal'));
+                window.stockTable.destroy();
+                $('#myTable tfoot tr').remove();
+                $('#myTable tbody').remove();
+                getUserStockData();
             }
         });
     } else {

@@ -1,6 +1,8 @@
 <html>
 	<script>
 	$(document).ready(function(){
+		$('#buy-success-alert').hide();
+		$('#sell-success-alert').hide();
 		$('#first-buy').click(function(){
 			validateBuyForm();
 		});
@@ -9,16 +11,12 @@
 			var ticker = $('#buy-ticker').val().toUpperCase();
 			var shares = $('#buy-shares').val();
 			getStockPrice(ticker, shares, 'buy');
-			
+			$('#confirm-modal').foundation('reveal', 'close');
 		});
 
 		$('#buy-success-close').click(function(){
-			//refresh the datatable and stock buy form
-			clearChildren(document.getElementById('buy-form'));
-            window.stockTable.destroy();
-            $('#myTable tfoot tr').remove();
-            $('#myTable tbody').remove();
-            getUserStockData();
+			$('#buy-success-alert').hide();
+			
 		});
 
 		$('#sell-submit').click(function(){
@@ -32,16 +30,12 @@
 			var ticker = $('#sell-form-ticker').val().toUpperCase();
 			var shares = $('#sell-form-shares').val();
 			getStockPrice(ticker, shares, 'sell')
+			$('#confirm-sell-modal').foundation('reveal', 'close');
 		});
 
 		$('#sell-success-close').click(function(){
-			//refresh the datatable and stock buy form
-			clearChildren(document.getElementById('buy-form'));
-			clearChildren(document.getElementById('sell-modal'));
-            window.stockTable.destroy();
-            $('#myTable tfoot tr').remove();
-            $('#myTable tbody').remove();
-            getUserStockData();
+			$('#sell-success-alert').hide();
+			
 		});
 		
 		window.totalChange = parseFloat(0);
@@ -63,6 +57,14 @@
 	</style>
 	<body>
 		<div id="debug-output">
+		</div>
+		<div id="buy-success-alert" class="alert-box success radius" style="color:black;">
+		  Purchase Successful
+		  <a id="buy-success-close" href="#" class="close">&times;</a>
+		</div>
+		<div id="sell-success-alert" class="alert-box success radius" style="color:black;">
+		  Sale Successful
+		  <a id="sell-success-close" href="#" class="close">&times;</a>
 		</div>
 		<div id="buy-form" name="buy-form">
 			<input id="buy-ticker" type="text" placeholder="ticker">
@@ -93,10 +95,6 @@
 		  <p class="invalid"></p>
 		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
-		<div id="buy-success-modal" class="reveal-modal" data-reveal aria-labelledby="buy-success-modal-title" aria-hidden="true" role="dialog">
-		  <h2 id="buy-success-modal-title" class="success">Purchase Successful</h2>
-		  <a id="buy-success-close"class="close-reveal-modal" aria-label="Close">&#215;</a>
-		</div>
 		<div id="sell-modal" class="reveal-modal" data-reveal aria-labelledby="sell-modal-title" aria-hidden="true" role="dialog">
 		  <h2 id="sell-modal-title"></h2>
 		  <input type="hidden" id="sell-form-ticker" name="sell-form-ticker"> 
@@ -115,10 +113,6 @@
 		  <p></p>
 		  <p><a href="javascript:void(0);" id="sell-confirm" data-reveal-id class="secondary button">Confirm</a></p>
 		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-		</div>
-		<div id="sell-success-modal" class="reveal-modal" data-reveal aria-labelledby="sell-success-modal-title" aria-hidden="true" role="dialog">
-		  <h2 id="sell-success-modal-title" class="success">Sale Successful</h2>
-		  <a id="sell-success-close"class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
 		<div id="ticker-not-exist-modal" class="reveal-modal" data-reveal aria-labelledby="ticker-not-exist-modal-title" aria-hidden="true" role="dialog">
 		  <h2 id="ticker-not-exist-modal-title">Invalid Field(s)</h2>

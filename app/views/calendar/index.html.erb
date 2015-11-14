@@ -1,3 +1,11 @@
+<style>
+#ui-datepicker-div {
+	background-color: white;
+	padding: 3px;
+	border: 1px solid black;
+}
+</style>
+
 <script>
 
   $(document).ready(function () {
@@ -9,6 +17,9 @@
   	var eventEndTime = '';
 
   	$('#removeBtn').hide();
+
+  	$('#startDateField').datepicker();	
+  	$('#endDateField').datepicker();	
 
   	var events = [];
 
@@ -22,12 +33,13 @@
 			selectable: true,
 			selectHelper: true,
 			editable: true,
+			timezone: 'local',
 
 			// Adding an event
 		  select: function(start, end) {
-		  	eventStartDate = start.format('MMM DD, YYYY');
+		  	eventStartDate = start.format('l');
 		  	eventStartTime = start.format('hh:mm A');
-		  	eventEndDate = end.format('MMM DD, YYYY');
+		  	eventEndDate = end.format('l');
 		  	eventEndTime = end.format('hh:mm A');
 
 		  	$('#myModal').foundation('reveal', 'open');
@@ -75,11 +87,12 @@
 		// Save Button
 		$('a.closeModal').on('click', function() {
 			// If All fields are filled...
-			if ($('#titleField').val() != '' &&
+			if ($('#titleField').val() != '' && 
+					$('#titleField').val().length < 100 &&
 					$('#startDateField').val() != '' &&
 					$('#startTimeField').val() != '' &&
 					$('#endDateField').val() != '' &&
-					$('#endTimeField').val() != '') {
+					$('#endTimeField').val() != '' ) {
 				
 				// Create eventData to render FullCalendar event
 				var eventData;

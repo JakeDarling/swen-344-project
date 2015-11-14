@@ -22,8 +22,8 @@
 		<div id="upload-instructions" class="reveal-modal" data-reveal aria-labelledby="upload-instructions-title" aria-hidden="true" role="dialog">
 		  <h2 id="upload-instructions-title">Upload Instructions</h2>
 		  <p>The file must be a CSV formatted like the image below and sorted by date descending. Headers are not required.</p>
-		  <img <%= image_tag('csv-example.png', :alt => 'CSV example') %>
-
+		  <img <%= image_tag('csv-example.png', :alt => 'CSV example') %>/>
+		  <p>Note: any transactions with invalid values will be ignored.</p>
 		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
 		<script src="http://jquery-csv.googlecode.com/files/jquery.csv-0.71.js"></script>

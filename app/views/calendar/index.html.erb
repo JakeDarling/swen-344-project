@@ -87,11 +87,12 @@
 		// Save Button
 		$('a.closeModal').on('click', function() {
 			// If All fields are filled...
-			if ($('#titleField').val() != '' &&
+			if ($('#titleField').val() != '' && 
+					$('#titleField').val().length < 100 &&
 					$('#startDateField').val() != '' &&
 					$('#startTimeField').val() != '' &&
 					$('#endDateField').val() != '' &&
-					$('#endTimeField').val() != '') {
+					$('#endTimeField').val() != '' ) {
 				
 				// Create eventData to render FullCalendar event
 				var eventData;

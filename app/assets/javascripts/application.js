@@ -657,7 +657,7 @@ function buildTransTable(data){
     var datetime;
 
     if(ts.length == 0){
-        dataTable([]);
+        dataTableTrans([]);
     } else {
         $.each(ts, function(index, value){
             price = parseFloat(value['price']);

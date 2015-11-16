@@ -580,7 +580,7 @@ function dataTable(sArr){
 }
 
 function dataTableTrans(sArr){
-    $('#trans-table').DataTable( {
+    window.transTable = $('#trans-table').DataTable( {
 
         "columns": [
             {title: "Symbol"},
@@ -657,7 +657,7 @@ function buildTransTable(data){
     var datetime;
 
     if(ts.length == 0){
-        dataTable([]);
+        dataTableTrans([]);
     } else {
         $.each(ts, function(index, value){
             price = parseFloat(value['price']);
@@ -679,15 +679,70 @@ function buildTransTable(data){
 function formatDate(date) {
   var hours = date.getHours();
   var minutes = date.getMinutes();
+  var seconds = date.getSeconds();
   var ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
   minutes = minutes < 10 ? '0'+minutes : minutes;
-  var strTime = hours + ':' + minutes + ' ' + ampm;
+  seconds = seconds < 10 ? '0'+seconds : seconds;
+  var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
   return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
 }
 /*****************************************************************************/
 /* END STOCKS*/
+/*****************************************************************************/
+/*****************************************************************************/
+/* FILE UPLOAD */
+/*****************************************************************************/
+// Method that checks that the browser supports the HTML5 File API
+function browserSupportFileUpload() {
+    var isCompatible = false;
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+    isCompatible = true;
+    }
+    return isCompatible;
+}
+
+// Method that reads and processes the selected file
+function upload(evt) {
+    $('#upload-alert').hide();
+    if (!browserSupportFileUpload()) {
+        alert('The File APIs are not fully supported in this browser!');
+    } else {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function(event) {
+            var csvData = event.target.result;
+            data = $.csv.toArrays(csvData);
+            if (data && data.length > 0) {
+                //alert('Imported -' + data.length + '- rows successfully!');
+                $.ajax({
+                    type:'POST',
+                    url:'/upload-transactions',
+                    dataType: 'json',
+                    data:{
+                        'data': JSON.stringify(data),
+                    },
+                    success: function(){
+                        $('#upload-alert').show();
+                        //refresh the transaction datatable
+                        window.transTable.destroy();
+                        getUserTransactions();
+                    },
+                });
+            } else {
+                alert('No data to import!');
+            }
+        };
+        reader.onerror = function() {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+}
+/*****************************************************************************/
+/* END FILE UPLOAD*/
 /*****************************************************************************/
 $(function () {
     $(document).foundation();

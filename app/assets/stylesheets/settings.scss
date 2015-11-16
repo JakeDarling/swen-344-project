@@ -1,10 +1,28 @@
+$include-html-classes: true;
+$include-html-global-classes: $include-html-classes;
+
 /**---------------------------------------------------------
  * VARIABLE SETS
  *----------------------------------------------------------*/
+//$primary-color: rgb(255, 159, 0);
+//$secondary-color: #e7e7e7;
+//$alert-color: #f04124;
+//$success-color: #43AC6A;
+//$warning-color: #f08a24;
+//$info-color: #a0d3e8;
+
+//Main Menu variables
 $main-color: #000000;
 $main-inverse: #ffffff;
-$accent-color: #ff7500;
+$hover-color: #c86800;
+
 /**---------------------------------------------------------
  * MENU CONFIGURATION
  *----------------------------------------------------------*/
 $topbar-bg-color: $main-color;
+$topbar-link-bg-color-hover: $hover-color;
+$topbar-link-bg-hover: $hover-color;
+$topbar-link-padding: .5rem;
+
+
+$row-width: 90%;

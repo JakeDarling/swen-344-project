@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get '/' => 'epic#index'
   get '/stocks' => 'stocks#index'
   get '/calendar' => 'calendar#index'
+  get '/transactions' => 'stocks#render_transactions'
   post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
 
@@ -14,6 +15,10 @@ Rails.application.routes.draw do
   post '/sell-stock' => 'stocks#sell_stock'
   get '/my-stocks' => 'stocks#view_my_stocks'
   get '/get-my-stocks' => 'stocks#get_my_stocks'
+
+  #transactions actions
+  post 'upload-transactions' => 'stocks#upload_transactions'
+  get '/get-my-transactions' => 'stocks#get_my_transactions'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

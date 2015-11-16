@@ -24,6 +24,9 @@
 //= require fullcalendar
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.foundation
+//= require dataTables/extras/dataTables.fixedHeader
+//= require dataTables/extras/dataTables.tableTools
+//= require dataTables/extras/dataTables.responsive
 $(document).foundation();
 
 $(function() {
@@ -279,7 +282,14 @@ function postBuyForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                $('#buy-success-modal').foundation('reveal', 'open');
+                $('#sell-success-alert').hide();
+                $('#buy-success-alert').show();
+                //refresh the datatable and stock buy form
+                clearChildren(document.getElementById('buy-form'));
+                window.stockTable.destroy();
+                $('#myTable tfoot tr').remove();
+                $('#myTable tbody').remove();
+                getUserStockData();
             }
         });
     } else {
@@ -318,7 +328,7 @@ function buildStockTable(data){
     var stocks = data['stocks'];
     var sArr = [];
     var row;
-    var numStocks = Object.keys(stocks).length
+    var numStocks = Object.keys(stocks).length;
     var index = 0;
 
     if(stocks.length == 0){
@@ -498,7 +508,15 @@ function postSellForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                $('#sell-success-modal').foundation('reveal', 'open');
+                $('#buy-success-alert').hide();
+                $('#sell-success-alert').show();
+                //refresh the datatable and stock buy form
+                clearChildren(document.getElementById('buy-form'));
+                clearChildren(document.getElementById('sell-modal'));
+                window.stockTable.destroy();
+                $('#myTable tfoot tr').remove();
+                $('#myTable tbody').remove();
+                getUserStockData();
             }
         });
     } else {
@@ -556,11 +574,175 @@ function dataTable(sArr){
 
     options.lengthMenu = [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]];
     options.pageLength = 5;
+    options.responsive = true;
 
     window.stockTable = $('#myTable').DataTable(options);
 }
+
+function dataTableTrans(sArr){
+    window.transTable = $('#trans-table').DataTable( {
+
+        "columns": [
+            {title: "Symbol"},
+            {title: "Price"},
+            {title: "Shares"},
+            {title: "Buy/Sell"},
+            {title: "Date"},
+        ],
+        "data": sArr,
+        "order": [[ 4, "desc" ]],
+        "fixedHeader": true,
+        "responsive": true,
+        "aoColumnDefs": [
+            {
+                "aTargets":[3],
+                "fnCreatedCell": function(nTd, sData, oData, iRow, iCol)
+                {
+                    if(sData == 'sell' ) {
+                         $(nTd).css('color', 'red');
+                    } else if(sData == 'buy'){
+                        $(nTd).css('color', 'green');
+                    }
+                }
+            }
+        ],
+        /*"oTableTools": {
+            "sSwfPath": "dataTables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf",
+            "aButtons": ["copy", "print", {
+                 "sExtends": "collection",
+                 "sButtonText": "Save <span class=\"caret\" />",
+                 "aButtons": ["csv", "xls", "pdf"]
+            }]
+        },*/
+        "dom": 'T<"clear">lfrtip',
+        "tableTools": {
+            "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
+        },
+        aButtons: [
+            { sExtends: "csv",
+              sFileName: 'download.csv',
+              sFieldSeperator: "," //<--- example of how to set the delimiter
+            },
+            { sExtends: "xls",
+              sFileName: 'download.xls'
+            },
+            { sExtends: "pdf",
+              sFileName: 'download.pdf'
+            }   
+        ], 
+    } );
+}
+
+function getUserTransactions(){
+    $.ajax({
+        type:'GET',
+        url:'/get-my-transactions',
+        dataType:'json',
+
+        success: function(data){
+            buildTransTable(data);
+        }
+    });
+}
+
+function buildTransTable(data){
+        //$('#debug-output').html(JSON.stringify(data));
+    var ts = data['transactions'];
+    var sArr = [];
+    var row;
+    var numTrans = Object.keys(ts).length;
+    var index = 0;
+    var price;
+    var tType;
+    var datetime;
+
+    if(ts.length == 0){
+        dataTableTrans([]);
+    } else {
+        $.each(ts, function(index, value){
+            price = parseFloat(value['price']);
+            shares = parseInt(value['shares']);
+            tType = 'buy'
+            datetime = new Date(value['timestamp']);
+            index ++;
+            if(shares < 0.0){
+                tType = 'sell';
+                shares *= -1;
+            }
+            sArr.push([value['ticker_symbol'], price, shares, tType, formatDate(datetime)])
+            
+        });
+        dataTableTrans(sArr);
+    }
+}
+
+function formatDate(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var seconds = date.getSeconds();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  seconds = seconds < 10 ? '0'+seconds : seconds;
+  var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+  return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+}
 /*****************************************************************************/
 /* END STOCKS*/
+/*****************************************************************************/
+/*****************************************************************************/
+/* FILE UPLOAD */
+/*****************************************************************************/
+// Method that checks that the browser supports the HTML5 File API
+function browserSupportFileUpload() {
+    var isCompatible = false;
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+    isCompatible = true;
+    }
+    return isCompatible;
+}
+
+// Method that reads and processes the selected file
+function upload(evt) {
+    $('#upload-alert').hide();
+    if (!browserSupportFileUpload()) {
+        alert('The File APIs are not fully supported in this browser!');
+    } else {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function(event) {
+            var csvData = event.target.result;
+            data = $.csv.toArrays(csvData);
+            if (data && data.length > 0) {
+                //alert('Imported -' + data.length + '- rows successfully!');
+                $.ajax({
+                    type:'POST',
+                    url:'/upload-transactions',
+                    dataType: 'json',
+                    data:{
+                        'data': JSON.stringify(data),
+                    },
+                    success: function(){
+                        $('#upload-alert').show();
+                        //refresh the transaction datatable
+                        window.transTable.destroy();
+                        getUserTransactions();
+                    },
+                });
+            } else {
+                alert('No data to import!');
+            }
+        };
+        reader.onerror = function() {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+}
+/*****************************************************************************/
+/* END FILE UPLOAD*/
 /*****************************************************************************/
 $(function () {
     $(document).foundation();

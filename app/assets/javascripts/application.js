@@ -877,13 +877,8 @@ function validateAddEvent() {
         success: function(){
           $('#calendar').fullCalendar('renderEvent', eventData, true);
           $('#myModal').foundation('reveal', 'close');
-        },
-        error: function() {
-          alert('Error adding event to database');
         }
       });
-    } else {
-      alert('Bad EventData');
     }
   }
 }

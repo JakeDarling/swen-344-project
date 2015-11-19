@@ -786,6 +786,124 @@ function fb_login() {
 /* CALENDAR */
 /*********************************************************/
 
+function renderCalendar() {
+    var selectedEvent;
+    var eventTitle;
+    var eventStartDate;
+    var eventStartTime;
+    var eventEndDate;
+    var eventEndTime;
+
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        defaultView: 'agendaWeek',
+        selectable: true,
+        selectHelper: true,
+        editable: true,
+
+        // Adding an event
+        select: function(start, end) {
+            eventStartDate = start.format('MMM DD, YYYY');
+            eventStartTime = start.format('hh:mm A');
+            eventEndDate = end.format('MMM DD, YYYY');
+            eventEndTime = end.format('hh:mm A');
+
+            // Open Modal
+            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+              var modal = $(this);
+              $('#startDateField').val(eventStartDate);
+              $('#startTimeField').val(eventStartTime);
+              $('#endDateField').val(eventEndDate);
+              $('#endTimeField').val(eventEndTime);
+            });
+            $('#myModal').foundation('reveal', 'open');
+        },
+
+        unselect: function() {
+            $('#eventButtons').hide();
+            selectedEvent = null;
+        },
+        
+        // Show event info
+        eventClick: function(calEvent, jsEvent, view) {
+            $('#eventButtons').show();
+            selectedEvent = calEvent;
+        }
+    });
+}
+
+function loadEvents() {
+    var events = [];
+    $.ajax({
+        type:'GET',
+        url:'/load-events',
+        dataType:'json',
+        success: function(data){
+          for (var z = 0; z < data.events.length; z++) {
+            var event = {};
+            event.title = data.events[z].title;
+            event.start = data.events[z].start;
+            event.end = data.events[z].end1;
+            events.push(event);
+          }
+          $('#calendar').fullCalendar('addEventSource', events);
+        }
+    });
+}
+
+function storeEvent() {
+    // If All fields are filled...
+    if ($('#titleField').val() != '' &&
+            $('#startDateField').val() != '' &&
+            $('#startTimeField').val() != '' &&
+            $('#endDateField').val() != '' &&
+            $('#endTimeField').val() != '') {
+        
+        // Create eventData to render FullCalendar event
+        var eventData;
+            eventData = {
+            title: $('#titleField').val(),
+            start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+            end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+        };
+
+        // Store event in database
+        if (eventData.title && eventData.start && eventData.end) {
+            $.ajax({
+              type:'POST',
+              url:'/store-event',
+              data:{
+                'title': eventData.title,
+                'start': eventData.start,
+                'end1': eventData.end,
+              },
+              success: function(){
+                console.log('Event stored');
+                $('#calendar').fullCalendar('renderEvent', eventData, true);
+                $('#myModal').foundation('reveal', 'close');
+              },
+              error: function() {
+                console.log('Error adding event to database');
+              }
+            });
+        }
+    } else {
+        alert('Please fill in all fields');
+    }
+}
+
+function resetAddEventForm() {
+    $('#titleField').val('');
+    $('#startDateField').val('');
+    $('#startTimeField').val('');
+    $('#endDateField').val('');
+    $('#endTimeField').val('');
+}
+
 /*****************************************************************************/
 /* HELPER*/
 /*****************************************************************************/

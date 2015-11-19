@@ -2,12 +2,12 @@ Rails.application.routes.draw do
 
   post '/associate-user' => 'application#associate_user'
   get '/' => 'epic#index'
+  get '/get-front-page-events' => 'epic#get_front_page_events'
   get '/stocks' => 'stocks#index'
   get '/calendar' => 'calendar#index'
   get '/transactions' => 'stocks#render_transactions'
   post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
-
   get '/get-my-events' => 'calendar#get_my_events'
 
   #stocks actions

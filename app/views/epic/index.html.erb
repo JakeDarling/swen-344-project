@@ -257,6 +257,28 @@
           });
         }
 
+        function loadCalendarEvents() {
+          // Load Events from Database
+          $.ajax({
+            type:'GET',
+            url:'/get-front-page-events',
+            dataType:'json',
+            success: function(data){
+              var events = [];
+              for (var z = 0; z < data.events.length; z++) {
+                var event = {};
+
+                event.title = data.events[z].title;
+                event.start = data.events[z].start;
+                event.end = data.events[z].end1;
+
+                events.push(event);
+              }
+              $('#frontPageCalendar').fullCalendar('addEventSource', events);
+            }
+          });
+        }
+
         ndaq();
         nyse();
         dow();
@@ -265,7 +287,7 @@
         xom();
 
         initCalendar();
-
+        loadCalendarEvents();
     });
 
 

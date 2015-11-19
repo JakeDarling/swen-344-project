@@ -831,6 +831,9 @@ function renderCalendar() {
         // Show event info
         eventClick: function(calEvent, jsEvent, view) {
             $('#eventButtons').show();
+            var obj = {title: calEvent.title, start: calEvent.start, end: calEvent.end};
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+            $('#downloadBtn').wrap('<a href="data:' + data + '" download="data.json"></a>');
             selectedEvent = calEvent;
         }
     });

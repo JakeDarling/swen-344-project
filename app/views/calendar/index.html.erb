@@ -1,5 +1,11 @@
+<style>
+#ui-datepicker-div {
+	background-color: white;
+	padding: 3px;
+	border: 1px solid black;
+}
+</style>
 <script>
-
   $(document).ready(function () {
   	var selectedEvent = '';
   	var eventTitle = '';
@@ -9,6 +15,9 @@
   	var eventEndTime = '';
 
   	$('#removeBtn').hide();
+
+  	$('#startDateField').datepicker();	
+   	$('#endDateField').datepicker();	
 
   	var events = [];
 
@@ -22,12 +31,13 @@
 			selectable: true,
 			selectHelper: true,
 			editable: true,
+			timezone: 'local',
 
 			// Adding an event
 		  select: function(start, end) {
-		  	eventStartDate = start.format('MMM DD, YYYY');
+		  	eventStartDate = start.format('l');
 		  	eventStartTime = start.format('hh:mm A');
-		  	eventEndDate = end.format('MMM DD, YYYY');
+		  	eventEndDate = end.format('l');
 		  	eventEndTime = end.format('hh:mm A');
 
 		  	$('#myModal').foundation('reveal', 'open');
@@ -65,7 +75,6 @@
 
 		// Model is open
 		$(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-		  var modal = $(this);
 		  $('#startDateField').val(eventStartDate);
 		  $('#startTimeField').val(eventStartTime);
 		  $('#endDateField').val(eventEndDate);
@@ -74,44 +83,7 @@
 
 		// Save Button
 		$('a.closeModal').on('click', function() {
-			// If All fields are filled...
-			if ($('#titleField').val() != '' &&
-					$('#startDateField').val() != '' &&
-					$('#startTimeField').val() != '' &&
-					$('#endDateField').val() != '' &&
-					$('#endTimeField').val() != '') {
-				
-				// Create eventData to render FullCalendar event
-				var eventData;
-				eventData = {
-					title: $('#titleField').val(),
-					start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
-					end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
-				};
-
-				// Store event in database
-				if (eventData.title && eventData.start && eventData.end) {
-					$.ajax({
-	          type:'POST',
-	          url:'/store-event',
-	          data:{
-	            'title': eventData.title,
-	            'start': eventData.start,
-	            'end1': eventData.end,
-	          },
-	          success: function(){
-	            console.log('Event stored');
-							$('#calendar').fullCalendar('renderEvent', eventData, true);
-					  	$('#myModal').foundation('reveal', 'close');
-	          },
-	          error: function() {
-	          	alert('Error adding event to database');
-	          }
-	        });
-				}
-			} else {
-				alert('Please fill in all fields');
-			}
+			validateAddEvent();
 		});
 
 		// Modal is closed
@@ -173,6 +145,13 @@
 			</div>
 		  <a href="#" class="button small round right closeModal">Save</a>
 		</form>
+
+	<!-- Validation Alerts -->
+	<div id="invalid-event-input-modal" class="reveal-modal tiny" data-reveal aria-labelledby="invalid-event-input-modal-title" aria-hidden="true" role="dialog">
+	  <h2 id="invalid-event-input-modal-title">Invalid Field(s)</h2>
+	  <p class="invalid"></p>
+	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+	</div>
 
 	</div>
 </div>

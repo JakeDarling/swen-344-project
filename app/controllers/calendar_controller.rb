@@ -7,7 +7,7 @@ class CalendarController < ApplicationController
 	    events = Event.where(user_id:user.id)
 
 	    render :json => {events:events}
-	  end
+	end
 
 	def store_event
 		title = params[:title]

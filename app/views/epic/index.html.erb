@@ -129,7 +129,9 @@
   }
 </style>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
+        getTopStocks();
+        /*
         function ndaq() {
             $.ajax({
                 dataType: "xml",
@@ -250,6 +252,7 @@
         googl();
         xrx();
         xom();
+        */
 
     });
 
@@ -696,13 +699,22 @@
     }
 </script>
 <body>
+
 <div class="row">
   <!-- FACEBOOK INFO-->
   <div data-alert class="alert-box">
     <div id="login-status" name="login-status"></div>
     <a href="#" class="close">&times;</a>
   </div>
-
+  Top Stocks
+<table id="top-stock-table" style="display:inline-table">
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+            </tfoot>
+        </table>
   <div id="facebook-post-status" name="facebook-post-status">
   </div>
 
@@ -711,6 +723,8 @@
   </div>
 
   <!-- STOCK INFO -->
+        
+    <!--
   <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
     <div class="row">
       <div class="large-12 small-12 columns">
@@ -746,7 +760,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div>-->
 </div>
 </div>
 </body>

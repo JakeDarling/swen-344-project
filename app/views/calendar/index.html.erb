@@ -7,6 +7,7 @@
 </style>
 <script>
   $(document).ready(function () {
+<<<<<<< HEAD
   	var events = [];
   	var selectedEvent;
   	var eventTitle;
@@ -66,11 +67,20 @@
         $('#calendar').fullCalendar('addEventSource', events);
       }
     });
+=======
+  	$('#eventButtons').hide();
 
+  	// Render Calendar and Events
+  	renderCalendar();
+  	loadEvents()
+>>>>>>> origin/develop
+
+  	// Remove Event
 		$('#removeBtn').click(function() {
 		  $('#calendar').fullCalendar('removeEvents', selectedEvent._id);
 		});
 
+<<<<<<< HEAD
 		// Model is open
 		$(document).on('open.fndtn.reveal', '[data-reveal]', function () {
 		  $('#startDateField').val(eventStartDate);
@@ -82,22 +92,25 @@
 		// Save Button
 		$('a.closeModal').on('click', function() {
 			validateAddEvent();
+=======
+		// Save Event
+		$('a.closeModal').on('click', function() {
+			storeEvent();
+>>>>>>> origin/develop
 		});
 
 		// Modal is closed
 		$(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
 			$('#calendar').fullCalendar('unselect');
-			// Reset Fields
-			$('#titleField').val('');
-			$('#startDateField').val('');
-			$('#startTimeField').val('');
-			$('#endDateField').val('');
-			$('#endTimeField').val('');
+			resetAddEventForm();
 		});
   });
 </script>
 
+<div id="eventButtons">
 <button type="button" name="removeBtn" id="removeBtn">Remove</button>
+<button type="button" name="downloadBtn" id="downloadBtn">Download</button>
+</div>
 <div class="row">
   <div id='calendar' class='modal'></div>
 
@@ -143,6 +156,7 @@
 			</div>
 		  <a href="#" class="button small round right closeModal">Save</a>
 		</form>
+<<<<<<< HEAD
 
 	<!-- Validation Alerts -->
 	<div id="invalid-event-input-modal" class="reveal-modal tiny" data-reveal aria-labelledby="invalid-event-input-modal-title" aria-hidden="true" role="dialog">
@@ -151,6 +165,7 @@
 	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 	</div>
 
+=======
+>>>>>>> origin/develop
 	</div>
 </div>
-

@@ -395,9 +395,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
 
         gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
         gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
-        var note = {
-            contents:escapeHtml(value['note']),
-        };
+        var note = value['note'];
         row = [
             name,
             symbol,
@@ -436,9 +434,8 @@ function getUserStockData(){
     });
 }
 
-function noteButtonClicked(symbol, noteObj){
+function noteButtonClicked(symbol, note){
     var sym = symbol;
-    var note = noteObj.contents
     //alert(symbol.id + ' ' + shares);
     $('#note-modal').foundation('reveal', 'open');
     $(document).foundation('reveal', {

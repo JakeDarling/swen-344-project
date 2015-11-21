@@ -41,7 +41,7 @@
 
 		$('#note-submit').click(function(){
 			var ticker = $('#note-form-ticker').val().toUpperCase();
-			var note = $('#note-editable p').html();
+			var note = escapeHTML($('#note-editable p').html());
 			$.ajax({
 	            type:'POST',
 	            url:'/edit-stock-note',

@@ -395,7 +395,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
 
         gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
         gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
-        var note = value['note'];
+        var note = escapeHTML(value['note']);
         row = [
             name,
             symbol,
@@ -1061,8 +1061,14 @@ function clearChildren(element) {
 
 // Use the browser's built-in functionality to quickly and safely escape the
 // string
-function escapeHtml(str) {
+// Use the browser's built-in functionality to quickly and safely escape the
+// string
+function escapeHTML(str) {
+    if(str == null){
+        str="";
+    }
     var div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
+    div.appendChild(document.createTextNode(str.replace(/"/g, '&quot;')));
+
     return div.innerHTML;
 };

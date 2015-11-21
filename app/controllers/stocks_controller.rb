@@ -280,4 +280,43 @@ class StocksController < ApplicationController
     puts index
     render :json => { :ok => true }, :status => :ok
   end
+=begin
+  update the note for a given stock
+=end
+  def edit_stock_note
+    user = User.find_by(fbUserId:session[:user])
+    ticker = params[:ticker_symbol].upcase
+    note = params[:note]
+    tReg = /^[a-zA-Z]+$/
+    if ticker != '' and (tReg.match(ticker))
+      stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
+      if stock != nil
+        stock.note = note
+      else
+        puts "=========================================="
+        puts "note update failed. ticker entry invalid."
+        puts "=========================================="
+        return false
+      end
+      if stock.valid?
+        stock.save()
+        puts "==================================="
+        puts "Note Updated"
+        puts "user id: #{user.id}"
+        puts "user fbUserId: #{user.fbUserId}"
+        puts "stock: #{stock.ticker_symbol}"
+        puts "note: #{stock.note}"
+        puts "==================================="
+      else
+        puts "=========================================="
+        puts "note update failed. note entry invalid."
+        puts "=========================================="
+      end
+    else
+        puts "=========================================="
+        puts "note update failed. input validation failed."
+        puts "=========================================="
+    end
+    render:nothing => true
+  end
 end

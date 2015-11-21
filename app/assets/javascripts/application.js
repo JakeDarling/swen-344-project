@@ -284,6 +284,7 @@ function postBuyForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
+                $('#note-success-alert').hide();
                 $('#sell-success-alert').hide();
                 $('#buy-success-alert').show();
                 //refresh the datatable and stock buy form
@@ -394,8 +395,9 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
 
         gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
         gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
-        days_gain = 'TBD'//change * value['shares'];
-        
+        var note = {
+            contents:escapeHtml(value['note']),
+        };
         row = [
             name,
             symbol,
@@ -405,7 +407,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
             marketCap,
             gain,
             gain_pc,
-            '<button id="' + symbol + ' ' + '" class="button tiny radius" data-reveal onClick="noteButtonClicked(' + symbol + ',' + value['note'] + ')">note</button>',
+            '<button id="' + symbol + ' ' + '" class="button tiny radius" data-reveal onClick="noteButtonClicked(\''+symbol+'\',\''+note+'\')">note</button>',
             '<button id="' + symbol +  '" class="button tiny radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>',
         ];
         sArr.push(row);
@@ -434,8 +436,9 @@ function getUserStockData(){
     });
 }
 
-function noteButtonClicked(symbol, note){
-    var sym = symbol.id;
+function noteButtonClicked(symbol, noteObj){
+    var sym = symbol;
+    var note = noteObj.contents
     //alert(symbol.id + ' ' + shares);
     $('#note-modal').foundation('reveal', 'open');
     $(document).foundation('reveal', {
@@ -444,7 +447,7 @@ function noteButtonClicked(symbol, note){
         }
     });  
     $('#note-modal h2').html('Note for ' + sym);
-    if (note == null){
+    if (note == null || note == "" || note == 'null'){
         note = "edit note here...";
     }
     $('#note-editable').html('<p>' + note + '</p>');
@@ -531,6 +534,7 @@ function postSellForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
+                $('#note-success-alert').hide();
                 $('#buy-success-alert').hide();
                 $('#sell-success-alert').show();
                 //refresh the datatable and stock buy form
@@ -1056,3 +1060,12 @@ function clearChildren(element) {
       }
    }
 }
+
+
+// Use the browser's built-in functionality to quickly and safely escape the
+// string
+function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+};

@@ -1,6 +1,7 @@
 <html>
 	<script>
 	$(document).ready(function(){
+		$('#note-success-alert').hide();
 		$('#buy-success-alert').hide();
 		$('#sell-success-alert').hide();
 		$('#first-buy').click(function(){
@@ -37,6 +38,39 @@
 			$('#sell-success-alert').hide();
 			
 		});
+
+		$('#note-submit').click(function(){
+			var ticker = $('#note-form-ticker').val().toUpperCase();
+			var note = $('#note-editable p').html();
+			$.ajax({
+	            type:'POST',
+	            url:'/edit-stock-note',
+	            data:{
+	                'ticker_symbol': ticker,
+	                'note': note,
+	            },
+	            success: function(){
+	                $('#buy-success-alert').hide();
+	                $('#sell-success-alert').hide();
+	                
+	                //refresh the datatable and stock buy form
+	                clearChildren(document.getElementById('buy-form'));
+	                window.stockTable.destroy();
+	                $('#myTable tfoot tr').remove();
+	                $('#myTable tbody').remove();
+	                $('#note-modal').foundation('reveal', 'close');
+	                $('#note-success-alert').show();
+	                getUserStockData();
+	                
+
+	            }
+	        });
+		});
+
+		$('#note-success-close').click(function(){
+			$('#note-success-alert').hide();
+			
+		});
 		
 		window.totalChange = parseFloat(0);
     	window.totalMarketCap = 0;
@@ -64,6 +98,10 @@
 		<div id="sell-success-alert" class="alert-box success radius" style="color:black;">
 		  Sale Successful
 		  <a id="sell-success-close" href="#" class="close">&times;</a>
+		</div>
+		<div id="note-success-alert" class="alert-box success radius" style="color:black;">
+		  Note Updated
+		  <a id="note-success-close" href="#" class="close">&times;</a>
 		</div>
 		<div id="buy-form" name="buy-form">
 			<input id="buy-ticker" type="text" placeholder="ticker">

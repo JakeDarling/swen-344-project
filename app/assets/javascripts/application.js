@@ -143,88 +143,27 @@ function printQuote(data) {
     var symbol = $(data).find('Symbol').text();
     var volume = $(data).find('Volume').text();
     var stockxchange = $(data).find('StockExchange').text();
+    var sArr = [];
 
-    $('#quoteResults').empty();
+    var nameS = 'Name: ' + '<strong>' + name + '</strong>';
+    var symbolS = 'Symbol: ' + '<strong>' + symbol + '</strong>';
+    var volS = 'Volume: ' + '<strong>' + volume + '</strong>';
+    var sexS = 'Stock Exchange: ' + '<strong>' + stockxchange + '</strong>';
+    var changeS = 'Change: ' + '<strong>' + change + '</strong>';
+    var daysRangeS = "Day's Range: " + '<strong>' + daysRange + '</strong>';
+    var daysLowS = "Day's Low: " + '<strong>' + daysLow + '</strong>';
+    var daysHighS = "Day's High: " + '<strong>' + daysHigh + '</strong>';
 
-    var avgDailyVolumeDiv = $('<div>', {
-        id: 'averageDailyVolume',
-        name: 'averageDailyVolume',
-        text: 'Average Daily Volume: ' + avgDailyVol,
-    });
-    $('#quoteResults').append(avgDailyVolumeDiv);
+    var yearLowS = "Year Low: " + '<strong>' + yearLow + '</strong>';
+    var yearHighS = 'Year High: ' + '<strong>' + yearHigh + '</strong>';
+    var mcS = 'Market Cap.: ' + '<strong>' + marketCap + '</strong>';
+    var lastPriceS = 'Last Trade Price: ' + '<strong>' + lastTradePrice + '</strong>';
 
-    var changeDiv = $('<div>', {
-        id: 'change',
-        name: 'change',
-        text: 'Change: ' + change,
-    });
-    $('#quoteResults').append(changeDiv);
-    var daysLowDiv = $('<div>', {
-        id: 'daysLow',
-        name: 'daysLow',
-        text: "Day's Low: " + daysLow,
-    });
-    $('#quoteResults').append(daysLowDiv);
-    var daysHighDiv = $('<div>', {
-        id: 'daysHigh',
-        name: 'daysHigh',
-        text: "Day's High: " + daysHigh,
-    });
-    $('#quoteResults').append(daysHighDiv);
-    var yearLowDiv = $('<div>', {
-        id: 'yearLow',
-        name: 'yearLow',
-        text: "Year Low: " + yearLow,
-    });
-    $('#quoteResults').append(yearLowDiv);
-    var yearHighDiv = $('<div>', {
-        id: 'yearHigh',
-        name: 'yearHigh',
-        text: 'Year High: ' + yearHigh,
-    });
-    $('#quoteResults').append(yearHighDiv);
-    var marketCapDiv = $('<div>', {
-        id: 'marketCap',
-        name: 'marketCap',
-        text: 'Market Capitalization: ' + marketCap,
-    });
-    $('#quoteResults').append(marketCapDiv);
-    var lastTradePriceDiv = $('<div>', {
-        id: 'lastTradePrice',
-        name: 'lastTradePrice',
-        text: 'Last Trade Price: ' + lastTradePrice,
-    });
-    $('#quoteResults').append(lastTradePriceDiv);
-    var daysRangeDiv = $('<div>', {
-        id: 'daysRange',
-        name: 'daysRange',
-        text: "Day's Range: " + daysRange,
-    });
-    $('#quoteResults').append(daysRangeDiv);
-    var nameDiv = $('<div>', {
-        id: 'name',
-        name: 'name',
-        text: 'Name: ' + name,
-    });
-    $('#quoteResults').append(nameDiv);
-    var symbolDiv = $('<div>', {
-        id: 'symbol',
-        name: 'symbol',
-        text: 'Symbol: ' + symbol,
-    });
-    $('#quoteResults').append(symbolDiv);
-    var volumeDiv = $('<div>', {
-        id: 'volume',
-        name: 'volume',
-        text: 'Volume: ' + volume,
-    });
-    $('#quoteResults').append(volumeDiv);
-    var stockxchangeDiv = $('<div>', {
-        id: 'stockExchange',
-        name: 'stockExchange',
-        text: 'Stock Exchange: ' + stockxchange,
-    });
-    $('#quoteResults').append(stockxchangeDiv);
+    sArr.push([nameS, changeS, yearLowS]);
+    sArr.push([symbolS, daysRangeS, yearHighS]);
+    sArr.push([volS, daysLowS, mcS]);
+    sArr.push([lastPriceS, daysHighS, sexS]);
+    dataTableQuote(sArr);
 }
 
 function validateBuyForm(){
@@ -632,6 +571,27 @@ function dataTableTrans(sArr){
             }   
         ], 
     } );
+}
+
+function dataTableQuote(sArr){
+    if (window.quoteTable!=undefined){
+        window.quoteTable.destroy();
+    }
+    window.quoteTable = $('#quote-table').DataTable({
+        "columns": [
+            {title: ""},
+            {title: ""},
+            {title: ""},
+        ],
+        "data": sArr,
+        "responsive": true,
+        "bFilter": false,
+        "paging": false,
+        "bSort" : false,
+    });
+    document.getElementById("quote-table").deleteTHead();
+    document.getElementById("quote-table").deleteTFoot();
+    $('#quote-table_info').hide();
 }
 
 function getUserTransactions(){

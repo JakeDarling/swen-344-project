@@ -33,6 +33,7 @@ $(document).foundation();
 $(function() {
     $(document).foundation();
 });
+
 /*****************************************************************************/
 /* STOCKS*/
 /*****************************************************************************/
@@ -404,8 +405,8 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
             marketCap,
             gain,
             gain_pc,
-            days_gain,
-            '<button id="' + symbol +  '" class="button small radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>'
+            '<button id="' + symbol + ' ' + '" class="button tiny radius" data-reveal onClick="noteButtonClicked(' + symbol + ',' + value['note'] + ')">note</button>',
+            '<button id="' + symbol +  '" class="button tiny radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>',
         ];
         sArr.push(row);
     }
@@ -415,7 +416,6 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
     window.totalMarketCap = (parseFloat(window.totalMarketCap) + parseFloat(marketCap)).toFixed(2);
     window.totalGain = (parseFloat(window.totalGain) + parseFloat(gain)).toFixed(2);
     window.totalGainPc = (parseFloat(window.totalGainPc) + parseFloat(gain_pc)).toFixed(2);
-    window.totalDaysGain = "TBD";
 
     if(index==numStocks){
         dataTable(sArr);
@@ -434,10 +434,32 @@ function getUserStockData(){
     });
 }
 
+function noteButtonClicked(symbol, note){
+    var sym = symbol.id;
+    //alert(symbol.id + ' ' + shares);
+    $('#note-modal').foundation('reveal', 'open');
+    $(document).foundation('reveal', {
+        opened: function(event){
+            $(event.target).find('[autofocus]').first().focus();
+        }
+    });  
+    $('#note-modal h2').html('Note for ' + sym);
+    if (note == null){
+        note = "edit note here...";
+    }
+    $('#note-editable').html('<p>' + note + '</p>');
+    $('#note-form-ticker').val($.trim(sym));
+}
+
 function sellButtonClicked(symbol, shares){
     var sym = symbol.id;
     //alert(symbol.id + ' ' + shares);
     $('#sell-modal').foundation('reveal', 'open');
+    $(document).foundation('reveal', {
+        opened: function(event){
+            $(event.target).find('[autofocus]').first().focus();
+        }
+    });
     $('#sell-modal h2').html('Sell ' + sym);
     $('#sell-form-ticker').val(sym);
     $('#sell-form-held').val(parseInt(shares));
@@ -537,8 +559,8 @@ function dataTable(sArr){
             { title: "Market Cap." },
             { title: "Gain" },
             { title: "Gain %" },
-            { title: "Day's Gain" },
-            { title: "" }
+            { title: ""},
+            { title: "" },
         ];
     options.fnInitComplete = function(){
         $('#myTable tfoot').prepend(                
@@ -562,7 +584,10 @@ function dataTable(sArr){
                     window.totalGainPc +
                 '</th>' +
                 '<th>' +
-                    window.totalDaysGain +
+                    
+                '</th>' +
+                '<th>' +
+                    
                 '</th>' +
             '</tr>'
         );

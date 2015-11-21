@@ -395,7 +395,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
 
         gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
         gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
-        var note = escapeHTML(value['note']);
+        var note = escapeHtml(value['note']);
         row = [
             name,
             symbol,
@@ -447,7 +447,7 @@ function noteButtonClicked(symbol, note){
     if (note == null || note == "" || note == 'null'){
         note = "edit note here...";
     }
-    $('#note-editable').html('<p>' + note + '</p>');
+    $('#note-editable').html('<p>' + unescapeHtml(note) + '</p>');
     $('#note-form-ticker').val($.trim(sym));
 }
 
@@ -1063,7 +1063,7 @@ function clearChildren(element) {
 // string
 // Use the browser's built-in functionality to quickly and safely escape the
 // string
-function escapeHTML(str) {
+function escapeHtml(str) {
     if(str == null){
         str="";
     }
@@ -1071,4 +1071,12 @@ function escapeHTML(str) {
     div.appendChild(document.createTextNode(str.replace(/"/g, '&quot;')));
 
     return div.innerHTML;
+};
+
+// UNSAFE with unsafe strings; only use on previously-escaped ones!
+function unescapeHtml(escapedStr) {
+    var div = document.createElement('div');
+    div.innerHTML = escapedStr;
+    var child = div.childNodes[0];
+    return child ? child.nodeValue : '';
 };

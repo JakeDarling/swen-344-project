@@ -395,7 +395,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
 
         gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
         gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
-        var note = escapeHtml(value['note']);
+        var note = value['note'];
         row = [
             name,
             symbol,
@@ -714,6 +714,31 @@ function formatDate(date) {
   seconds = seconds < 10 ? '0'+seconds : seconds;
   var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
   return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+}
+
+function postNote(){
+    var ticker = $('#note-form-ticker').val().toUpperCase();
+    var note = escapeHtml($('#note-editable p').html());
+    $.ajax({
+        type:'POST',
+        url:'/edit-stock-note',
+        data:{
+            'ticker_symbol': ticker,
+            'note': note,
+        },
+        success: function(){
+            $('#buy-success-alert').hide();
+            $('#sell-success-alert').hide();
+            $('#note-modal').foundation('reveal', 'close');
+            $('#note-success-alert').show();
+            //refresh the datatable and stock buy form
+            clearChildren(document.getElementById('buy-form'));
+            window.stockTable.destroy();
+            $('#myTable tfoot tr').remove();
+            $('#myTable tbody').remove();
+            getUserStockData();
+        }
+    });
 }
 /*****************************************************************************/
 /* END STOCKS*/

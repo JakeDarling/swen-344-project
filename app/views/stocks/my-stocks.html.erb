@@ -40,31 +40,7 @@
 		});
 
 		$('#note-submit').click(function(){
-			var ticker = $('#note-form-ticker').val().toUpperCase();
-			var note = escapeHtml($('#note-editable p').html());
-			$.ajax({
-	            type:'POST',
-	            url:'/edit-stock-note',
-	            data:{
-	                'ticker_symbol': ticker,
-	                'note': note,
-	            },
-	            success: function(){
-	                $('#buy-success-alert').hide();
-	                $('#sell-success-alert').hide();
-	                
-	                //refresh the datatable and stock buy form
-	                clearChildren(document.getElementById('buy-form'));
-	                window.stockTable.destroy();
-	                $('#myTable tfoot tr').remove();
-	                $('#myTable tbody').remove();
-	                $('#note-modal').foundation('reveal', 'close');
-	                $('#note-success-alert').show();
-	                getUserStockData();
-	                
-
-	            }
-	        });
+			postNote();
 		});
 
 		$('#note-success-close').click(function(){

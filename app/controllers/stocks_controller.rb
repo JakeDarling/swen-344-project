@@ -1,3 +1,5 @@
+include ERB::Util
+
 class StocksController < ApplicationController
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -291,7 +293,7 @@ class StocksController < ApplicationController
     if ticker != '' and (tReg.match(ticker))
       stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
       if stock != nil
-        stock.note = note
+        stock.note = html_escape(note)
       else
         puts "=========================================="
         puts "note update failed. ticker entry invalid."

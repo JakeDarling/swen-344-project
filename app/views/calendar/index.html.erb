@@ -25,6 +25,8 @@
 
 			// Adding an event
 		  select: function(start, end) {
+          $("#modalTitle").html("Add Event");
+          $("#removeBtn").hide();
 		  	eventStartDate = start.format('MMM DD, YYYY');
 		  	eventStartTime = start.format('hh:mm A');
 		  	eventEndDate = end.format('MMM DD, YYYY');
@@ -35,8 +37,17 @@
 			
 		  // Show event info
 		  eventClick: function(calEvent, jsEvent, view) {
-  			$('#removeBtn').show();
   			selectedEvent = calEvent;
+            console.log(selectedEvent);
+            
+            $("#removeBtn").show();
+            $("#modalTitle").html("Edit Event");
+            $('#myModal').foundation('reveal', 'open');
+            $("#titleField").val(selectedEvent.title);
+            $("#startDateField").val(selectedEvent.start.format('MMM DD, YYYY'));
+            $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
+            $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
+            $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
 		  }
 		});
 
@@ -80,35 +91,69 @@
 					$('#startTimeField').val() != '' &&
 					$('#endDateField').val() != '' &&
 					$('#endTimeField').val() != '') {
-				
-				// Create eventData to render FullCalendar event
-				var eventData;
-				eventData = {
-					title: $('#titleField').val(),
-					start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
-					end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
-				};
+                
+                if ($("#modalTitle").html() == "Add Event") {
+    				// Create eventData to render FullCalendar event
+    				var eventData;
+    				eventData = {
+    					title: $('#titleField').val(),
+    					start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+    					end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+    				};
 
-				// Store event in database
-				if (eventData.title && eventData.start && eventData.end) {
-					$.ajax({
-	          type:'POST',
-	          url:'/store-event',
-	          data:{
-	            'title': eventData.title,
-	            'start': eventData.start,
-	            'end1': eventData.end,
-	          },
-	          success: function(){
-	            console.log('Event stored');
-							$('#calendar').fullCalendar('renderEvent', eventData, true);
-					  	$('#myModal').foundation('reveal', 'close');
-	          },
-	          error: function() {
-	          	alert('Error adding event to database');
-	          }
-	        });
-				}
+    				// Store event in database
+    				if (eventData.title && eventData.start && eventData.end) {
+    					$.ajax({
+    	          type:'POST',
+    	          url:'/store-event',
+    	          data:{
+    	            'title': eventData.title,
+    	            'start': eventData.start,
+    	            'end1': eventData.end,
+    	          },
+    	          success: function(){
+    	            console.log('Event stored');
+    							$('#calendar').fullCalendar('renderEvent', eventData, true);
+    					  	$('#myModal').foundation('reveal', 'close');
+    	          },
+    	          error: function() {
+    	          	alert('Error adding event to database');
+    	          }
+    	        });
+    				}
+                } else {
+    				var eventData;
+    				eventData = {
+    					title: $('#titleField').val(),
+    					start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+    					end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+    				};
+
+    				// Store event in database
+    				if (eventData.title && eventData.start && eventData.end) {
+    					$.ajax({
+    	          type:'POST',
+    	          url:'/modify-event',
+    	          data:{
+                      'id': selectedEvent._id.replace(/\D/g,''),
+    	            'title': eventData.title,
+    	            'start': eventData.start,
+    	            'end1': eventData.end,
+    	          },
+    	          success: function(){
+    	            console.log('Event modified');
+                    selectedEvent.title = eventData.title;
+                    selectedEvent.start = eventData.start;
+                    selectedEvent.end = eventData.end;
+    							$('#calendar').fullCalendar('updateEvent', selectedEvent);
+    					  	$('#myModal').foundation('reveal', 'close');
+    	          },
+    	          error: function() {
+    	          	alert('Error modifying event in database');
+    	          }
+              });
+                }
+            }
 			} else {
 				alert('Please fill in all fields');
 			}
@@ -127,7 +172,6 @@
   });
 </script>
 
-<button type="button" name="removeBtn" id="removeBtn">Remove</button>
 <div class="row">
   <div id='calendar' class='modal'></div>
 
@@ -171,7 +215,7 @@
 			    </div>
 			  </div>
 			</div>
-		  <a href="#" class="button small round right closeModal">Save</a>
+		  <button type="button" name="removeBtn" id="removeBtn">Remove</button><a href="#" class="button small round right closeModal">Save</a>
 		</form>
 
 	</div>

@@ -51,12 +51,13 @@ class StocksController < ApplicationController
 
       #update Stock table
       stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
-      cost = (shares.to_i * price.to_f).round(2)
+      cost = (shares.to_i * price.to_f.round(2)).round(2)
       if stock != nil
         stock.shares += shares.to_i
         stock.base_cost += cost
+        stock.last_price = price.to_f.round(2)
       else
-        stock = Stock.new(ticker_symbol:ticker, shares:shares, user_id:user.id, base_cost:cost)
+        stock = Stock.new(ticker_symbol:ticker, shares:shares.to_i, user_id:user.id, base_cost:cost, last_price:price.to_f.round(2))
       end
       
       if stock.valid?
@@ -144,6 +145,7 @@ class StocksController < ApplicationController
       if stock != nil and (shares * -1 <= stock.shares)
         stock.shares += shares
         stock.base_cost += cost
+        stock.last_price = price.to_f.round(2)
       else
         #user doesn't own this stock
         ##TODO: render failure template but this shouldn't happen since client validates
@@ -320,5 +322,16 @@ class StocksController < ApplicationController
         puts "=========================================="
     end
     render:nothing => true
+  end
+=begin  
+  return's the user's top 5 stocks based on last trade price
+=end
+  def get_top_stocks
+    user = User.find_by(fbUserId:session[:user])
+    stocks = Stock.order(last_price: :desc).where(user_id:user.id).limit(5)
+
+    puts stocks.inspect
+    render :json => {stocks:stocks}
+
   end
 end

@@ -703,6 +703,76 @@ function buildTransTable(data){
     }
 }
 
+function getTopStocks(){
+    $.ajax({
+        type:'GET',
+        url:'/get-top-stocks',
+        dataType:'json',
+
+        success: function(data){
+            if (Object.keys(data['stocks']).length > 0){
+                buildTopStockTable(data);
+            } else {
+                //user has no stocks so use default
+                df = JSON.parse('{"stocks":[{"id":4,"ticker_symbol":"GOOGL","shares":10,"note":null,"created_at":"2015-11-20T00:14:58.237Z","updated_at":"2015-11-20T00:14:58.237Z","user_id":1,"base_cost":"7599.4","last_price":"759.9400000000001"},{"id":5,"ticker_symbol":"NDAQ","shares":1,"note":null,"created_at":"2015-11-20T00:16:04.227Z","updated_at":"2015-11-20T00:16:04.227Z","user_id":1,"base_cost":"661.27","last_price":"661.27"},{"id":1,"ticker_symbol":"DOW","shares":1,"note":null,"created_at":"2015-11-20T00:06:59.309Z","updated_at":"2015-11-20T00:07:57.474Z","user_id":1,"base_cost":"118.78","last_price":"118.78"},{"id":7,"ticker_symbol":"XRX","shares":1,"note":null,"created_at":"2015-11-20T00:17:04.823Z","updated_at":"2015-11-20T00:17:04.823Z","user_id":1,"base_cost":"118.71","last_price":"118.71"},{"id":6,"ticker_symbol":"XOM","shares":1,"note":null,"created_at":"2015-11-20T00:16:24.032Z","updated_at":"2015-11-20T00:16:24.032Z","user_id":1,"base_cost":"67.66","last_price":"67.66"}]}');
+                buildTopStockTable(df);
+            }
+        }
+    });
+}
+
+function buildTopStockTable(data){
+    var ts = data['stocks'];
+    var sArr = [];
+    var row;
+    var numTrans = Object.keys(ts).length;
+    var index = 0;
+    var price;
+    var tType;
+    var datetime;
+
+    if(ts.length == 0){
+        dataTableTrans([]);
+    } else {
+        $.each(ts, function(index, value){
+            $.ajax({
+                async: false,
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: value['ticker_symbol'],
+                },
+                success: function (data) {
+                    var change = $(data).find('Change').text();
+                    price = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
+                    sArr.push([value['ticker_symbol'], price, change])
+                },
+            });
+            
+        });
+        dataTableTopStocks(sArr);
+    }
+}
+
+function dataTableTopStocks(sArr){
+    window.topStockTable = $('#top-stock-table').DataTable( {
+
+        "columns": [
+            {title: "Symbol"},
+            {title: "Price"},
+            {title: "Day's Change"},
+        ],
+        "data": sArr,
+        "responsive": true,
+        "bFilter": false,
+        "paging": false,
+        "order": [[ 1, "desc" ]]
+    });
+}
+
 function formatDate(date) {
   var hours = date.getHours();
   var minutes = date.getMinutes();

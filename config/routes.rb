@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   #stocks actions
   post '/buy-stock' => 'stocks#buy_stock'
   post '/sell-stock' => 'stocks#sell_stock'
+  get '/get-top-stocks' => 'stocks#get_top_stocks'
   get '/my-stocks' => 'stocks#view_my_stocks'
   get '/get-my-stocks' => 'stocks#get_my_stocks'
 

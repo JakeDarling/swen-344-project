@@ -1,61 +1,4 @@
 <html>
-	<script>
-	$(document).ready(function(){
-		$('#note-success-alert').hide();
-		$('#buy-success-alert').hide();
-		$('#sell-success-alert').hide();
-		$('#first-buy').click(function(){
-			validateBuyForm();
-		});
-
-		$('#buy-submit').click(function(){
-			var ticker = $('#buy-ticker').val().toUpperCase();
-			var shares = $('#buy-shares').val();
-			getStockPrice(ticker, shares, 'buy');
-			$('#confirm-modal').foundation('reveal', 'close');
-		});
-
-		$('#buy-success-close').click(function(){
-			$('#buy-success-alert').hide();
-			
-		});
-
-		$('#sell-submit').click(function(){
-			//var ticker = $('#sell-form-ticker').val().toUpperCase();
-			//var shares = $('#sell-form-shares').val();
-			//alert(ticker + ' ' + shares);
-			validateSellForm();
-		});
-
-		$('#sell-confirm').click(function(){
-			var ticker = $('#sell-form-ticker').val().toUpperCase();
-			var shares = $('#sell-form-shares').val();
-			getStockPrice(ticker, shares, 'sell')
-			$('#confirm-sell-modal').foundation('reveal', 'close');
-		});
-
-		$('#sell-success-close').click(function(){
-			$('#sell-success-alert').hide();
-			
-		});
-
-		$('#note-submit').click(function(){
-			postNote();
-		});
-
-		$('#note-success-close').click(function(){
-			$('#note-success-alert').hide();
-			
-		});
-		
-		window.totalChange = parseFloat(0);
-    	window.totalMarketCap = 0;
-    	window.totalGain = 0;
-    	window.totalGainPc = 0;
-		getUserStockData();
-
-	});
-	</script>
 	<style type="text/css">
 		div.row {
 			max-width: 100%!important;
@@ -141,5 +84,62 @@
 		  <a href="javascript:void(0);" id="note-submit" data-reveal-id class="radius button tiny ">Save Changes</a>
 		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
+	<script>
+		$(document).ready(function(){
+			$('#note-success-alert').hide();
+			$('#buy-success-alert').hide();
+			$('#sell-success-alert').hide();
+			$('#first-buy').click(function(){
+				validateBuyForm();
+			});
+
+			$('#buy-submit').click(function(){
+				var ticker = $('#buy-ticker').val().toUpperCase();
+				var shares = $('#buy-shares').val();
+				getStockPrice(ticker, shares, 'buy');
+				$('#confirm-modal').foundation('reveal', 'close');
+			});
+
+			$('#buy-success-close').click(function(){
+				$('#buy-success-alert').hide();
+				
+			});
+
+			$('#sell-submit').click(function(){
+				//var ticker = $('#sell-form-ticker').val().toUpperCase();
+				//var shares = $('#sell-form-shares').val();
+				//alert(ticker + ' ' + shares);
+				validateSellForm();
+			});
+
+			$('#sell-confirm').click(function(){
+				var ticker = $('#sell-form-ticker').val().toUpperCase();
+				var shares = $('#sell-form-shares').val();
+				getStockPrice(ticker, shares, 'sell')
+				$('#confirm-sell-modal').foundation('reveal', 'close');
+			});
+
+			$('#sell-success-close').click(function(){
+				$('#sell-success-alert').hide();
+				
+			});
+
+			$('#note-submit').click(function(){
+				postNote();
+			});
+
+			$('#note-success-close').click(function(){
+				$('#note-success-alert').hide();
+				
+			});
+			
+			window.totalChange = parseFloat(0);
+	    	window.totalMarketCap = 0;
+	    	window.totalGain = 0;
+	    	window.totalGainPc = 0;
+			getUserStockData();
+
+		});
+	</script>
 	</body>
 </html>

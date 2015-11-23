@@ -33,6 +33,7 @@ $(document).foundation();
 $(function() {
     $(document).foundation();
 });
+
 /*****************************************************************************/
 /* STOCKS*/
 /*****************************************************************************/
@@ -283,6 +284,7 @@ function postBuyForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
+                $('#note-success-alert').hide();
                 $('#sell-success-alert').hide();
                 $('#buy-success-alert').show();
                 //refresh the datatable and stock buy form
@@ -393,8 +395,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
 
         gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
         gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
-        days_gain = 'TBD'//change * value['shares'];
-        
+        var note = value['note'];
         row = [
             name,
             symbol,
@@ -404,8 +405,8 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
             marketCap,
             gain,
             gain_pc,
-            days_gain,
-            '<button id="' + symbol +  '" class="button small radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>'
+            '<button id="' + symbol + ' ' + '" class="button tiny radius" data-reveal onClick="noteButtonClicked(\''+symbol+'\',\''+note+'\')">note</button>',
+            '<button id="' + symbol +  '" class="button tiny radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>',
         ];
         sArr.push(row);
     }
@@ -415,7 +416,6 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
     window.totalMarketCap = (parseFloat(window.totalMarketCap) + parseFloat(marketCap)).toFixed(2);
     window.totalGain = (parseFloat(window.totalGain) + parseFloat(gain)).toFixed(2);
     window.totalGainPc = (parseFloat(window.totalGainPc) + parseFloat(gain_pc)).toFixed(2);
-    window.totalDaysGain = "TBD";
 
     if(index==numStocks){
         dataTable(sArr);
@@ -434,10 +434,32 @@ function getUserStockData(){
     });
 }
 
+function noteButtonClicked(symbol, note){
+    var sym = symbol;
+    //alert(symbol.id + ' ' + shares);
+    $('#note-modal').foundation('reveal', 'open');
+    $(document).foundation('reveal', {
+        opened: function(event){
+            $(event.target).find('[autofocus]').first().focus();
+        }
+    });  
+    $('#note-modal h2').html('Note for ' + sym);
+    if (note == null || note == "" || note == 'null'){
+        note = "edit note here...";
+    }
+    $('#note-editable').html('<p>' + unescapeHtml(note) + '</p>');
+    $('#note-form-ticker').val($.trim(sym));
+}
+
 function sellButtonClicked(symbol, shares){
     var sym = symbol.id;
     //alert(symbol.id + ' ' + shares);
     $('#sell-modal').foundation('reveal', 'open');
+    $(document).foundation('reveal', {
+        opened: function(event){
+            $(event.target).find('[autofocus]').first().focus();
+        }
+    });
     $('#sell-modal h2').html('Sell ' + sym);
     $('#sell-form-ticker').val(sym);
     $('#sell-form-held').val(parseInt(shares));
@@ -509,6 +531,7 @@ function postSellForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
+                $('#note-success-alert').hide();
                 $('#buy-success-alert').hide();
                 $('#sell-success-alert').show();
                 //refresh the datatable and stock buy form
@@ -537,8 +560,8 @@ function dataTable(sArr){
             { title: "Market Cap." },
             { title: "Gain" },
             { title: "Gain %" },
-            { title: "Day's Gain" },
-            { title: "" }
+            { title: ""},
+            { title: "" },
         ];
     options.fnInitComplete = function(){
         $('#myTable tfoot').prepend(                
@@ -562,7 +585,10 @@ function dataTable(sArr){
                     window.totalGainPc +
                 '</th>' +
                 '<th>' +
-                    window.totalDaysGain +
+                    
+                '</th>' +
+                '<th>' +
+                    
                 '</th>' +
             '</tr>'
         );
@@ -758,6 +784,31 @@ function formatDate(date) {
   seconds = seconds < 10 ? '0'+seconds : seconds;
   var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
   return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+}
+
+function postNote(){
+    var ticker = $('#note-form-ticker').val().toUpperCase();
+    var note = escapeHtml($('#note-editable p').html());
+    $.ajax({
+        type:'POST',
+        url:'/edit-stock-note',
+        data:{
+            'ticker_symbol': ticker,
+            'note': note,
+        },
+        success: function(){
+            $('#buy-success-alert').hide();
+            $('#sell-success-alert').hide();
+            $('#note-modal').foundation('reveal', 'close');
+            $('#note-success-alert').show();
+            //refresh the datatable and stock buy form
+            clearChildren(document.getElementById('buy-form'));
+            window.stockTable.destroy();
+            $('#myTable tfoot tr').remove();
+            $('#myTable tbody').remove();
+            getUserStockData();
+        }
+    });
 }
 /*****************************************************************************/
 /* END STOCKS*/
@@ -1101,3 +1152,26 @@ function clearChildren(element) {
       }
    }
 }
+
+
+// Use the browser's built-in functionality to quickly and safely escape the
+// string
+// Use the browser's built-in functionality to quickly and safely escape the
+// string
+function escapeHtml(str) {
+    if(str == null){
+        str="";
+    }
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str.replace(/"/g, '&quot;')));
+
+    return div.innerHTML;
+};
+
+// UNSAFE with unsafe strings; only use on previously-escaped ones!
+function unescapeHtml(escapedStr) {
+    var div = document.createElement('div');
+    div.innerHTML = escapedStr;
+    var child = div.childNodes[0];
+    return child ? child.nodeValue : '';
+};

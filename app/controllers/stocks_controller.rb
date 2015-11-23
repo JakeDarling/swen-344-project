@@ -1,3 +1,5 @@
+include ERB::Util
+
 class StocksController < ApplicationController
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -283,6 +285,45 @@ class StocksController < ApplicationController
     render :json => { :ok => true }, :status => :ok
   end
 =begin
+  update the note for a given stock
+=end
+  def edit_stock_note
+    user = User.find_by(fbUserId:session[:user])
+    ticker = params[:ticker_symbol].upcase
+    note = params[:note]
+    tReg = /^[a-zA-Z]+$/
+    if ticker != '' and (tReg.match(ticker))
+      stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
+      if stock != nil
+        stock.note = html_escape(note)
+      else
+        puts "=========================================="
+        puts "note update failed. ticker entry invalid."
+        puts "=========================================="
+        return false
+      end
+      if stock.valid?
+        stock.save()
+        puts "==================================="
+        puts "Note Updated"
+        puts "user id: #{user.id}"
+        puts "user fbUserId: #{user.fbUserId}"
+        puts "stock: #{stock.ticker_symbol}"
+        puts "note: #{stock.note}"
+        puts "==================================="
+      else
+        puts "=========================================="
+        puts "note update failed. note entry invalid."
+        puts "=========================================="
+      end
+    else
+        puts "=========================================="
+        puts "note update failed. input validation failed."
+        puts "=========================================="
+    end
+    render:nothing => true
+  end
+=begin  
   return's the user's top 5 stocks based on last trade price
 =end
   def get_top_stocks
@@ -291,5 +332,6 @@ class StocksController < ApplicationController
 
     puts stocks.inspect
     render :json => {stocks:stocks}
+
   end
 end

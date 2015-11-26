@@ -6,35 +6,35 @@
 }
 </style>
 <script>
-  $(document).ready(function () {
+$(document).ready(function () {
   	$('#eventButtons').hide();
 
   	// Render Calendar and Events
   	renderCalendar();
-  	loadEvents()
+  	loadEvents();
 
   	// Remove Event
-		$('#removeBtn').click(function() {
-		  $('#calendar').fullCalendar('removeEvents', selectedEvent._id);
-		});
+	$('#removeBtn').click(function() {
+		$('#calendar').fullCalendar('removeEvents', selectedEvent._id);
+	});
 
-		// Save Event
-		$('a.closeModal').on('click', function() {
+	// Save Event
+	$('a.closeModal').on('click', function() {
+		if ($("#modalTitle").html() == "Add Event") {
 			storeEvent();
-		});
+		} else {
+			modifyEvent();
+		}
+	});
 
-		// Modal is closed
-		$(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
-			$('#calendar').fullCalendar('unselect');
-			resetAddEventForm();
-		});
-  });
+	// Modal is closed
+	$(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+		$('#calendar').fullCalendar('unselect');
+		resetAddEventForm();
+	});
+});
 </script>
 
-<div id="eventButtons">
-<button type="button" name="removeBtn" id="removeBtn">Remove</button>
-<button type="button" name="downloadBtn" id="downloadBtn">Download</button>
-</div>
 <div class="row">
   <div id='calendar' class='modal'></div>
 
@@ -44,6 +44,7 @@
 	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 	  <form>
 	  	<div class="panel">
+			<input type="hidden" id="eventId" />
 			  <div class="row">
 			    <div class="large-12 columns">
 			      <label>Title
@@ -78,7 +79,10 @@
 			    </div>
 			  </div>
 			</div>
-		  <a href="#" class="button small round right closeModal">Save</a>
+			<div id="eventButtons">
+  		  <button type="button" name="removeBtn" id="removeBtn">Remove</button>
+  		  <button type="button" name="downloadBtn" id="downloadBtn">Download</button>
+  		  </div><a href="#" class="button small round right closeModal">Save</a>
 		</form>
 	<!-- Validation Alerts -->
 	<div id="invalid-event-input-modal" class="reveal-modal tiny" data-reveal aria-labelledby="invalid-event-input-modal-title" aria-hidden="true" role="dialog">

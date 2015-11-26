@@ -35,6 +35,32 @@ class CalendarController < ApplicationController
 
 		render:nothing => true
 	end
+	
+	def modify_event
+		id = params[:id]
+	    title = params[:title]
+        start = params[:start]
+	    end1 = params[:end1]
+
+	    user = User.find_by(fbUserId:session[:user])
+		
+		event = Event.find(id)
+		
+		# checks if user owns this event in his calendar
+		if user.id == event.user_id
+			event.title = title
+			event.start = start
+			event.end1 = end1
+
+			event.save
+		else
+			#failure
+		end
+
+	    puts event.inspect
+
+	    render:nothing => true
+    end
 
 	def validate_event_input(title, start, end1)
     # tReg = /^.{0,100}$/

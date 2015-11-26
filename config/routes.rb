@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get '/transactions' => 'stocks#render_transactions'
   post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
+  post '/modify-event' => 'calendar#modify_event'
   get '/load-events' => 'calendar#load_events'
   
   #stocks actions

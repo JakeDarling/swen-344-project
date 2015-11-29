@@ -16,7 +16,6 @@
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.foundation
 //= require dataTables/jquery.dataTables
-//= require turbolinks
 //= require_tree .
 //= require d3.v3
 //= require nv.d3

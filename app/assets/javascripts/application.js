@@ -537,7 +537,7 @@ function dataTable(sArr){
         { "bSortable": false, 'aTargets': [ -1 ]},
     ];
 
-    options.lengthMenu = [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]];
+    options.lengthMenu = [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]];
     options.pageLength = 5;
     options.responsive = true;
 
@@ -558,6 +558,7 @@ function dataTableTrans(sArr){
         "order": [[ 4, "desc" ]],
         "fixedHeader": true,
         "responsive": true,
+        "lengthMenu": [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]],
         "aoColumnDefs": [
             {
                 "aTargets":[3],

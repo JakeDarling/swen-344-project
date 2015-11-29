@@ -35,6 +35,42 @@ class CalendarController < ApplicationController
 
 		render:nothing => true
 	end
+	
+	def modify_event
+		id = params[:id]
+	    title = params[:title]
+        start = params[:start]
+	    end1 = params[:end1]
+
+	    user = User.find_by(fbUserId:session[:user])
+		
+		event = Event.find(id)
+		
+		# Validates all inputs first
+		if validate_event_input(title, start, end1)
+			# checks if user owns this event in his calendar
+			if user.id == event.user_id
+				event.title = title
+				event.start = start
+				event.end1 = end1
+
+				event.save
+			else
+	        	puts "============================="
+	        	puts "modifying event failed. entry failed"
+	        	puts "============================="
+			end
+		else
+        	puts "============================="
+        	puts "invalid inputs. return false"
+        	puts "============================="
+		end
+			
+
+	    puts event.inspect
+
+	    render:nothing => true
+    end
 
 	def validate_event_input(title, start, end1)
     # tReg = /^.{0,100}$/

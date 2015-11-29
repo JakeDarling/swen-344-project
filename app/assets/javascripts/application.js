@@ -993,10 +993,12 @@ function renderCalendar() {
             // Open Modal
             $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
               var modal = $(this);
+              $("#modalTitle").html("Add Event");
               $('#startDateField').val(eventStartDate);
               $('#startTimeField').val(eventStartTime);
               $('#endDateField').val(eventEndDate);
               $('#endTimeField').val(eventEndTime);
+              $("#eventId").val("");
             });
             $('#myModal').foundation('reveal', 'open');
         },
@@ -1008,11 +1010,20 @@ function renderCalendar() {
         
         // Show event info
         eventClick: function(calEvent, jsEvent, view) {
-            $('#eventButtons').show();
             var obj = {title: calEvent.title, start: calEvent.start, end: calEvent.end};
             var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
             $('#downloadBtn').wrap('<a href="data:' + data + '" download="data.json"></a>');
             selectedEvent = calEvent;
+            
+            $('#eventButtons').show();
+            $("#modalTitle").html("Edit Event");
+            $('#myModal').foundation('reveal', 'open');
+            $("#titleField").val(selectedEvent.title);
+            $("#startDateField").val(selectedEvent.start.format('MMM DD, YYYY'));
+            $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
+            $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
+            $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
+            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
         }
     });
 }
@@ -1074,6 +1085,38 @@ function storeEvent() {
         }
     } else {
         alert('Please fill in all fields');
+    }
+}
+
+function modifyEvent() {
+    var eventData;
+    eventData = {
+        id: $("#eventId").val(),
+    	title: $('#titleField').val(),
+    	start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+    	end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+    };
+
+    if (eventData.title && eventData.start && eventData.end) {
+    	$.ajax({
+            type: 'POST',
+    	    url: '/modify-event',
+    	    data: {
+                'id': eventData.id,
+    	        'title': eventData.title,
+    	        'start': eventData.start,
+    	        'end1': eventData.end,
+    	    },
+    	    success: function() {
+    	        console.log('Event modified');
+                $("#calendar").fullCalendar( 'removeEvents');
+                loadEvents();
+    			$('#myModal').foundation('reveal', 'close');
+    	    },
+    	    error: function() {
+    	        alert('Error modifying event in database');
+    	    }
+        });
     }
 }
 

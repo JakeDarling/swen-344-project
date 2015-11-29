@@ -46,16 +46,26 @@ class CalendarController < ApplicationController
 		
 		event = Event.find(id)
 		
-		# checks if user owns this event in his calendar
-		if user.id == event.user_id
-			event.title = title
-			event.start = start
-			event.end1 = end1
+		# Validates all inputs first
+		if validate_event_input(title, start, end1)
+			# checks if user owns this event in his calendar
+			if user.id == event.user_id
+				event.title = title
+				event.start = start
+				event.end1 = end1
 
-			event.save
+				event.save
+			else
+	        	puts "============================="
+	        	puts "modifying event failed. entry failed"
+	        	puts "============================="
+			end
 		else
-			#failure
+        	puts "============================="
+        	puts "invalid inputs. return false"
+        	puts "============================="
 		end
+			
 
 	    puts event.inspect
 

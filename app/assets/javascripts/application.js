@@ -632,6 +632,19 @@ function getUserTransactions(){
     });
 }
 
+function deleteUserTransactions(){
+    $.ajax({
+        type:'POST',
+        url:'/delete-transactions',
+        success: function(data){
+            $('#upload-alert').hide();
+            $('#ts-delete-alert').show();
+            window.transTable.destroy();
+            getUserTransactions();            
+        }
+    });
+}
+
 function buildTransTable(data){
         //$('#debug-output').html(JSON.stringify(data));
     var ts = data['transactions'];
@@ -788,6 +801,7 @@ function browserSupportFileUpload() {
 // Method that reads and processes the selected file
 function upload(evt) {
     $('#upload-alert').hide();
+    $('#ts-delete-alert').hide();
     if (!browserSupportFileUpload()) {
         alert('The File APIs are not fully supported in this browser!');
     } else {
@@ -812,6 +826,8 @@ function upload(evt) {
                         //refresh the transaction datatable
                         window.transTable.destroy();
                         getUserTransactions();
+                        resetFormElement($('#txtFileUpload'));
+                        
                     },
                 });
             } else {
@@ -1135,3 +1151,12 @@ function unescapeHtml(escapedStr) {
     var child = div.childNodes[0];
     return child ? child.nodeValue : '';
 };
+
+function resetFormElement(e) {
+  e.wrap('<form>').closest('form').get(0).reset();
+  e.unwrap();
+
+  // Prevent form submission
+  e.stopPropagation();
+  e.preventDefault();
+}

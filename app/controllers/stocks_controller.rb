@@ -1,3 +1,5 @@
+include ERB::Util
+
 class StocksController < ApplicationController
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -31,44 +33,51 @@ class StocksController < ApplicationController
     price - the price of the stock at purchase time
 =end  
   def buy_stock
-    ticker = params[:ticker_symbol]
+    ticker = params[:ticker_symbol].upcase
     shares = params[:shares]
     price = params[:price]
     user = User.find_by(fbUserId:session[:user])
 
     #input validation
-    if validate_stock_input(shares, ticker, price)
-
-      #record the transaction
-      tran = Transaction.new( ticker_symbol:ticker, \
-                              user_id:user.id, \
-                              timestamp:DateTime.now, \
-                              price:price.to_f.round(2), \
-                              shares:shares \
-                            )
-      if tran.valid?
-        tran.save()
+    if validate_stock_input(shares, ticker, price, params[:timestamp])
+      if params[:timestamp] == nil
+        timestamp = DateTime.now
       else
-        #TODO: render failure template but this shouldn't happen since client validates
-        puts "=========================================="
-        puts "Transaction failed. transaction entry invalid."
-        puts "=========================================="
+        puts params[:timestamp]
+        timestamp = DateTime.strptime(params[:timestamp], '%m/%d/%Y %H:%M:%S %p')
+        now = DateTime.now
+        timestamp = timestamp.change(:offset => now.zone)
       end
-      puts tran.inspect
 
       #update Stock table
       stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
-      cost = (shares.to_i * price.to_f).round(2)
+      cost = (shares.to_i * price.to_f.round(2)).round(2)
       if stock != nil
         stock.shares += shares.to_i
         stock.base_cost += cost
+        stock.last_price = price.to_f.round(2)
       else
-        stock = Stock.new(ticker_symbol:ticker, shares:shares, user_id:user.id, base_cost:cost)
+        stock = Stock.new(ticker_symbol:ticker, shares:shares.to_i, user_id:user.id, base_cost:cost, last_price:price.to_f.round(2))
       end
       
       if stock.valid?
         stock.save()
 
+      else
+        puts "=========================================="
+        puts "Transaction failed. stock entry invalid."
+        puts "=========================================="
+      end
+
+      #record the transaction
+      tran = Transaction.new( ticker_symbol:ticker, \
+                              user_id:user.id, \
+                              timestamp:timestamp, \
+                              price:price.to_f.round(2), \
+                              shares:shares.to_i \
+                            )
+      if tran.valid?
+        tran.save()
         #log to console
         puts "==================================="
         puts "Transaction Complete"
@@ -82,17 +91,23 @@ class StocksController < ApplicationController
         puts "base cost: #{stock.base_cost}"
         puts "==================================="
       else
+        #TODO: render failure template but this shouldn't happen since client validates
         puts "=========================================="
-        puts "Transaction failed. stock entry invalid."
+        puts "Transaction failed. transaction entry invalid."
         puts "=========================================="
+        return false
       end
+      puts tran.inspect
+
     else
       puts "============================="
       puts "invalid inputs. return false"
       puts "============================="
     end
-
-    render:nothing => true
+    if !params[:internal]
+      render:nothing => true
+    end
+    
   end
 
 =begin
@@ -106,51 +121,58 @@ class StocksController < ApplicationController
     price - the price of the stock at purchase time
 =end
   def sell_stock
-    ticker = params[:ticker_symbol]
+    ticker = params[:ticker_symbol].upcase
     shares = params[:shares]
     price = params[:price]
     user = User.find_by(fbUserId:session[:user])
 
     #input validation
-    if validate_stock_input(shares, ticker, price)
+    if validate_stock_input(shares, ticker, price, params[:timestamp])
+      if params[:timestamp] == nil
+        timestamp = DateTime.now
+      else
+        timestamp = DateTime.strptime(params[:timestamp], '%m/%d/%Y %H:%M:%S %p')
+        now = DateTime.now
+        timestamp = timestamp.change(:offset => now.zone)
+      end
 
       shares = shares.to_i * -1
       price = price.to_f.round(2)
 
-      #record the transaction
-      tran = Transaction.new( ticker_symbol:ticker, \
-                              user_id:user.id, \
-                              timestamp:DateTime.now, \
-                              price:price, \
-                              shares:shares \
-                            )
-      if tran.valid?
-        tran.save()
-      else
-        #TODO: render failure template but this shouldn't happen since client validates
-        puts "=========================================="
-        puts "Transaction failed. transaction entry invalid."
-        puts "=========================================="
-      end
-      puts tran.inspect
-
       #update Stock table
       stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
       cost = (shares * price).round(2)
-      if stock != nil
+      if stock != nil and (shares * -1 <= stock.shares)
         stock.shares += shares
         stock.base_cost += cost
+        stock.last_price = price.to_f.round(2)
       else
         #user doesn't own this stock
         ##TODO: render failure template but this shouldn't happen since client validates
         puts "=========================================="
         puts "Transaction failed. transaction entry invalid."
         puts "=========================================="
+        return false
       end
       
       if stock.valid?
         stock.save()
-              #log to console
+      else
+        puts "=========================================="
+        puts "Transaction failed. stock entry invalid."
+        puts "=========================================="
+      end
+
+      #record the transaction
+      tran = Transaction.new( ticker_symbol:ticker, \
+                              user_id:user.id, \
+                              timestamp:timestamp, \
+                              price:price, \
+                              shares:shares \
+                            )
+      if tran.valid?
+        tran.save()
+        #log to console
         puts "==================================="
         puts "Transaction Complete"
         puts "user id: #{user.id}"
@@ -163,10 +185,13 @@ class StocksController < ApplicationController
         puts "base cost: #{stock.base_cost}"
         puts "==================================="
       else
+        #TODO: render failure template but this shouldn't happen since client validates
         puts "=========================================="
-        puts "Transaction failed. stock entry invalid."
+        puts "Transaction failed. transaction entry invalid."
         puts "=========================================="
+        return false
       end
+      puts tran.inspect
 
 =begin
       if stock.shares <= 0
@@ -182,18 +207,131 @@ class StocksController < ApplicationController
       puts "invalid inputs. return false"
       puts "============================="
     end
-    render:nothing => true
+    if !params[:internal]
+      render:nothing => true
+    end
   end
 
-  def validate_stock_input(shares, ticker, price)
+  def validate_stock_input(shares, ticker, price, timestamp)
     sReg = /^[0-9]*$/
     tReg = /^[a-zA-Z]+$/
     pReg = /^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*\.[0-9]{2}$/
+    tsReg = /^((?:[0]?[1-9]|[1][012])[-:\/.](?:(?:[0-2]?\d{1})|(?:[3][01]{1}))[-:\/.](?:(?:[1]{1}\d{1}\d{1}\d{1})|(?:[2]{1}\d{3})))(?![\d])(\s+)((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\s?(?:am|AM|pm|PM))?)$/
 
     if ticker == '' or !tReg.match(ticker) or shares == '' or !sReg.match(shares) or pReg == '' or !pReg.match(price)
       return false
     else
+      if timestamp != nil
+        if !tsReg.match(timestamp)
+          return false
+        end
+      end
       return true
     end
+  end
+
+=begin
+  render the transactions page
+=end
+  def render_transactions
+    render :template => "stocks/transactions"
+  end
+
+=begin
+  return all transactions for the associated user
+=end
+  def get_my_transactions
+    user = User.find_by(fbUserId:session[:user])
+    ts = Transaction.where(user_id:user.id)
+    render :json => {transactions:ts}
+  end
+
+  def upload_transactions
+    data = JSON.parse(params[:data]).reverse
+    data.each do |row|
+      ticker = row[0]
+      price = row[1]
+      shares = row[2]
+      tType = row[3]
+      timestamp = row[4]
+      index = 0
+      successful = 0
+
+      if validate_stock_input(shares, ticker, price, timestamp)
+        params[:ticker_symbol] = ticker
+        params[:shares] = shares
+        params[:price] = price
+        params[:timestamp] = timestamp
+        params[:internal] = true
+        if tType == "buy"
+          buy_stock()
+        elsif tType == "sell"
+          sell_stock()
+        else
+          puts "========================================"
+          puts "invalid transaction type. skipping row"
+          puts "========================================" 
+        end
+      else
+        puts "==========================================="
+        puts "invalid value(s) in this row. skipping row"
+        puts "==========================================="
+      end
+    end
+    puts "========================================"
+    puts "Upload complete"
+    puts "========================================"
+    puts index
+    render :json => { :ok => true }, :status => :ok
+  end
+=begin
+  update the note for a given stock
+=end
+  def edit_stock_note
+    user = User.find_by(fbUserId:session[:user])
+    ticker = params[:ticker_symbol].upcase
+    note = params[:note]
+    tReg = /^[a-zA-Z]+$/
+    if ticker != '' and (tReg.match(ticker))
+      stock = Stock.find_by(user_id:user.id, ticker_symbol:ticker)
+      if stock != nil
+        stock.note = html_escape(note)
+      else
+        puts "=========================================="
+        puts "note update failed. ticker entry invalid."
+        puts "=========================================="
+        return false
+      end
+      if stock.valid?
+        stock.save()
+        puts "==================================="
+        puts "Note Updated"
+        puts "user id: #{user.id}"
+        puts "user fbUserId: #{user.fbUserId}"
+        puts "stock: #{stock.ticker_symbol}"
+        puts "note: #{stock.note}"
+        puts "==================================="
+      else
+        puts "=========================================="
+        puts "note update failed. note entry invalid."
+        puts "=========================================="
+      end
+    else
+        puts "=========================================="
+        puts "note update failed. input validation failed."
+        puts "=========================================="
+    end
+    render:nothing => true
+  end
+=begin  
+  return's the user's top 5 stocks based on last trade price
+=end
+  def get_top_stocks
+    user = User.find_by(fbUserId:session[:user])
+    stocks = Stock.order(last_price: :desc).where(user_id:user.id).limit(5)
+
+    puts stocks.inspect
+    render :json => {stocks:stocks}
+
   end
 end

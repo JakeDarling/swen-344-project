@@ -1,71 +1,88 @@
+<style>
+#ui-datepicker-div {
+	background-color: white;
+	padding: 3px;
+	border: 1px solid black;
+}
+</style>
 <script>
-
   $(document).ready(function () {
-  	var selectedEvent = '';
-  	var eventTitle = '';
-  	var eventStartDate = '';
-  	var eventStartTime = '';
-  	var eventEndDate = '';
-  	var eventEndTime = '';
+<<<<<<< HEAD
+  	var events = [];
+  	var selectedEvent;
+  	var eventTitle;
+  	var eventStartDate;
+  	var eventStartTime;
+  	var eventEndDate;
+  	var eventEndTime;
 
   	$('#removeBtn').hide();
+  	$('#startDateField').datepicker();	
+   	$('#endDateField').datepicker();	
 
-  	var events = [];
+  	$('#calendar').fullCalendar({
+    	header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			defaultView: 'agendaWeek',
+			selectable: true,
+			selectHelper: true,
+			editable: true,
+			timezone: 'local',
+
+			// Adding an event
+		  select: function(start, end) {
+		  	eventStartDate = start.format('l');
+		  	eventStartTime = start.format('hh:mm A');
+		  	eventEndDate = end.format('l');
+		  	eventEndTime = end.format('hh:mm A');
+
+		  	$('#myModal').foundation('reveal', 'open');
+			},
+			
+		  // Show event info
+		  eventClick: function(calEvent, jsEvent, view) {
+  			$('#removeBtn').show();
+  			selectedEvent = calEvent;
+		  }
+		});
 
 		// Load Events from Database
   	$.ajax({
-        type:'GET',
-        url:'/get-my-events',
-        dataType:'json',
-        success: function(data){
-            for (var z = 0; z < data.events.length; z++) {
-            	var event = {};
+      type:'GET',
+      url:'/get-my-events',
+      dataType:'json',
+      success: function(data){
+        for (var z = 0; z < data.events.length; z++) {
+        	var event = {};
 
-            	event.title = data.events[z].title;
-            	event.start = data.events[z].start;
-            	event.end = data.events[z].end1;
+        	event.title = data.events[z].title;
+        	event.start = data.events[z].start;
+        	event.end = data.events[z].end1;
 
-            	events.push(event);
-            }
-
-				    $('#calendar').fullCalendar({
-				    	header: {
-								left: 'prev,next today',
-								center: 'title',
-								right: 'month,agendaWeek,agendaDay'
-							},
-							defaultView: 'agendaWeek',
-							selectable: true,
-							selectHelper: true,
-							editable: true,
-							events: events,
-
-							// Adding an event
-						  select: function(start, end) {
-						  	eventStartDate = start.format('MMM DD, YYYY');
-						  	eventStartTime = start.format('hh:mm A');
-						  	eventEndDate = end.format('MMM DD, YYYY');
-						  	eventEndTime = end.format('hh:mm A');
-
-						  	$('#myModal').foundation('reveal', 'open');
-							},
-							
-						  // Show event info
-						  eventClick: function(calEvent, jsEvent, view) {
-				  			$('#removeBtn').show();
-				  			selectedEvent = calEvent;
-						  }
-						});
+        	events.push(event);
         }
+        $('#calendar').fullCalendar('addEventSource', events);
+      }
     });
+=======
+  	$('#eventButtons').hide();
 
+  	// Render Calendar and Events
+  	renderCalendar();
+  	loadEvents()
+>>>>>>> origin/develop
+
+  	// Remove Event
 		$('#removeBtn').click(function() {
 		  $('#calendar').fullCalendar('removeEvents', selectedEvent._id);
 		});
 
+<<<<<<< HEAD
 		// Model is open
 		$(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-		  var modal = $(this);
 		  $('#startDateField').val(eventStartDate);
 		  $('#startTimeField').val(eventStartTime);
 		  $('#endDateField').val(eventEndDate);
@@ -74,60 +91,26 @@
 
 		// Save Button
 		$('a.closeModal').on('click', function() {
-			// If All fields are filled...
-			if ($('#titleField').val() != '' &&
-					$('#startDateField').val() != '' &&
-					$('#startTimeField').val() != '' &&
-					$('#endDateField').val() != '' &&
-					$('#endTimeField').val() != '') {
-				
-				// Create eventData to render FullCalendar event
-				var eventData;
-				eventData = {
-					title: $('#titleField').val(),
-					start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
-					end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
-				};
-
-				// Store event in database
-				if (eventData.title && eventData.start && eventData.end) {
-					$.ajax({
-	          type:'POST',
-	          url:'/store-event',
-	          data:{
-	            'title': eventData.title,
-	            'start': eventData.start,
-	            'end1': eventData.end,
-	          },
-	          success: function(){
-	            console.log('Event stored');
-							$('#calendar').fullCalendar('renderEvent', eventData, true);
-					  	$('#myModal').foundation('reveal', 'close');
-	          },
-	          error: function() {
-	          	alert('Error adding event to database');
-	          }
-	        });
-				}
-			} else {
-				alert('Please fill in all fields');
-			}
+			validateAddEvent();
+=======
+		// Save Event
+		$('a.closeModal').on('click', function() {
+			storeEvent();
+>>>>>>> origin/develop
 		});
 
 		// Modal is closed
 		$(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
 			$('#calendar').fullCalendar('unselect');
-			// Reset Fields
-			$('#titleField').val('');
-			$('#startDateField').val('');
-			$('#startTimeField').val('');
-			$('#endDateField').val('');
-			$('#endTimeField').val('');
+			resetAddEventForm();
 		});
   });
 </script>
 
+<div id="eventButtons">
 <button type="button" name="removeBtn" id="removeBtn">Remove</button>
+<button type="button" name="downloadBtn" id="downloadBtn">Download</button>
+</div>
 <div class="row">
   <div id='calendar' class='modal'></div>
 
@@ -173,7 +156,16 @@
 			</div>
 		  <a href="#" class="button small round right closeModal">Save</a>
 		</form>
+<<<<<<< HEAD
 
+	<!-- Validation Alerts -->
+	<div id="invalid-event-input-modal" class="reveal-modal tiny" data-reveal aria-labelledby="invalid-event-input-modal-title" aria-hidden="true" role="dialog">
+	  <h2 id="invalid-event-input-modal-title">Invalid Field(s)</h2>
+	  <p class="invalid"></p>
+	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+	</div>
+
+=======
+>>>>>>> origin/develop
 	</div>
 </div>
-

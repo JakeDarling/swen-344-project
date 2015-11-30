@@ -11,6 +11,7 @@
 // about supported directives.
 //
 //= require jquery
+//= require jquery-ui
 //= require jquery_ujs
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.foundation
@@ -24,11 +25,15 @@
 //= require fullcalendar
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.foundation
+//= require dataTables/extras/dataTables.fixedHeader
+//= require dataTables/extras/dataTables.tableTools
+//= require dataTables/extras/dataTables.responsive
 $(document).foundation();
 
 $(function() {
     $(document).foundation();
 });
+
 /*****************************************************************************/
 /* STOCKS*/
 /*****************************************************************************/
@@ -139,88 +144,27 @@ function printQuote(data) {
     var symbol = $(data).find('Symbol').text();
     var volume = $(data).find('Volume').text();
     var stockxchange = $(data).find('StockExchange').text();
+    var sArr = [];
 
-    $('#quoteResults').empty();
+    var nameS = 'Name: ' + '<strong>' + name + '</strong>';
+    var symbolS = 'Symbol: ' + '<strong>' + symbol + '</strong>';
+    var volS = 'Volume: ' + '<strong>' + volume + '</strong>';
+    var sexS = 'Stock Exchange: ' + '<strong>' + stockxchange + '</strong>';
+    var changeS = 'Change: ' + '<strong>' + change + '</strong>';
+    var daysRangeS = "Day's Range: " + '<strong>' + daysRange + '</strong>';
+    var daysLowS = "Day's Low: " + '<strong>' + daysLow + '</strong>';
+    var daysHighS = "Day's High: " + '<strong>' + daysHigh + '</strong>';
 
-    var avgDailyVolumeDiv = $('<div>', {
-        id: 'averageDailyVolume',
-        name: 'averageDailyVolume',
-        text: 'Average Daily Volume: ' + avgDailyVol,
-    });
-    $('#quoteResults').append(avgDailyVolumeDiv);
+    var yearLowS = "Year Low: " + '<strong>' + yearLow + '</strong>';
+    var yearHighS = 'Year High: ' + '<strong>' + yearHigh + '</strong>';
+    var mcS = 'Market Cap.: ' + '<strong>' + marketCap + '</strong>';
+    var lastPriceS = 'Last Trade Price: ' + '<strong>' + lastTradePrice + '</strong>';
 
-    var changeDiv = $('<div>', {
-        id: 'change',
-        name: 'change',
-        text: 'Change: ' + change,
-    });
-    $('#quoteResults').append(changeDiv);
-    var daysLowDiv = $('<div>', {
-        id: 'daysLow',
-        name: 'daysLow',
-        text: "Day's Low: " + daysLow,
-    });
-    $('#quoteResults').append(daysLowDiv);
-    var daysHighDiv = $('<div>', {
-        id: 'daysHigh',
-        name: 'daysHigh',
-        text: "Day's High: " + daysHigh,
-    });
-    $('#quoteResults').append(daysHighDiv);
-    var yearLowDiv = $('<div>', {
-        id: 'yearLow',
-        name: 'yearLow',
-        text: "Year Low: " + yearLow,
-    });
-    $('#quoteResults').append(yearLowDiv);
-    var yearHighDiv = $('<div>', {
-        id: 'yearHigh',
-        name: 'yearHigh',
-        text: 'Year High: ' + yearHigh,
-    });
-    $('#quoteResults').append(yearHighDiv);
-    var marketCapDiv = $('<div>', {
-        id: 'marketCap',
-        name: 'marketCap',
-        text: 'Market Capitalization: ' + marketCap,
-    });
-    $('#quoteResults').append(marketCapDiv);
-    var lastTradePriceDiv = $('<div>', {
-        id: 'lastTradePrice',
-        name: 'lastTradePrice',
-        text: 'Last Trade Price: ' + lastTradePrice,
-    });
-    $('#quoteResults').append(lastTradePriceDiv);
-    var daysRangeDiv = $('<div>', {
-        id: 'daysRange',
-        name: 'daysRange',
-        text: "Day's Range: " + daysRange,
-    });
-    $('#quoteResults').append(daysRangeDiv);
-    var nameDiv = $('<div>', {
-        id: 'name',
-        name: 'name',
-        text: 'Name: ' + name,
-    });
-    $('#quoteResults').append(nameDiv);
-    var symbolDiv = $('<div>', {
-        id: 'symbol',
-        name: 'symbol',
-        text: 'Symbol: ' + symbol,
-    });
-    $('#quoteResults').append(symbolDiv);
-    var volumeDiv = $('<div>', {
-        id: 'volume',
-        name: 'volume',
-        text: 'Volume: ' + volume,
-    });
-    $('#quoteResults').append(volumeDiv);
-    var stockxchangeDiv = $('<div>', {
-        id: 'stockExchange',
-        name: 'stockExchange',
-        text: 'Stock Exchange: ' + stockxchange,
-    });
-    $('#quoteResults').append(stockxchangeDiv);
+    sArr.push([nameS, changeS, yearLowS]);
+    sArr.push([symbolS, daysRangeS, yearHighS]);
+    sArr.push([volS, daysLowS, mcS]);
+    sArr.push([lastPriceS, daysHighS, sexS]);
+    dataTableQuote(sArr);
 }
 
 function validateBuyForm(){
@@ -279,7 +223,15 @@ function postBuyForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                $('#buy-success-modal').foundation('reveal', 'open');
+                $('#note-success-alert').hide();
+                $('#sell-success-alert').hide();
+                $('#buy-success-alert').show();
+                //refresh the datatable and stock buy form
+                clearChildren(document.getElementById('buy-form'));
+                window.stockTable.destroy();
+                $('#myTable tfoot tr').remove();
+                $('#myTable tbody').remove();
+                getUserStockData();
             }
         });
     } else {
@@ -318,7 +270,7 @@ function buildStockTable(data){
     var stocks = data['stocks'];
     var sArr = [];
     var row;
-    var numStocks = Object.keys(stocks).length
+    var numStocks = Object.keys(stocks).length;
     var index = 0;
 
     if(stocks.length == 0){
@@ -382,8 +334,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
 
         gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
         gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
-        days_gain = 'TBD'//change * value['shares'];
-        
+        var note = value['note'];
         row = [
             name,
             symbol,
@@ -393,8 +344,8 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
             marketCap,
             gain,
             gain_pc,
-            days_gain,
-            '<button id="' + symbol +  '" class="button small radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>'
+            '<button id="' + symbol + ' ' + '" class="button tiny radius" data-reveal onClick="noteButtonClicked(\''+symbol+'\',\''+note+'\')">note</button>',
+            '<button id="' + symbol +  '" class="button tiny radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>',
         ];
         sArr.push(row);
     }
@@ -404,7 +355,6 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
     window.totalMarketCap = (parseFloat(window.totalMarketCap) + parseFloat(marketCap)).toFixed(2);
     window.totalGain = (parseFloat(window.totalGain) + parseFloat(gain)).toFixed(2);
     window.totalGainPc = (parseFloat(window.totalGainPc) + parseFloat(gain_pc)).toFixed(2);
-    window.totalDaysGain = "TBD";
 
     if(index==numStocks){
         dataTable(sArr);
@@ -423,10 +373,32 @@ function getUserStockData(){
     });
 }
 
+function noteButtonClicked(symbol, note){
+    var sym = symbol;
+    //alert(symbol.id + ' ' + shares);
+    $('#note-modal').foundation('reveal', 'open');
+    $(document).foundation('reveal', {
+        opened: function(event){
+            $(event.target).find('[autofocus]').first().focus();
+        }
+    });  
+    $('#note-modal h2').html('Note for ' + sym);
+    if (note == null || note == "" || note == 'null'){
+        note = "edit note here...";
+    }
+    $('#note-editable').html('<p>' + unescapeHtml(note) + '</p>');
+    $('#note-form-ticker').val($.trim(sym));
+}
+
 function sellButtonClicked(symbol, shares){
     var sym = symbol.id;
     //alert(symbol.id + ' ' + shares);
     $('#sell-modal').foundation('reveal', 'open');
+    $(document).foundation('reveal', {
+        opened: function(event){
+            $(event.target).find('[autofocus]').first().focus();
+        }
+    });
     $('#sell-modal h2').html('Sell ' + sym);
     $('#sell-form-ticker').val(sym);
     $('#sell-form-held').val(parseInt(shares));
@@ -498,7 +470,16 @@ function postSellForm(ticker, shares, price){
                 'price': price,
             },
             success: function(){
-                $('#sell-success-modal').foundation('reveal', 'open');
+                $('#note-success-alert').hide();
+                $('#buy-success-alert').hide();
+                $('#sell-success-alert').show();
+                //refresh the datatable and stock buy form
+                clearChildren(document.getElementById('buy-form'));
+                clearChildren(document.getElementById('sell-modal'));
+                window.stockTable.destroy();
+                $('#myTable tfoot tr').remove();
+                $('#myTable tbody').remove();
+                getUserStockData();
             }
         });
     } else {
@@ -518,8 +499,8 @@ function dataTable(sArr){
             { title: "Market Cap." },
             { title: "Gain" },
             { title: "Gain %" },
-            { title: "Day's Gain" },
-            { title: "" }
+            { title: ""},
+            { title: "" },
         ];
     options.fnInitComplete = function(){
         $('#myTable tfoot').prepend(                
@@ -543,7 +524,10 @@ function dataTable(sArr){
                     window.totalGainPc +
                 '</th>' +
                 '<th>' +
-                    window.totalDaysGain +
+                    
+                '</th>' +
+                '<th>' +
+                    
                 '</th>' +
             '</tr>'
         );
@@ -556,11 +540,291 @@ function dataTable(sArr){
 
     options.lengthMenu = [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]];
     options.pageLength = 5;
+    options.responsive = true;
 
     window.stockTable = $('#myTable').DataTable(options);
 }
+
+function dataTableTrans(sArr){
+    window.transTable = $('#trans-table').DataTable( {
+
+        "columns": [
+            {title: "Symbol"},
+            {title: "Price"},
+            {title: "Shares"},
+            {title: "Buy/Sell"},
+            {title: "Date"},
+        ],
+        "data": sArr,
+        "order": [[ 4, "desc" ]],
+        "fixedHeader": true,
+        "responsive": true,
+        "aoColumnDefs": [
+            {
+                "aTargets":[3],
+                "fnCreatedCell": function(nTd, sData, oData, iRow, iCol)
+                {
+                    if(sData == 'sell' ) {
+                         $(nTd).css('color', 'red');
+                    } else if(sData == 'buy'){
+                        $(nTd).css('color', 'green');
+                    }
+                }
+            }
+        ],
+        /*"oTableTools": {
+            "sSwfPath": "dataTables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf",
+            "aButtons": ["copy", "print", {
+                 "sExtends": "collection",
+                 "sButtonText": "Save <span class=\"caret\" />",
+                 "aButtons": ["csv", "xls", "pdf"]
+            }]
+        },*/
+        "dom": 'T<"clear">lfrtip',
+        "tableTools": {
+            "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
+        },
+        aButtons: [
+            { sExtends: "csv",
+              sFileName: 'download.csv',
+              sFieldSeperator: "," //<--- example of how to set the delimiter
+            },
+            { sExtends: "xls",
+              sFileName: 'download.xls'
+            },
+            { sExtends: "pdf",
+              sFileName: 'download.pdf'
+            }   
+        ], 
+    } );
+}
+
+function dataTableQuote(sArr){
+    if (window.quoteTable!=undefined){
+        window.quoteTable.destroy();
+    }
+    window.quoteTable = $('#quote-table').DataTable({
+        "columns": [
+            {title: ""},
+            {title: ""},
+            {title: ""},
+        ],
+        "data": sArr,
+        "responsive": true,
+        "bFilter": false,
+        "paging": false,
+        "bSort" : false,
+    });
+    document.getElementById("quote-table").deleteTHead();
+    document.getElementById("quote-table").deleteTFoot();
+    $('#quote-table_info').hide();
+}
+
+function getUserTransactions(){
+    $.ajax({
+        type:'GET',
+        url:'/get-my-transactions',
+        dataType:'json',
+
+        success: function(data){
+            buildTransTable(data);
+        }
+    });
+}
+
+function buildTransTable(data){
+        //$('#debug-output').html(JSON.stringify(data));
+    var ts = data['transactions'];
+    var sArr = [];
+    var row;
+    var numTrans = Object.keys(ts).length;
+    var index = 0;
+    var price;
+    var tType;
+    var datetime;
+
+    if(ts.length == 0){
+        dataTableTrans([]);
+    } else {
+        $.each(ts, function(index, value){
+            price = parseFloat(value['price']);
+            shares = parseInt(value['shares']);
+            tType = 'buy'
+            datetime = new Date(value['timestamp']);
+            index ++;
+            if(shares < 0.0){
+                tType = 'sell';
+                shares *= -1;
+            }
+            sArr.push([value['ticker_symbol'], price, shares, tType, formatDate(datetime)])
+            
+        });
+        dataTableTrans(sArr);
+    }
+}
+
+function getTopStocks(){
+    $.ajax({
+        type:'GET',
+        url:'/get-top-stocks',
+        dataType:'json',
+
+        success: function(data){
+            if (Object.keys(data['stocks']).length > 0){
+                buildTopStockTable(data);
+            } else {
+                //user has no stocks so use default
+                df = JSON.parse('{"stocks":[{"id":4,"ticker_symbol":"GOOGL","shares":10,"note":null,"created_at":"2015-11-20T00:14:58.237Z","updated_at":"2015-11-20T00:14:58.237Z","user_id":1,"base_cost":"7599.4","last_price":"759.9400000000001"},{"id":5,"ticker_symbol":"NDAQ","shares":1,"note":null,"created_at":"2015-11-20T00:16:04.227Z","updated_at":"2015-11-20T00:16:04.227Z","user_id":1,"base_cost":"661.27","last_price":"661.27"},{"id":1,"ticker_symbol":"DOW","shares":1,"note":null,"created_at":"2015-11-20T00:06:59.309Z","updated_at":"2015-11-20T00:07:57.474Z","user_id":1,"base_cost":"118.78","last_price":"118.78"},{"id":7,"ticker_symbol":"XRX","shares":1,"note":null,"created_at":"2015-11-20T00:17:04.823Z","updated_at":"2015-11-20T00:17:04.823Z","user_id":1,"base_cost":"118.71","last_price":"118.71"},{"id":6,"ticker_symbol":"XOM","shares":1,"note":null,"created_at":"2015-11-20T00:16:24.032Z","updated_at":"2015-11-20T00:16:24.032Z","user_id":1,"base_cost":"67.66","last_price":"67.66"}]}');
+                buildTopStockTable(df);
+            }
+        }
+    });
+}
+
+function buildTopStockTable(data){
+    var ts = data['stocks'];
+    var sArr = [];
+    var row;
+    var numTrans = Object.keys(ts).length;
+    var index = 0;
+    var price;
+    var tType;
+    var datetime;
+
+    if(ts.length == 0){
+        dataTableTrans([]);
+    } else {
+        $.each(ts, function(index, value){
+            $.ajax({
+                async: false,
+                dataType: "xml",
+                type: 'GET',
+                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+                data: {
+                    diagnostics: 'true',
+                    env: 'store://datatables.org/alltableswithkeys',
+                    symbol: value['ticker_symbol'],
+                },
+                success: function (data) {
+                    var change = $(data).find('Change').text();
+                    price = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
+                    sArr.push([value['ticker_symbol'], price, change])
+                },
+            });
+            
+        });
+        dataTableTopStocks(sArr);
+    }
+}
+
+function dataTableTopStocks(sArr){
+    window.topStockTable = $('#top-stock-table').DataTable( {
+
+        "columns": [
+            {title: "Symbol"},
+            {title: "Price"},
+            {title: "Day's Change"},
+        ],
+        "data": sArr,
+        "responsive": true,
+        "bFilter": false,
+        "paging": false,
+        "order": [[ 1, "desc" ]]
+    });
+}
+
+function formatDate(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var seconds = date.getSeconds();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  seconds = seconds < 10 ? '0'+seconds : seconds;
+  var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+  return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+}
+
+function postNote(){
+    var ticker = $('#note-form-ticker').val().toUpperCase();
+    var note = escapeHtml($('#note-editable p').html());
+    $.ajax({
+        type:'POST',
+        url:'/edit-stock-note',
+        data:{
+            'ticker_symbol': ticker,
+            'note': note,
+        },
+        success: function(){
+            $('#buy-success-alert').hide();
+            $('#sell-success-alert').hide();
+            $('#note-modal').foundation('reveal', 'close');
+            $('#note-success-alert').show();
+            //refresh the datatable and stock buy form
+            clearChildren(document.getElementById('buy-form'));
+            window.stockTable.destroy();
+            $('#myTable tfoot tr').remove();
+            $('#myTable tbody').remove();
+            getUserStockData();
+        }
+    });
+}
 /*****************************************************************************/
 /* END STOCKS*/
+/*****************************************************************************/
+/*****************************************************************************/
+/* FILE UPLOAD */
+/*****************************************************************************/
+// Method that checks that the browser supports the HTML5 File API
+function browserSupportFileUpload() {
+    var isCompatible = false;
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+    isCompatible = true;
+    }
+    return isCompatible;
+}
+
+// Method that reads and processes the selected file
+function upload(evt) {
+    $('#upload-alert').hide();
+    if (!browserSupportFileUpload()) {
+        alert('The File APIs are not fully supported in this browser!');
+    } else {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function(event) {
+            var csvData = event.target.result;
+            data = $.csv.toArrays(csvData);
+            if (data && data.length > 0) {
+                //alert('Imported -' + data.length + '- rows successfully!');
+                $.ajax({
+                    type:'POST',
+                    url:'/upload-transactions',
+                    dataType: 'json',
+                    data:{
+                        'data': JSON.stringify(data),
+                    },
+                    success: function(){
+                        $('#upload-alert').show();
+                        //refresh the transaction datatable
+                        window.transTable.destroy();
+                        getUserTransactions();
+                    },
+                });
+            } else {
+                alert('No data to import!');
+            }
+        };
+        reader.onerror = function() {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+}
+/*****************************************************************************/
+/* END FILE UPLOAD*/
 /*****************************************************************************/
 $(function () {
     $(document).foundation();
@@ -604,6 +868,223 @@ function fb_login() {
 /* CALENDAR */
 /*********************************************************/
 
+function validateAddEvent() {
+  // var tReg = new RegExp('^.{0,100}$');
+  // var sReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
+  // var eReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
+
+  var title = $('#titleField').val();
+  var startDate = $('#startDateField').val();
+  var startTime = $('#startTimeField').val();
+  var endDate = $('#endDateField').val();
+  var endTime = $('#endTimeField').val();
+
+  var invalid=false;
+  var invalidFields = {
+      title: false,
+      startDate: false,
+      startTime: false,
+      endDate: false,
+      endTime: false
+  };
+
+  //validate inputs
+  if (title == '') {
+    invalid = true;
+    invalidFields['title'] = true;
+  } else if (title.length > 100) {
+    invalid = true;
+    invalidFields['titleLength'] = true;
+  }
+  if (startDate == ''){
+    invalid = true;
+    invalidFields['startDate'] = true;
+  }
+  if (startTime == ''){
+    invalid = true;
+    invalidFields['startTime'] = true;
+  }
+  if (endDate == ''){
+    invalid = true;
+    invalidFields['endDate'] = true;
+  }
+  if (endTime == ''){
+    invalid = true;
+    invalidFields['endTime'] = true;
+  }
+  
+  // Set error message
+  if(invalid){
+    $('#invalid-event-input-modal p:first').empty();
+    $('#invalid-event-input-modal').foundation('reveal', 'open');
+
+    if(invalidFields['title']){
+      $('#invalid-event-input-modal p:first').append("<br>Please enter a title");
+    }
+    if(invalidFields['titleLength']){
+      $('#invalid-event-input-modal p:first').append("<br>Title must be less than 100 characters");
+    }
+    if(invalidFields['startDate']){
+      $('#invalid-event-input-modal p:first').append("<br>Please select a Start Date");
+    }
+    if(invalidFields['startTime']){
+      $('#invalid-event-input-modal p:first').append("<br>Please enter a Start Time");
+    }
+    if(invalidFields['endDate']){
+      $('#invalid-event-input-modal p:first').append("<br>Please select an End Date");
+    }
+    if(invalidFields['endTime']){
+      $('#invalid-event-input-modal p:first').append("<br>Please enter an End Time");
+    }
+  } else {
+    // Create eventData to render FullCalendar event
+    var eventData;
+    eventData = {
+      title: $('#titleField').val(),
+      start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+      end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+    };
+
+    // Store event in database
+    if (eventData.title && eventData.start && eventData.end) {
+      $.ajax({
+        type:'POST',
+        url:'/store-event',
+        data:{
+          'title': eventData.title,
+          'start': eventData.start,
+          'end1': eventData.end,
+        },
+        success: function(){
+          $('#calendar').fullCalendar('renderEvent', eventData, true);
+          $('#myModal').foundation('reveal', 'close');
+        }
+      });
+    }
+  }
+}
+
+function renderCalendar() {
+    var selectedEvent;
+    var eventTitle;
+    var eventStartDate;
+    var eventStartTime;
+    var eventEndDate;
+    var eventEndTime;
+
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        defaultView: 'agendaWeek',
+        selectable: true,
+        selectHelper: true,
+        editable: true,
+
+        // Adding an event
+        select: function(start, end) {
+            eventStartDate = start.format('MMM DD, YYYY');
+            eventStartTime = start.format('hh:mm A');
+            eventEndDate = end.format('MMM DD, YYYY');
+            eventEndTime = end.format('hh:mm A');
+
+            // Open Modal
+            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+              var modal = $(this);
+              $('#startDateField').val(eventStartDate);
+              $('#startTimeField').val(eventStartTime);
+              $('#endDateField').val(eventEndDate);
+              $('#endTimeField').val(eventEndTime);
+            });
+            $('#myModal').foundation('reveal', 'open');
+        },
+
+        unselect: function() {
+            $('#eventButtons').hide();
+            selectedEvent = null;
+        },
+        
+        // Show event info
+        eventClick: function(calEvent, jsEvent, view) {
+            $('#eventButtons').show();
+            var obj = {title: calEvent.title, start: calEvent.start, end: calEvent.end};
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+            $('#downloadBtn').wrap('<a href="data:' + data + '" download="data.json"></a>');
+            selectedEvent = calEvent;
+        }
+    });
+}
+
+function loadEvents() {
+    var events = [];
+    $.ajax({
+        type:'GET',
+        url:'/load-events',
+        dataType:'json',
+        success: function(data){
+          for (var z = 0; z < data.events.length; z++) {
+            var event = {};
+            event.title = data.events[z].title;
+            event.start = data.events[z].start;
+            event.end = data.events[z].end1;
+            events.push(event);
+          }
+          $('#calendar').fullCalendar('addEventSource', events);
+        }
+    });
+}
+
+function storeEvent() {
+    // If All fields are filled...
+    if ($('#titleField').val() != '' &&
+            $('#startDateField').val() != '' &&
+            $('#startTimeField').val() != '' &&
+            $('#endDateField').val() != '' &&
+            $('#endTimeField').val() != '') {
+        
+        // Create eventData to render FullCalendar event
+        var eventData;
+            eventData = {
+            title: $('#titleField').val(),
+            start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+            end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+        };
+
+        // Store event in database
+        if (eventData.title && eventData.start && eventData.end) {
+            $.ajax({
+              type:'POST',
+              url:'/store-event',
+              data:{
+                'title': eventData.title,
+                'start': eventData.start,
+                'end1': eventData.end,
+              },
+              success: function(){
+                console.log('Event stored');
+                $('#calendar').fullCalendar('renderEvent', eventData, true);
+                $('#myModal').foundation('reveal', 'close');
+              },
+              error: function() {
+                console.log('Error adding event to database');
+              }
+            });
+        }
+    } else {
+        alert('Please fill in all fields');
+    }
+}
+
+function resetAddEventForm() {
+    $('#titleField').val('');
+    $('#startDateField').val('');
+    $('#startTimeField').val('');
+    $('#endDateField').val('');
+    $('#endTimeField').val('');
+}
+
 /*****************************************************************************/
 /* HELPER*/
 /*****************************************************************************/
@@ -631,3 +1112,26 @@ function clearChildren(element) {
       }
    }
 }
+
+
+// Use the browser's built-in functionality to quickly and safely escape the
+// string
+// Use the browser's built-in functionality to quickly and safely escape the
+// string
+function escapeHtml(str) {
+    if(str == null){
+        str="";
+    }
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str.replace(/"/g, '&quot;')));
+
+    return div.innerHTML;
+};
+
+// UNSAFE with unsafe strings; only use on previously-escaped ones!
+function unescapeHtml(escapedStr) {
+    var div = document.createElement('div');
+    div.innerHTML = escapedStr;
+    var child = div.childNodes[0];
+    return child ? child.nodeValue : '';
+};

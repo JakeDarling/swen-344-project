@@ -1,0 +1,47 @@
+<html>
+	<body>
+		<div id="upload-alert" class="alert-box success radius" style="color:black;">
+			File Uploaded
+			<a id="upload-alert-close" href="#" class="close">&times;</a>
+		</div>
+		<table id="trans-table">
+			<thead>
+			</thead>
+			<tbody>
+			</tbody>
+			<tfoot>
+			</tfoot>
+		</table>
+		<div id="dvImportSegments" class="fileupload ">
+		    <fieldset>
+		        <legend>Upload Transaction History (<a href="#" data-reveal-id="upload-instructions">Instructions</a>)
+		        </legend>
+		            <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+		   </fieldset>
+		</div>
+		<div id="upload-instructions" class="reveal-modal" data-reveal aria-labelledby="upload-instructions-title" aria-hidden="true" role="dialog">
+		  <h2 id="upload-instructions-title">Upload Instructions</h2>
+		  <p>The file must be a CSV formatted like the image below and sorted by date descending. Headers are not required.</p>
+		  <img <%= image_tag('csv-example.png', :alt => 'CSV example') %>/>
+		  <p>Note: any transactions with invalid values will be ignored.</p>
+		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+		</div>
+		<script src="http://jquery-csv.googlecode.com/files/jquery.csv-0.71.js"></script>
+		<script>
+			$(document).ready(function(){
+				$('#upload-alert').hide();
+				$('#upload-alert-close').click(function(){
+					$('#upload-alert').hide();
+				});
+				// The event listener for the file upload
+    			document.getElementById('txtFileUpload').addEventListener('change', upload, false);
+				
+				getUserTransactions();
+				
+			});
+		</script>
+		<style type="text/css">
+
+		</style>
+	</body>
+</html>

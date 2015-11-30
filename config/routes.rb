@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   #transactions actions
   post 'upload-transactions' => 'stocks#upload_transactions'
   get '/get-my-transactions' => 'stocks#get_my_transactions'
+  post '/delete-transactions' => 'stocks#delete_transactions'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -16,7 +16,6 @@
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.foundation
 //= require dataTables/jquery.dataTables
-//= require turbolinks
 //= require_tree .
 //= require d3.v3
 //= require nv.d3
@@ -538,7 +537,7 @@ function dataTable(sArr){
         { "bSortable": false, 'aTargets': [ -1 ]},
     ];
 
-    options.lengthMenu = [[5, 10, 25, 50, 100], [5, 10, 25, 50, 100]];
+    options.lengthMenu = [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]];
     options.pageLength = 5;
     options.responsive = true;
 
@@ -559,6 +558,7 @@ function dataTableTrans(sArr){
         "order": [[ 4, "desc" ]],
         "fixedHeader": true,
         "responsive": true,
+        "lengthMenu": [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]],
         "aoColumnDefs": [
             {
                 "aTargets":[3],
@@ -632,6 +632,17 @@ function getUserTransactions(){
     });
 }
 
+function deleteUserTransactions(){
+    $.ajax({
+        type:'POST',
+        url:'/delete-transactions',
+        success: function(data){
+            $('#upload-alert').hide();
+            $('#ts-delete-alert').show();           
+        }
+    });
+}
+
 function buildTransTable(data){
         //$('#debug-output').html(JSON.stringify(data));
     var ts = data['transactions'];
@@ -644,8 +655,13 @@ function buildTransTable(data){
     var datetime;
 
     if(ts.length == 0){
+        $('#delete-ts').click(function () {return false;});
+        $('#delete-ts').css("background-color", "grey");
         dataTableTrans([]);
     } else {
+        $('#delete-ts').unbind('click', false);
+        $('#delete-ts').css("background-color", "rgb(240, 65, 36)");
+        $('#delete-ts').replaceWith('<a href="javascript:void(0);" id="delete-ts" data-reveal-id="confirm-modal" class="radius button small alert">Delete Transaction History</a>');
         $.each(ts, function(index, value){
             price = parseFloat(value['price']);
             shares = parseInt(value['shares']);
@@ -788,6 +804,7 @@ function browserSupportFileUpload() {
 // Method that reads and processes the selected file
 function upload(evt) {
     $('#upload-alert').hide();
+    $('#ts-delete-alert').hide();
     if (!browserSupportFileUpload()) {
         alert('The File APIs are not fully supported in this browser!');
     } else {
@@ -812,6 +829,8 @@ function upload(evt) {
                         //refresh the transaction datatable
                         window.transTable.destroy();
                         getUserTransactions();
+                        resetFormElement($('#txtFileUpload'));
+                        
                     },
                 });
             } else {
@@ -1178,3 +1197,12 @@ function unescapeHtml(escapedStr) {
     var child = div.childNodes[0];
     return child ? child.nodeValue : '';
 };
+
+function resetFormElement(e) {
+  e.wrap('<form>').closest('form').get(0).reset();
+  e.unwrap();
+
+  // Prevent form submission
+  e.stopPropagation();
+  e.preventDefault();
+}

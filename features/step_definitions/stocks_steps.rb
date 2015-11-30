@@ -44,6 +44,7 @@ end
 
 When(/^I choose (\d+) shares$/) do |arg|
   MyStocks.new(@b).set_shares arg
+  @num_shares = arg
 end
 
 When(/^I confirm the purchase$/) do
@@ -51,7 +52,7 @@ When(/^I confirm the purchase$/) do
 end
 
 Then(/^my transaction history shows the purchase$/) do
-  Transactions.new(@b).num_shares(1)
+  expect(Transactions.new(@b).num_shares(1) == @num_shares);
 end
 
 And(/^I navigate to my transaction history$/) do

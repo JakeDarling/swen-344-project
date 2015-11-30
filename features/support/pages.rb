@@ -111,7 +111,7 @@ class MyStocks
     @b.link(:href => TRANSACTION_HISTORY).click
   end
   def buy
-    @b.link(:id => 'first-buy').click
+    @b.link(:id => 'first-buy').when_present.click
   end
   def set_ticker(symbol)
     @b.text_field(:id => 'buy-ticker').when_present.set symbol

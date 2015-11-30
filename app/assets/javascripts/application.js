@@ -638,9 +638,7 @@ function deleteUserTransactions(){
         url:'/delete-transactions',
         success: function(data){
             $('#upload-alert').hide();
-            $('#ts-delete-alert').show();
-            window.transTable.destroy();
-            getUserTransactions();            
+            $('#ts-delete-alert').show();           
         }
     });
 }
@@ -657,8 +655,13 @@ function buildTransTable(data){
     var datetime;
 
     if(ts.length == 0){
+        $('#delete-ts').click(function () {return false;});
+        $('#delete-ts').css("background-color", "grey");
         dataTableTrans([]);
     } else {
+        $('#delete-ts').unbind('click', false);
+        $('#delete-ts').css("background-color", "rgb(240, 65, 36)");
+        $('#delete-ts').replaceWith('<a href="javascript:void(0);" id="delete-ts" data-reveal-id="confirm-modal" class="radius button small alert">Delete Transaction History</a>');
         $.each(ts, function(index, value){
             price = parseFloat(value['price']);
             shares = parseInt(value['shares']);

@@ -53,6 +53,8 @@
     			$('#delete-ts-submit').click(function(){
     				deleteUserTransactions();
     				$('#delete-ts-submit').foundation('reveal', 'close');
+    				window.transTable.destroy();
+                    getUserTransactions();
     			});
 				
 				getUserTransactions();

@@ -17,6 +17,9 @@
  *= require_self
  *= require fullcalendar
  *= require dataTables/jquery.dataTables.foundation
+ *= require dataTables/extras/dataTables.responsive
+ *= require dataTables/extras/dataTables.tableTools
+ *= require dataTables/extras/dataTables.fixedHeader
  */
 @import "epic";
 @import "settings";
@@ -32,4 +35,8 @@
 
 .success {
 	color: green;
+}
+
+.alert-box {
+	display: none;
 }

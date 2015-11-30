@@ -1,19 +1,30 @@
 Rails.application.routes.draw do
-
+  #front page actions
   post '/associate-user' => 'application#associate_user'
   get '/' => 'epic#index'
+  get '/get-front-page-events' => 'epic#get_front_page_events'
   get '/stocks' => 'stocks#index'
+
+  #calendar actions
   get '/calendar' => 'calendar#index'
+  get '/transactions' => 'stocks#render_transactions'
   post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
-
-  get '/get-my-events' => 'calendar#get_my_events'
-
+  post '/modify-event' => 'calendar#modify_event'
+  get '/load-events' => 'calendar#load_events'
+  
   #stocks actions
   post '/buy-stock' => 'stocks#buy_stock'
   post '/sell-stock' => 'stocks#sell_stock'
+  post '/edit-stock-note' => 'stocks#edit_stock_note'
+  get '/get-top-stocks' => 'stocks#get_top_stocks'
   get '/my-stocks' => 'stocks#view_my_stocks'
   get '/get-my-stocks' => 'stocks#get_my_stocks'
+
+  #transactions actions
+  post 'upload-transactions' => 'stocks#upload_transactions'
+  get '/get-my-transactions' => 'stocks#get_my_transactions'
+  post '/delete-transactions' => 'stocks#delete_transactions'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

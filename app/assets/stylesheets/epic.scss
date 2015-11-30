@@ -21,6 +21,11 @@ body{
 #main_wrap {
   min-height: 45em;
   padding:1em;
+  background: white;
+}
+
+#content_wrap{
+  background: white;
 }
 
 .dashboard-chart {
@@ -58,6 +63,7 @@ body{
 img{
   margin: 0;
   padding: 0;
+  vertical-align: top;
 }
 
 .full_width {

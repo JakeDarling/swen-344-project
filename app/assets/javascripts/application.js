@@ -560,14 +560,14 @@ function dataTable(sArr){
     window.stockTable = $('#myTable').DataTable(options);
 }
 /*****************************************************************************/
-/* END STOCKS*/
+/* END STOCKS */
 /*****************************************************************************/
 $(function () {
     $(document).foundation();
 });
 
 /*****************************************************************************/
-/* FACEBOOK*/
+/* FACEBOOK */
 /*****************************************************************************/
 function fb_login() {
     FB.login(function (response) {
@@ -600,6 +600,11 @@ function fb_login() {
     document.getElementById('fb-root').appendChild(e);
 }());
 
+function fb_logout() {
+    FB.logout(function(response) {
+        // Person is now logged out
+    });
+}
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/

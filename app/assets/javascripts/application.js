@@ -998,6 +998,7 @@ function renderCalendar() {
             right: 'month,agendaWeek,agendaDay'
         },
         defaultView: 'agendaWeek',
+        timezone: 'local',
         selectable: true,
         selectHelper: true,
         editable: true,

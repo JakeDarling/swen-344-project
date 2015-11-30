@@ -982,7 +982,7 @@ function renderCalendar() {
         timezone: 'local',
         selectable: true,
         selectHelper: true,
-        editable: true,
+        eventStartEditable: false,
 
         // Adding an event
         select: function(start, end) {

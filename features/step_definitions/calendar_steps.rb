@@ -11,8 +11,8 @@ When(/^I choose to add a new calendar event$/) do
 end
 
 And(/^I set the start and end day$/) do
-  Calendar.new(@b).set_start_day 'Nov 06, 2015'
-  Calendar.new(@b).set_end_day 'Nov 06, 2015'
+  Calendar.new(@b).set_start_day 'Nov 06, 2017'
+  Calendar.new(@b).set_end_day 'Nov 06, 2017'
 end
 
 And(/^I set the start and end time$/) do
@@ -29,35 +29,40 @@ Then(/^the event is displayed on my calendar$/) do
 end
 
 Given(/^I have created a calendar event$/) do
-  pending # express the regexp above with the code you wish you had
+  step 'I choose to add a new calendar event'
+  step 'I set the event title'
+  step 'I set the start and end day'
+  step 'I set the start and end time'
+  step 'I confirm the event'
+  step 'the event is displayed on my calendar'
 end
 
 When(/^I choose to edit the "(.*?)" calendar event$/) do |arg1|
-  pending # express the regexp above with the code you wish you had
+  Calendar.new(@b).edit_event(0)
 end
 
 And(/^I change the start time$/) do
-  pending # express the regexp above with the code you wish you had
+  Calendar.new(@b).set_start_time('5:00 PM')
 end
 
 And(/^I change the end time$/) do
-  pending # express the regexp above with the code you wish you had
+  Calendar.new(@b).set_end_time('6:00 PM')
 end
 
 And(/^I change the title/) do
-  pending # express the regexp above with the code you wish you had
+  Calendar.new(@b).set_title('An edited title')
 end
 
 Then(/^the updated event is displayed on my calendar$/) do
-  pending # express the regexp above with the code you wish you had
+  expect(Calendar.new(@b).has_events?)
 end
 
-When(/^I delete the "([^"]*)" calendar event$/) do |arg|
-  pending
+When(/^I delete the event$/) do
+  Calendar.new(@b).delete_event
 end
 
 Then(/^my calendar does not display any events$/) do
-  pending
+  expect(! Calendar.new(@b).has_events?)
 end
 
 And(/^I set the event title$/) do

@@ -149,7 +149,7 @@ class Calendar
     @b = browser
   end
   def on_page?
-    false
+    @b.div(:id => 'calendar').exists?
   end
   def set_title(title)
     @b.text_field(:id => 'titleField').set title
@@ -157,6 +157,13 @@ class Calendar
   # Fullcalendar makes this odd, so this just clicks the first entry
   def add_event
     @b.div(:class => 'fc-widget-content').click
+  end
+  # Edit the nth event
+  def edit_event(index)
+    @b.div(:class => 'fc-event', :index => index).when_present.click
+  end
+  def delete_event
+    @b.button(:id => 'removeBtn').when_present.click
   end
   def set_start_time(time)
     @b.text_field(:id => 'startTimeField').set time

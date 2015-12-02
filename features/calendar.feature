@@ -5,7 +5,7 @@ Feature: Calendar scenarios
     Given I have logged in to Epic
     And I have navigated to the calendar page
 
-  @p1 @done
+  @p1 @uc12 @done
   Scenario: Add new event
     When I choose to add a new calendar event
     And I set the event title
@@ -14,7 +14,7 @@ Feature: Calendar scenarios
     And I confirm the event
     Then the event is displayed on my calendar
 
-  @p1
+  @p1 @uc13 @done
    Scenario: Edit event
      Given I have created a calendar event
      When I choose to edit the "1st" calendar event
@@ -22,8 +22,9 @@ Feature: Calendar scenarios
      And I change the end time
      Then the updated event is displayed on my calendar
 
-   @p1
+   @p1 @uc14 @done
    Scenario: Delete event
      Given I have created a calendar event
-     When I delete the "1st" calendar event
+     When I choose to edit the "1st" calendar event
+     And I delete the event
      Then my calendar does not display any events

@@ -62,3 +62,18 @@ end
 Given(/^I have navigated to the my stocks page$/) do
   Navigation.new(@b).my_stocks
 end
+
+Given(/^I have purchased some stocks$/) do
+  step 'I enter the ticker "AAPL"'
+  step 'I choose 10 shares'
+  step 'I choose the buy option'
+  step 'I confirm the purchase'
+end
+
+When(/^I delete my transaction history$/) do
+  Transactions.new(@b).delete_history
+end
+
+Then(/^my transaction history is empty$/) do
+  Transactions.new(@b).has_history?
+end

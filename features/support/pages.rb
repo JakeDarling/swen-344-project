@@ -141,6 +141,12 @@ class Transactions
   def bought?(index)
     @b.tr(:index => index).td(:index => 4).text == 'buy'
   end
+  def delete_history
+    @b.button(:id => 'delete-ts').click
+  end
+  def has_history?
+    @b.div(:id => 'TODO').exists?
+  end
 end
 
 # Epic calendar

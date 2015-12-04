@@ -983,6 +983,39 @@ function validateAddEvent() {
   }
 }
 
+function initCalendar() {
+  $('#frontPageCalendar').fullCalendar({
+    defaultView: 'agendaDay',
+    timezone: 'local',
+    selectable: false,
+    allDaySlot: false,
+    editable: false,
+  });
+  $('.fc-right').hide();
+}
+
+function loadCalendarEvents() {
+  // Load Events from Database
+  $.ajax({
+    type:'GET',
+    url:'/get-front-page-events',
+    dataType:'json',
+    success: function(data){
+      var events = [];
+      for (var z = 0; z < data.events.length; z++) {
+        var event = {};
+
+        event.title = data.events[z].title;
+        event.start = data.events[z].start;
+        event.end = data.events[z].end1;
+
+        events.push(event);
+      }
+      $('#frontPageCalendar').fullCalendar('addEventSource', events);
+    }
+  });
+}
+
 function renderCalendar() {
     var selectedEvent;
     var eventTitle;
@@ -1002,6 +1035,7 @@ function renderCalendar() {
         selectable: true,
         selectHelper: true,
         editable: true,
+        allDaySlot: false,
 
         // Adding an event
         select: function(start, end) {

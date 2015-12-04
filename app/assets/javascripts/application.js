@@ -789,6 +789,7 @@ function postNote(){
 /*****************************************************************************/
 /* END STOCKS*/
 /*****************************************************************************/
+
 /*****************************************************************************/
 /* FILE UPLOAD */
 /*****************************************************************************/
@@ -845,6 +846,7 @@ function upload(evt) {
 /*****************************************************************************/
 /* END FILE UPLOAD*/
 /*****************************************************************************/
+
 $(function () {
     $(document).foundation();
 });
@@ -854,10 +856,7 @@ $(function () {
 /*****************************************************************************/
 function fb_login() {
     FB.login(function (response) {
-
         if (response.authResponse) {
-            console.log('Welcome!  Fetching your information.... ');
-            //console.log(response); // dump complete info
             access_token = response.authResponse.accessToken; //get access token
             user_id = response.authResponse.userID; //get FB UID
 
@@ -870,7 +869,6 @@ function fb_login() {
         } else {
             //user hit cancel button
             console.log('User cancelled login or did not fully authorize.');
-
         }
     }, {
         scope: 'publish_actions,email,public_profile,user_posts'
@@ -883,107 +881,442 @@ function fb_login() {
     document.getElementById('fb-root').appendChild(e);
 }());
 
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+        testAPI();
+        showWall();
+    } else if (response.status === 'not_authorized') {
+        document.getElementById('login-status').innerHTML = 'Please log ' +
+                'into this app.';
+    } else {
+        document.getElementById('login-status').innerHTML = 'Please log ' +
+                'into Facebook.';
+    }
+}
+
+function checkLoginState() {
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+}
+
+window.fbAsyncInit = function () {
+    FB.init({
+        appId: '1715981821968291',
+        cookie: true,
+        xfbml: true,
+        version: 'v2.4'
+    });
+
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+};
+
+(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+function testAPI() {
+    FB.api('/me?fields=name,id', function (response) {
+        myName = response.name;
+        myId = response.id            
+
+        //associate user in our database
+        $.ajax({
+            type:'POST',
+            url:'/associate-user',
+            data:{'idString': response.id},
+        });
+
+        document.getElementById('login-status').innerHTML =
+                'Thanks for logging in, ' + response.name + '!';
+        document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
+        
+        displayPostStatus();
+    });
+}
+
+function displayPostStatus() {
+    $("#facebook-post-status").append(
+        '<select id="status_privacy"><option value="EVERYONE">Public</option><option value="ALL_FRIENDS">Friends</option>' +
+        '<option value="FRIENDS_OF_FRIENDS">Friends of Friends</option><option value="SELF">Only Me</option></select>');
+
+    $("#facebook-post-status").append('<ul class="tabs" data-tab><li class="tab-title active"><a href="#panel1">Post Status</a></li><li class="tab-title"><a href="#panel2">Post Photo</a></li></ul>');
+    $("#facebook-post-status").append(
+        '<div class="tabs-content"><div class="content active" id="panel1">' +
+        '<form onsubmit="updateStatus(this.status.value)"><input type="text" name="status" placeholder="What\'s on your mind?" /><input type="submit" style="visibility: hidden;" /></form>' +
+        '</div><div class="content" id="panel2">' +
+        '<form onsubmit="uploadPhoto(this.caption.value, this.url.value)"><input type="text" name="url" placeholder="Enter URL" /><input type="text" name="caption" placeholder="Caption" /><input type="submit" style="visibility: hidden;" /></form>' +
+        '</div></div>');
+    $(document).foundation();
+}
+
+function showWall() {   
+  FB.api(
+    '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id', 
+    function(response) {
+      if (response && !response.error) {
+        postsData = response.data;
+        for (var i = 0; i < postsData.length; i++) {
+          var post = postsData[i];
+
+          // Profile Pic of Poster
+          var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
+
+          // Post Time
+          var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
+          var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
+                            "August", "September", "October", "November", "December"];
+          var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
+          var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
+
+          // Post Type
+          var postType = post.type;
+
+          // Poster (from)
+          var from = post.from
+
+          // Post ID
+          var postId = post.id;
+
+          // Post Link
+          var postLink = 'https://www.facebook.com/' + from.id + '/posts/' + postId.split('_')[1];
+
+          // Post Story
+          if (post.story) {
+            var postStory = ' ' + post.story.split(from.name + ' ')[1];
+          }
+
+          // Comments
+          if (post.comments) {
+            var comments = post.comments.data;
+          }
+
+          // Post
+          $('#wall').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + postId}));
+
+          // Post Profile Pic Link
+          $('#post' + postId).append($('<a>', {
+            href: 'https://facebook.com/' + from.id,
+            target: '_blank',
+            id: 'pplink' + postId
+          }));
+
+          // Post Profile Pic
+          $('#pplink' + postId).append($('<img>', {
+            src: postProfilePic,
+            alt: 'Post Profile Picture',
+            class: 'postProfilePic',
+            height: '40px',
+            width: '40px'
+          }));
+
+          // Poster (from)
+          $('#post' + postId).append($('<a>', {
+            href: 'https://facebook.com/' + from.id,
+            class: 'poster',
+            target: '_blank',
+            text: from.name
+          }));
+
+          // Story
+          if (post.story) {
+            $('#post' + postId).append($('<span>', { class: 'postStory', text: postStory }));
+          }
+          $('#post' + postId).append($('</br>'));
+
+          // Post Time
+          $('#post' + postId).append($('<a>', { 
+            href: postLink,   
+            target: '_blank',  
+            class: 'postTime',
+            text: strFbTime
+          }));
+          $('#post' + postId).append($('</br>'));
+
+          // Post Message
+          if (post.message) {
+            $('#post' + postId).append($('<p>', { class: 'postMessage', text: post.message }));
+          }
+
+          // Attachments
+          if (post.attachments) {
+            if (postType == 'photo') {
+              if (post.attachments.data[0].type == 'album') {
+                var attachments = post.attachments.data[0].subattachments.data;
+                for (var n = 0; n < attachments.length; n++) {
+                  var attachment = attachments[n];
+                  // Image Link
+                  $('#post' + postId).append($('<a>', {
+                    href: attachment.target.url,
+                    target: '_blank',
+                    id: 'imglink' + attachment.target.id
+                  }));
+                  // Image
+                  $('#imglink' + attachment.target.id).append($('<img>', {
+                    src: attachment.media.image.src,
+                    alt: 'Post photo',
+                    height: attachment.media.image.height / 2,
+                    width: attachment.media.image.width / 2
+                  }));
+                }
+                $('#post' + postId).append($('</br>'));
+              } else if (post.attachments.data[0].type == 'photo') {
+                var attachments = post.attachments.data;
+                for (var m = 0; m < attachments.length; m++) {
+                  var attachment = attachments[m];
+                  // Image Link
+                  $('#post' + postId).append($('<a>', {
+                    href: attachment.target.url,
+                    target: '_blank',
+                    id: 'imglink' + attachment.target.id
+                  }));
+                  // Image
+                  $('#imglink' + attachment.target.id).append($('<img>', {
+                    src: attachment.media.image.src,
+                    alt: 'Post photo',
+                    height: attachment.media.image.height / 2,
+                    width: attachment.media.image.width / 2
+                  }));
+                  $('#post' + postId).append($('</br>'));
+                }
+              }
+            }
+          }
+
+          // Likes
+          var iLike = false;
+          var postLikes = [];
+          if (post.likes) {       
+            postLikes = post.likes.data;
+            for (var l = 0; l < postLikes.length; l++) {
+              if (postLikes[l].id == myId) {
+                iLike = true;
+              }
+            }
+          }
+
+          // Like Post
+          $('#post' + postId).append($('<hr>'));
+
+          if (iLike) {
+            $('#post' + postId).append($('<a>', { class: 'likePost liked', id: post.id, text: 'Like '}));
+          } else {
+            $('#post' + postId).append($('<a>', { class: 'likePost notLiked', id: post.id, text: 'Like '}));
+          }
+
+          // Comment on Post
+          $('#post' + postId).append($('<a>', { 
+            class: 'commentPost',
+            id: 'commentPost' + post.id, 
+            text: 'Comment '  
+          }));
+
+          // Share Post
+          if (postType == 'link') {
+            $('#post' + postId).append($('<a>', { class: 'sharePost', text: 'Share '  }));
+          }
+
+          // Comments Box
+          $('#wall').append($('<div>', {
+            name: 'fbComments',
+            class: 'fbComments',
+            id: 'comments' + postId
+          }));
+
+
+          // 1 person likes Post
+          if (postLikes.length == 1) {
+            var likesMessage;
+            if (iLike == true) {
+              likesMessage = 'You like this.';
+            } else {
+              likesMessage = postLikes[0].name + ' likes this.';
+            }
+            $('#comments' + postId).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+          }
+
+          // 2 people like this.
+          if (postLikes.length == 2) {
+            var likesMessage;
+            if (iLike == true) {
+              var otherPerson;
+              for (var u = 0; u < postLikes.length; u++) {
+                if (postLikes[u].id != myId) {
+                  otherPerson = postLikes[u].name;
+                }
+              }
+              likesMessage = 'You and ' + otherPerson + ' like this.';
+            } else {
+              likesMessage = postLikes[0].name + ' and ' + postLikes[1].name + ' like this.';
+            }
+            $('#comments' + postId).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+          }
+
+          // Comments
+          if (post.comments) {
+            for (var k = 0; k < post.comments.data.length; k++) {
+              var comment = post.comments.data[k];
+              // Comment Div
+              $('#comments' + postId).append($('<div>', {
+                class: 'comment',
+                id: 'comment' + comment.id
+              }));
+
+              // Comment Image
+              $('#comment' + comment.id).append($('<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><img src="https://graph.facebook.com/' + comment.from.id + '/picture?fields=url&type=square" alt="Comment Pic" class="commentPic" height="32px" width="32px"></a>'));
+              
+              // Comment Name
+              $('#comment' + comment.id).append($('<a>', {
+                href: 'https://facebook.com/' + comment.from.id,
+                target: '_blank',
+                class: 'commenter',
+                text: comment.from.name
+              }));
+
+              // Comment message
+              $('#comment' + comment.id).append($('<span>', { text: comment.message  }));
+              $('#comment' + comment.id).append($('</br>'));
+
+              // Like/Unlike Comment
+              if (comment.can_like) {
+                if (comment.user_likes==true) {
+                  // Unlike Comment
+                  $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
+                } else {
+                  // Like Comment
+                  $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
+                }
+                $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
+              }
+
+              // Reply to Comment
+              if (comment.can_comment) {
+                $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
+              $('#comment' + comment.id).append($('</br>'));
+              }
+            }
+          }
+
+          // Add Comment Profile Pic
+          $('#comments' + postId).append($('<img>', {
+            src: 'https://graph.facebook.com/' + myId + '/picture?fields=url&type=square',
+            alt: 'Add Comment Profile Picture',
+            class: 'addCommentPic',
+            height: 32,
+            width: 32
+          }));
+
+          // Add Comment Input Field
+          $('#comments' + postId).append($('<input>', {
+            type: 'text',
+            class: 'addCommentField',
+            id: 'addCommentField' + post.id,
+            name: 'addComment' + postId,
+            placeholder: 'Write a comment...'
+          }));
+        }
+      }
+
+      // Click to Like
+      $('#wall a.notLiked').click(function() {
+        FB.api(
+          "/" + $(this).attr('id') + "/likes",
+          "POST",
+          function (response) {
+            if (response && !response.error) {
+              console.log('liked!');
+            } else {
+              console.log('error');
+            }
+          }
+        );
+        $(this).attr('class', 'likePost liked');
+        location.reload();
+      });
+
+      // Click to Unlike
+      $('#wall a.liked').click(function() {
+        FB.api(
+          "/" + $(this).attr('id') + "/likes",
+          "DELETE",
+          function (response) {
+            if (response && !response.error) {
+              console.log('unliked');
+            } else {
+              console.log('error');
+            }
+          }
+        );
+        $(this).attr('class', 'likePost notLiked');
+        location.reload();
+      });
+
+      // Click to Add Comment
+      $('#wall a.commentPost').click(function() {
+        $('#addCommentField' + $(this).attr('id').substring('commentPost'.length)).focus();
+      });
+
+      // Submit Post Comment
+      $('.addCommentField').keypress(function(event) {
+        if (event.keyCode == 13) { // Enter key
+          FB.api(
+            "/" + $(this).attr('id').substring('addCommentField'.length) + "/comments",
+            "POST",
+            {"message":$(this).val()},
+            function (response) {
+              if (response && !response.error) {
+                // Added comment
+              } else {
+                console.log('error');
+              }
+            }
+          );
+          location.reload();
+        }
+      });
+  });
+}   
+
+function updateStatus(status) {
+    FB.api('/me/feed',
+        'post',
+        {
+            message: status,
+            privacy: {
+                "value": $("#status_privacy").val()
+            }
+        });
+}
+
+function uploadPhoto(status, url) {
+    FB.api("/me/photos",
+        "POST",
+        {
+            "caption": status,
+            "url": url,
+            "privacy": {
+                "value": $("#status_privacy").val()
+            }
+        });
+}
+
+function logout() {
+    FB.logout();
+}
+
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
-
-function validateAddEvent() {
-  // var tReg = new RegExp('^.{0,100}$');
-  // var sReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
-  // var eReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
-
-  var title = $('#titleField').val();
-  var startDate = $('#startDateField').val();
-  var startTime = $('#startTimeField').val();
-  var endDate = $('#endDateField').val();
-  var endTime = $('#endTimeField').val();
-
-  var invalid=false;
-  var invalidFields = {
-      title: false,
-      startDate: false,
-      startTime: false,
-      endDate: false,
-      endTime: false
-  };
-
-  //validate inputs
-  if (title == '') {
-    invalid = true;
-    invalidFields['title'] = true;
-  } else if (title.length > 100) {
-    invalid = true;
-    invalidFields['titleLength'] = true;
-  }
-  if (startDate == ''){
-    invalid = true;
-    invalidFields['startDate'] = true;
-  }
-  if (startTime == ''){
-    invalid = true;
-    invalidFields['startTime'] = true;
-  }
-  if (endDate == ''){
-    invalid = true;
-    invalidFields['endDate'] = true;
-  }
-  if (endTime == ''){
-    invalid = true;
-    invalidFields['endTime'] = true;
-  }
-  
-  // Set error message
-  if(invalid){
-    $('#invalid-event-input-modal p:first').empty();
-    $('#invalid-event-input-modal').foundation('reveal', 'open');
-
-    if(invalidFields['title']){
-      $('#invalid-event-input-modal p:first').append("<br>Please enter a title");
-    }
-    if(invalidFields['titleLength']){
-      $('#invalid-event-input-modal p:first').append("<br>Title must be less than 100 characters");
-    }
-    if(invalidFields['startDate']){
-      $('#invalid-event-input-modal p:first').append("<br>Please select a Start Date");
-    }
-    if(invalidFields['startTime']){
-      $('#invalid-event-input-modal p:first').append("<br>Please enter a Start Time");
-    }
-    if(invalidFields['endDate']){
-      $('#invalid-event-input-modal p:first').append("<br>Please select an End Date");
-    }
-    if(invalidFields['endTime']){
-      $('#invalid-event-input-modal p:first').append("<br>Please enter an End Time");
-    }
-  } else {
-    // Create eventData to render FullCalendar event
-    var eventData;
-    eventData = {
-      title: $('#titleField').val(),
-      start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
-      end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
-    };
-
-    // Store event in database
-    if (eventData.title && eventData.start && eventData.end) {
-      $.ajax({
-        type:'POST',
-        url:'/store-event',
-        data:{
-          'title': eventData.title,
-          'start': eventData.start,
-          'end1': eventData.end,
-        },
-        success: function(){
-          $('#calendar').fullCalendar('renderEvent', eventData, true);
-          $('#myModal').foundation('reveal', 'close');
-        }
-      });
-    }
-  }
-}
-
-function initCalendar() {
+function renderFrontPageCalendar() {
   $('#frontPageCalendar').fullCalendar({
     defaultView: 'basicDay',
     timezone: 'local',
@@ -994,7 +1327,7 @@ function initCalendar() {
   $('.fc-right').hide();
 }
 
-function loadCalendarEvents() {
+function loadFrontPageEvents() {
   // Load Events from Database
   $.ajax({
     type:'GET',
@@ -1139,6 +1472,102 @@ function loadEvents() {
     });
 }
 
+function validateAddEvent() {
+  // var tReg = new RegExp('^.{0,100}$');
+  // var sReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
+  // var eReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
+
+  var title = $('#titleField').val();
+  var startDate = $('#startDateField').val();
+  var startTime = $('#startTimeField').val();
+  var endDate = $('#endDateField').val();
+  var endTime = $('#endTimeField').val();
+
+  var invalid=false;
+  var invalidFields = {
+      title: false,
+      startDate: false,
+      startTime: false,
+      endDate: false,
+      endTime: false
+  };
+
+  //validate inputs
+  if (title == '') {
+    invalid = true;
+    invalidFields['title'] = true;
+  } else if (title.length > 100) {
+    invalid = true;
+    invalidFields['titleLength'] = true;
+  }
+  if (startDate == ''){
+    invalid = true;
+    invalidFields['startDate'] = true;
+  }
+  if (startTime == ''){
+    invalid = true;
+    invalidFields['startTime'] = true;
+  }
+  if (endDate == ''){
+    invalid = true;
+    invalidFields['endDate'] = true;
+  }
+  if (endTime == ''){
+    invalid = true;
+    invalidFields['endTime'] = true;
+  }
+  
+  // Set error message
+  if(invalid){
+    $('#invalid-event-input-modal p:first').empty();
+    $('#invalid-event-input-modal').foundation('reveal', 'open');
+
+    if(invalidFields['title']){
+      $('#invalid-event-input-modal p:first').append("<br>Please enter a title");
+    }
+    if(invalidFields['titleLength']){
+      $('#invalid-event-input-modal p:first').append("<br>Title must be less than 100 characters");
+    }
+    if(invalidFields['startDate']){
+      $('#invalid-event-input-modal p:first').append("<br>Please select a Start Date");
+    }
+    if(invalidFields['startTime']){
+      $('#invalid-event-input-modal p:first').append("<br>Please enter a Start Time");
+    }
+    if(invalidFields['endDate']){
+      $('#invalid-event-input-modal p:first').append("<br>Please select an End Date");
+    }
+    if(invalidFields['endTime']){
+      $('#invalid-event-input-modal p:first').append("<br>Please enter an End Time");
+    }
+  } else {
+    // Create eventData to render FullCalendar event
+    var eventData;
+    eventData = {
+      title: $('#titleField').val(),
+      start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+      end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+    };
+
+    // Store event in database
+    if (eventData.title && eventData.start && eventData.end) {
+      $.ajax({
+        type:'POST',
+        url:'/store-event',
+        data:{
+          'title': eventData.title,
+          'start': eventData.start,
+          'end1': eventData.end,
+        },
+        success: function(){
+          $('#calendar').fullCalendar('renderEvent', eventData, true);
+          $('#myModal').foundation('reveal', 'close');
+        }
+      });
+    }
+  }
+}
+
 function storeEvent() {
     // If All fields are filled...
     if ($('#titleField').val() != '' &&
@@ -1247,7 +1676,6 @@ function clearChildren(element) {
       }
    }
 }
-
 
 // Use the browser's built-in functionality to quickly and safely escape the
 // string

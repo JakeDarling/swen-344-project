@@ -1027,6 +1027,44 @@ function renderCalendar() {
             $('#eventButtons').hide();
             selectedEvent = null;
         },
+
+        eventResize: function(event) {
+          $.ajax({
+            type: 'POST',
+            url: '/modify-event',
+            data: {
+              'id': event._id.replace(/\D/g,''),
+              'title': event.title,
+              'start': event.start.format(),
+              'end1': event.end.format(),
+            },
+            success: function() {
+                console.log('Event resized');
+            },
+            error: function() {
+                alert('Error modifying event in database');
+            }
+          });
+        },
+
+        eventDrop: function(event) {
+          $.ajax({
+            type: 'POST',
+            url: '/modify-event',
+            data: {
+              'id': event._id.replace(/\D/g,''),
+              'title': event.title,
+              'start': event.start.format(),
+              'end1': event.end.format(),
+            },
+            success: function() {
+                console.log('Event dropped');
+            },
+            error: function() {
+                alert('Error modifying event in database');
+            }
+          });
+        },
         
         // Show event info
         eventClick: function(calEvent, jsEvent, view) {

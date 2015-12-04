@@ -985,7 +985,7 @@ function validateAddEvent() {
 
 function initCalendar() {
   $('#frontPageCalendar').fullCalendar({
-    defaultView: 'agendaDay',
+    defaultView: 'basicDay',
     timezone: 'local',
     selectable: false,
     allDaySlot: false,

@@ -71,6 +71,28 @@ class CalendarController < ApplicationController
 
 	    render:nothing => true
     end
+	
+	def delete_event
+		id = params[:id]
+
+	    user = User.find_by(fbUserId:session[:user])
+		
+		event = Event.find(id)
+
+		# checks if user owns this event in his calendar
+		if user.id == event.user_id
+			event.destroy
+		else
+        	puts "============================="
+        	puts "deleting event failed. entry failed"
+        	puts "============================="
+		end
+			
+
+	    puts event.inspect
+
+	    render:nothing => true
+    end
 
 	def validate_event_input(title, start, end1)
     # tReg = /^.{0,100}$/

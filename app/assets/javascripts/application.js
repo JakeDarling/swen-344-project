@@ -1632,6 +1632,26 @@ function modifyEvent() {
     }
 }
 
+function deleteEvent() {
+    if (window.confirm("Are you sure? This event will be deleted.")) {
+    	$.ajax({
+            type: 'POST',
+    	    url: '/delete-event',
+    	    data: {
+                'id': $("#eventId").val()
+    	    },
+    	    success: function() {
+                $("#calendar").fullCalendar('removeEvents');
+                loadEvents();
+    			$('#myModal').foundation('reveal', 'close');
+    	    },
+    	    error: function() {
+    	        alert('Error deleting event in database');
+    	    }
+        });
+    }
+}
+
 function resetAddEventForm() {
     $('#titleField').val('');
     $('#startDateField').val('');

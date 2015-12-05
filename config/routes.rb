@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   post '/associate-user' => 'application#associate_user'
   post '/store-event' => 'calendar#store_event'
   post '/modify-event' => 'calendar#modify_event'
+  post '/delete-event' => 'calendar#delete_event'
   get '/load-events' => 'calendar#load_events'
   
   #stocks actions

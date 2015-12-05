@@ -978,21 +978,12 @@ function showWall() {
           var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
           var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
 
-          // Post Type
-          var postType = post.type;
-
-          // Poster (from)
-          var from = post.from
-
-          // Post ID
-          var postId = post.id;
-
           // Post Link
-          var postLink = 'https://www.facebook.com/' + from.id + '/posts/' + postId.split('_')[1];
+          var postLink = 'https://www.facebook.com/' + post.from.id + '/posts/' + post.id.split('_')[1];
 
           // Post Story
           if (post.story) {
-            var postStory = ' ' + post.story.split(from.name + ' ')[1];
+            var postStory = ' ' + post.story.split(post.from.name + ' ')[1];
           }
 
           // Comments
@@ -1001,17 +992,17 @@ function showWall() {
           }
 
           // Post
-          $('#wall').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + postId}));
+          $('#wall').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + post.id}));
 
           // Post Profile Pic Link
-          $('#post' + postId).append($('<a>', {
-            href: 'https://facebook.com/' + from.id,
+          $('#post' + post.id).append($('<a>', {
+            href: 'https://facebook.com/' + post.from.id,
             target: '_blank',
-            id: 'pplink' + postId
+            id: 'pplink' + post.id
           }));
 
           // Post Profile Pic
-          $('#pplink' + postId).append($('<img>', {
+          $('#pplink' + post.id).append($('<img>', {
             src: postProfilePic,
             alt: 'Post Profile Picture',
             class: 'postProfilePic',
@@ -1020,42 +1011,42 @@ function showWall() {
           }));
 
           // Poster (from)
-          $('#post' + postId).append($('<a>', {
-            href: 'https://facebook.com/' + from.id,
+          $('#post' + post.id).append($('<a>', {
+            href: 'https://facebook.com/' + post.from.id,
             class: 'poster',
             target: '_blank',
-            text: from.name
+            text: post.from.name
           }));
 
           // Story
           if (post.story) {
-            $('#post' + postId).append($('<span>', { class: 'postStory', text: postStory }));
+            $('#post' + post.id).append($('<span>', { class: 'postStory', text: postStory }));
           }
-          $('#post' + postId).append($('</br>'));
+          $('#post' + post.id).append($('</br>'));
 
           // Post Time
-          $('#post' + postId).append($('<a>', { 
+          $('#post' + post.id).append($('<a>', { 
             href: postLink,   
             target: '_blank',  
             class: 'postTime',
             text: strFbTime
           }));
-          $('#post' + postId).append($('</br>'));
+          $('#post' + post.id).append($('</br>'));
 
           // Post Message
           if (post.message) {
-            $('#post' + postId).append($('<p>', { class: 'postMessage', text: post.message }));
+            $('#post' + post.id).append($('<p>', { class: 'postMessage', text: post.message }));
           }
 
           // Attachments
           if (post.attachments) {
-            if (postType == 'photo') {
+            if (post.type == 'photo') {
               if (post.attachments.data[0].type == 'album') {
                 var attachments = post.attachments.data[0].subattachments.data;
                 for (var n = 0; n < attachments.length; n++) {
                   var attachment = attachments[n];
                   // Image Link
-                  $('#post' + postId).append($('<a>', {
+                  $('#post' + post.id).append($('<a>', {
                     href: attachment.target.url,
                     target: '_blank',
                     id: 'imglink' + attachment.target.id
@@ -1068,13 +1059,13 @@ function showWall() {
                     width: attachment.media.image.width / 2
                   }));
                 }
-                $('#post' + postId).append($('</br>'));
+                $('#post' + post.id).append($('</br>'));
               } else if (post.attachments.data[0].type == 'photo') {
                 var attachments = post.attachments.data;
                 for (var m = 0; m < attachments.length; m++) {
                   var attachment = attachments[m];
                   // Image Link
-                  $('#post' + postId).append($('<a>', {
+                  $('#post' + post.id).append($('<a>', {
                     href: attachment.target.url,
                     target: '_blank',
                     id: 'imglink' + attachment.target.id
@@ -1086,7 +1077,7 @@ function showWall() {
                     height: attachment.media.image.height / 2,
                     width: attachment.media.image.width / 2
                   }));
-                  $('#post' + postId).append($('</br>'));
+                  $('#post' + post.id).append($('</br>'));
                 }
               }
             }
@@ -1105,31 +1096,31 @@ function showWall() {
           }
 
           // Like Post
-          $('#post' + postId).append($('<hr>'));
+          $('#post' + post.id).append($('<hr>'));
 
           if (iLike) {
-            $('#post' + postId).append($('<a>', { class: 'likePost liked', id: post.id, text: 'Like '}));
+            $('#post' + post.id).append($('<a>', { class: 'likePost liked', id: post.id, text: 'Like '}));
           } else {
-            $('#post' + postId).append($('<a>', { class: 'likePost notLiked', id: post.id, text: 'Like '}));
+            $('#post' + post.id).append($('<a>', { class: 'likePost notLiked', id: post.id, text: 'Like '}));
           }
 
           // Comment on Post
-          $('#post' + postId).append($('<a>', { 
+          $('#post' + post.id).append($('<a>', { 
             class: 'commentPost',
             id: 'commentPost' + post.id, 
             text: 'Comment '  
           }));
 
           // Share Post
-          if (postType == 'link') {
-            $('#post' + postId).append($('<a>', { class: 'sharePost', text: 'Share '  }));
+          if (post.type == 'link') {
+            $('#post' + post.id).append($('<a>', { class: 'sharePost', text: 'Share '  }));
           }
 
           // Comments Box
           $('#wall').append($('<div>', {
             name: 'fbComments',
             class: 'fbComments',
-            id: 'comments' + postId
+            id: 'comments' + post.id
           }));
 
 
@@ -1141,7 +1132,7 @@ function showWall() {
             } else {
               likesMessage = postLikes[0].name + ' likes this.';
             }
-            $('#comments' + postId).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+            $('#comments' + post.id).append($('<p>', { class: 'likesMessage', text: likesMessage }));
           }
 
           // 2 people like this.
@@ -1158,7 +1149,7 @@ function showWall() {
             } else {
               likesMessage = postLikes[0].name + ' and ' + postLikes[1].name + ' like this.';
             }
-            $('#comments' + postId).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+            $('#comments' + post.id).append($('<p>', { class: 'likesMessage', text: likesMessage }));
           }
 
           // Comments
@@ -1166,7 +1157,7 @@ function showWall() {
             for (var k = 0; k < post.comments.data.length; k++) {
               var comment = post.comments.data[k];
               // Comment Div
-              $('#comments' + postId).append($('<div>', {
+              $('#comments' + post.id).append($('<div>', {
                 class: 'comment',
                 id: 'comment' + comment.id
               }));
@@ -1207,7 +1198,7 @@ function showWall() {
           }
 
           // Add Comment Profile Pic
-          $('#comments' + postId).append($('<img>', {
+          $('#comments' + post.id).append($('<img>', {
             src: 'https://graph.facebook.com/' + myId + '/picture?fields=url&type=square',
             alt: 'Add Comment Profile Picture',
             class: 'addCommentPic',
@@ -1216,11 +1207,11 @@ function showWall() {
           }));
 
           // Add Comment Input Field
-          $('#comments' + postId).append($('<input>', {
+          $('#comments' + post.id).append($('<input>', {
             type: 'text',
             class: 'addCommentField',
             id: 'addCommentField' + post.id,
-            name: 'addComment' + postId,
+            name: 'addComment' + post.id,
             placeholder: 'Write a comment...'
           }));
         }

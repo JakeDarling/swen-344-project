@@ -1125,7 +1125,7 @@ function modifyEvent() {
                 'id': eventData.id,
     	        'title': eventData.title,
     	        'start': eventData.start,
-    	        'end1': eventData.end,
+    	        'end1': eventData.end
     	    },
     	    success: function() {
     	        console.log('Event modified');
@@ -1135,6 +1135,26 @@ function modifyEvent() {
     	    },
     	    error: function() {
     	        alert('Error modifying event in database');
+    	    }
+        });
+    }
+}
+
+function deleteEvent() {
+    if (window.confirm("Are you sure? This event will be deleted.")) {
+    	$.ajax({
+            type: 'POST',
+    	    url: '/delete-event',
+    	    data: {
+                'id': $("#eventId").val()
+    	    },
+    	    success: function() {
+                $("#calendar").fullCalendar('removeEvents');
+                loadEvents();
+    			$('#myModal').foundation('reveal', 'close');
+    	    },
+    	    error: function() {
+    	        alert('Error deleting event in database');
     	    }
         });
     }

@@ -789,6 +789,7 @@ function postNote(){
 /*****************************************************************************/
 /* END STOCKS*/
 /*****************************************************************************/
+
 /*****************************************************************************/
 /* FILE UPLOAD */
 /*****************************************************************************/
@@ -845,6 +846,7 @@ function upload(evt) {
 /*****************************************************************************/
 /* END FILE UPLOAD*/
 /*****************************************************************************/
+
 $(function () {
     $(document).foundation();
 });
@@ -854,10 +856,7 @@ $(function () {
 /*****************************************************************************/
 function fb_login() {
     FB.login(function (response) {
-
         if (response.authResponse) {
-            console.log('Welcome!  Fetching your information.... ');
-            //console.log(response); // dump complete info
             access_token = response.authResponse.accessToken; //get access token
             user_id = response.authResponse.userID; //get FB UID
 
@@ -870,7 +869,6 @@ function fb_login() {
         } else {
             //user hit cancel button
             console.log('User cancelled login or did not fully authorize.');
-
         }
     }, {
         scope: 'publish_actions,email,public_profile,user_posts'
@@ -883,9 +881,587 @@ function fb_login() {
     document.getElementById('fb-root').appendChild(e);
 }());
 
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+        testAPI();
+        showWall();
+    } else if (response.status === 'not_authorized') {
+        document.getElementById('login-status').innerHTML = 'Please log ' +
+                'into this app.';
+    } else {
+        document.getElementById('login-status').innerHTML = 'Please log ' +
+                'into Facebook.';
+    }
+}
+
+function checkLoginState() {
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+}
+
+window.fbAsyncInit = function () {
+    FB.init({
+        appId: '1715981821968291',
+        cookie: true,
+        xfbml: true,
+        version: 'v2.4'
+    });
+
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+};
+
+(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+function testAPI() {
+    FB.api('/me?fields=name,id', function (response) {
+        myName = response.name;
+        myId = response.id            
+
+        //associate user in our database
+        $.ajax({
+            type:'POST',
+            url:'/associate-user',
+            data:{'idString': response.id},
+        });
+
+        document.getElementById('login-status').innerHTML =
+                'Thanks for logging in, ' + response.name + '!';
+        document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
+        
+        displayPostStatus();
+    });
+}
+
+function displayPostStatus() {
+    $("#facebook-post-status").append(
+        '<select id="status_privacy"><option value="EVERYONE">Public</option><option value="ALL_FRIENDS">Friends</option>' +
+        '<option value="FRIENDS_OF_FRIENDS">Friends of Friends</option><option value="SELF">Only Me</option></select>');
+
+    $("#facebook-post-status").append('<ul class="tabs" data-tab><li class="tab-title active"><a href="#panel1">Post Status</a></li><li class="tab-title"><a href="#panel2">Post Photo</a></li></ul>');
+    $("#facebook-post-status").append(
+        '<div class="tabs-content"><div class="content active" id="panel1">' +
+        '<form onsubmit="updateStatus(this.status.value)"><input type="text" name="status" placeholder="What\'s on your mind?" /><input type="submit" style="visibility: hidden;" /></form>' +
+        '</div><div class="content" id="panel2">' +
+        '<form onsubmit="uploadPhoto(this.caption.value, this.url.value)"><input type="text" name="url" placeholder="Enter URL" /><input type="text" name="caption" placeholder="Caption" /><input type="submit" style="visibility: hidden;" /></form>' +
+        '</div></div>');
+    $(document).foundation();
+}
+
+function showWall() {   
+  FB.api(
+    '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id', 
+    function(response) {
+      if (response && !response.error) {
+        postsData = response.data;
+        for (var i = 0; i < postsData.length; i++) {
+          var post = postsData[i];
+
+          // Profile Pic of Poster
+          var postProfilePic = 'https://graph.facebook.com/' + post.from.id + '/picture?fields=url&type=square';
+
+          // Post Time
+          var fbTime = new Date(post.created_time.substring(0,(post.created_time.length-5)));
+          var monthNames = ["January", "February", "March", "April", "May", "June", "July", 
+                            "August", "September", "October", "November", "December"];
+          var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
+          var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
+
+          // Post Link
+          var postLink = 'https://www.facebook.com/' + post.from.id + '/posts/' + post.id.split('_')[1];
+
+          // Post Story
+          if (post.story) {
+            var postStory = ' ' + post.story.split(post.from.name + ' ')[1];
+          }
+
+          // Comments
+          if (post.comments) {
+            var comments = post.comments.data;
+          }
+
+          // Post
+          $('#wall').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + post.id}));
+
+          // Post Profile Pic Link
+          $('#post' + post.id).append($('<a>', {
+            href: 'https://facebook.com/' + post.from.id,
+            target: '_blank',
+            id: 'pplink' + post.id
+          }));
+
+          // Post Profile Pic
+          $('#pplink' + post.id).append($('<img>', {
+            src: postProfilePic,
+            alt: 'Post Profile Picture',
+            class: 'postProfilePic',
+            height: '40px',
+            width: '40px'
+          }));
+
+          // Poster (from)
+          $('#post' + post.id).append($('<a>', {
+            href: 'https://facebook.com/' + post.from.id,
+            class: 'poster',
+            target: '_blank',
+            text: post.from.name
+          }));
+
+          // Story
+          if (post.story) {
+            $('#post' + post.id).append($('<span>', { class: 'postStory', text: postStory }));
+          }
+          $('#post' + post.id).append($('</br>'));
+
+          // Post Time
+          $('#post' + post.id).append($('<a>', { 
+            href: postLink,   
+            target: '_blank',  
+            class: 'postTime',
+            text: strFbTime
+          }));
+          $('#post' + post.id).append($('</br>'));
+
+          // Post Message
+          if (post.message) {
+            $('#post' + post.id).append($('<p>', { class: 'postMessage', text: post.message }));
+          }
+
+          // Attachments
+          if (post.attachments) {
+            if (post.type == 'photo') {
+              if (post.attachments.data[0].type == 'album') {
+                var attachments = post.attachments.data[0].subattachments.data;
+                for (var n = 0; n < attachments.length; n++) {
+                  var attachment = attachments[n];
+                  // Image Link
+                  $('#post' + post.id).append($('<a>', {
+                    href: attachment.target.url,
+                    target: '_blank',
+                    id: 'imglink' + attachment.target.id
+                  }));
+                  // Image
+                  $('#imglink' + attachment.target.id).append($('<img>', {
+                    src: attachment.media.image.src,
+                    alt: 'Post photo',
+                    height: attachment.media.image.height / 2,
+                    width: attachment.media.image.width / 2
+                  }));
+                }
+                $('#post' + post.id).append($('</br>'));
+              } else if (post.attachments.data[0].type == 'photo') {
+                var attachments = post.attachments.data;
+                for (var m = 0; m < attachments.length; m++) {
+                  var attachment = attachments[m];
+                  // Image Link
+                  $('#post' + post.id).append($('<a>', {
+                    href: attachment.target.url,
+                    target: '_blank',
+                    id: 'imglink' + attachment.target.id
+                  }));
+                  // Image
+                  $('#imglink' + attachment.target.id).append($('<img>', {
+                    src: attachment.media.image.src,
+                    alt: 'Post photo',
+                    height: attachment.media.image.height / 2,
+                    width: attachment.media.image.width / 2
+                  }));
+                  $('#post' + post.id).append($('</br>'));
+                }
+              }
+            }
+          }
+
+          // Likes
+          var iLike = false;
+          var postLikes = [];
+          if (post.likes) {       
+            postLikes = post.likes.data;
+            for (var l = 0; l < postLikes.length; l++) {
+              if (postLikes[l].id == myId) {
+                iLike = true;
+              }
+            }
+          }
+
+          // Like Post
+          $('#post' + post.id).append($('<hr>'));
+
+          if (iLike) {
+            $('#post' + post.id).append($('<a>', { class: 'likePost liked', id: post.id, text: 'Like '}));
+          } else {
+            $('#post' + post.id).append($('<a>', { class: 'likePost notLiked', id: post.id, text: 'Like '}));
+          }
+
+          // Comment on Post
+          $('#post' + post.id).append($('<a>', { 
+            class: 'commentPost',
+            id: 'commentPost' + post.id, 
+            text: 'Comment '  
+          }));
+
+          // Share Post
+          if (post.type == 'link') {
+            $('#post' + post.id).append($('<a>', { class: 'sharePost', text: 'Share '  }));
+          }
+
+          // Comments Box
+          $('#wall').append($('<div>', {
+            name: 'fbComments',
+            class: 'fbComments',
+            id: 'comments' + post.id
+          }));
+
+
+          // 1 person likes Post
+          if (postLikes.length == 1) {
+            var likesMessage;
+            if (iLike == true) {
+              likesMessage = 'You like this.';
+            } else {
+              likesMessage = postLikes[0].name + ' likes this.';
+            }
+            $('#comments' + post.id).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+          }
+
+          // 2 people like this.
+          if (postLikes.length == 2) {
+            var likesMessage;
+            if (iLike == true) {
+              var otherPerson;
+              for (var u = 0; u < postLikes.length; u++) {
+                if (postLikes[u].id != myId) {
+                  otherPerson = postLikes[u].name;
+                }
+              }
+              likesMessage = 'You and ' + otherPerson + ' like this.';
+            } else {
+              likesMessage = postLikes[0].name + ' and ' + postLikes[1].name + ' like this.';
+            }
+            $('#comments' + post.id).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+          }
+
+          // Comments
+          if (post.comments) {
+            for (var k = 0; k < post.comments.data.length; k++) {
+              var comment = post.comments.data[k];
+              // Comment Div
+              $('#comments' + post.id).append($('<div>', {
+                class: 'comment',
+                id: 'comment' + comment.id
+              }));
+
+              // Comment Image
+              $('#comment' + comment.id).append($('<a href="https://facebook.com/' + comment.from.id + '" target="_blank"><img src="https://graph.facebook.com/' + comment.from.id + '/picture?fields=url&type=square" alt="Comment Pic" class="commentPic" height="32px" width="32px"></a>'));
+              
+              // Comment Name
+              $('#comment' + comment.id).append($('<a>', {
+                href: 'https://facebook.com/' + comment.from.id,
+                target: '_blank',
+                class: 'commenter',
+                text: comment.from.name
+              }));
+
+              // Comment message
+              $('#comment' + comment.id).append($('<span>', { text: comment.message  }));
+              $('#comment' + comment.id).append($('</br>'));
+
+              // Like/Unlike Comment
+              if (comment.can_like) {
+                if (comment.user_likes==true) {
+                  // Unlike Comment
+                  $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
+                } else {
+                  // Like Comment
+                  $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
+                }
+                $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
+              }
+
+              // Reply to Comment
+              if (comment.can_comment) {
+                $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
+              $('#comment' + comment.id).append($('</br>'));
+              }
+            }
+          }
+
+          // Add Comment Profile Pic
+          $('#comments' + post.id).append($('<img>', {
+            src: 'https://graph.facebook.com/' + myId + '/picture?fields=url&type=square',
+            alt: 'Add Comment Profile Picture',
+            class: 'addCommentPic',
+            height: 32,
+            width: 32
+          }));
+
+          // Add Comment Input Field
+          $('#comments' + post.id).append($('<input>', {
+            type: 'text',
+            class: 'addCommentField',
+            id: 'addCommentField' + post.id,
+            name: 'addComment' + post.id,
+            placeholder: 'Write a comment...'
+          }));
+        }
+      }
+
+      // Click to Like
+      $('#wall a.notLiked').click(function() {
+        FB.api(
+          "/" + $(this).attr('id') + "/likes",
+          "POST",
+          function (response) {
+            if (response && !response.error) {
+              console.log('liked!');
+            } else {
+              console.log('error');
+            }
+          }
+        );
+        $(this).attr('class', 'likePost liked');
+        location.reload();
+      });
+
+      // Click to Unlike
+      $('#wall a.liked').click(function() {
+        FB.api(
+          "/" + $(this).attr('id') + "/likes",
+          "DELETE",
+          function (response) {
+            if (response && !response.error) {
+              console.log('unliked');
+            } else {
+              console.log('error');
+            }
+          }
+        );
+        $(this).attr('class', 'likePost notLiked');
+        location.reload();
+      });
+
+      // Click to Add Comment
+      $('#wall a.commentPost').click(function() {
+        $('#addCommentField' + $(this).attr('id').substring('commentPost'.length)).focus();
+      });
+
+      // Submit Post Comment
+      $('.addCommentField').keypress(function(event) {
+        if (event.keyCode == 13) { // Enter key
+          FB.api(
+            "/" + $(this).attr('id').substring('addCommentField'.length) + "/comments",
+            "POST",
+            {"message":$(this).val()},
+            function (response) {
+              if (response && !response.error) {
+                // Added comment
+              } else {
+                console.log('error');
+              }
+            }
+          );
+          location.reload();
+        }
+      });
+  });
+}   
+
+function updateStatus(status) {
+    FB.api('/me/feed',
+        'post',
+        {
+            message: status,
+            privacy: {
+                "value": $("#status_privacy").val()
+            }
+        });
+}
+
+function uploadPhoto(status, url) {
+    FB.api("/me/photos",
+        "POST",
+        {
+            "caption": status,
+            "url": url,
+            "privacy": {
+                "value": $("#status_privacy").val()
+            }
+        });
+}
+
+function logout() {
+    FB.logout();
+}
+
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
+function renderFrontPageCalendar() {
+  $('#frontPageCalendar').fullCalendar({
+    defaultView: 'basicDay',
+    timezone: 'local',
+    selectable: false,
+    allDaySlot: false,
+    editable: false,
+  });
+  $('.fc-right').hide();
+}
+
+function loadFrontPageEvents() {
+  // Load Events from Database
+  $.ajax({
+    type:'GET',
+    url:'/get-front-page-events',
+    dataType:'json',
+    success: function(data){
+      var events = [];
+      for (var z = 0; z < data.events.length; z++) {
+        var event = {};
+
+        event.title = data.events[z].title;
+        event.start = data.events[z].start;
+        event.end = data.events[z].end1;
+
+        events.push(event);
+      }
+      $('#frontPageCalendar').fullCalendar('addEventSource', events);
+    }
+  });
+}
+
+function renderCalendar() {
+    var selectedEvent;
+    var eventTitle;
+    var eventStartDate;
+    var eventStartTime;
+    var eventEndDate;
+    var eventEndTime;
+
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        defaultView: 'agendaWeek',
+        timezone: 'local',
+        selectable: true,
+        selectHelper: true,
+        editable: true,
+        allDaySlot: false,
+
+        // Adding an event
+        select: function(start, end) {
+            eventStartDate = start.format('MMM DD, YYYY');
+            eventStartTime = start.format('hh:mm A');
+            eventEndDate = end.format('MMM DD, YYYY');
+            eventEndTime = end.format('hh:mm A');
+
+            // Open Modal
+            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+              var modal = $(this);
+              $("#modalTitle").html("Add Event");
+              $('#startDateField').val(eventStartDate);
+              $('#startTimeField').val(eventStartTime);
+              $('#endDateField').val(eventEndDate);
+              $('#endTimeField').val(eventEndTime);
+              $("#eventId").val("");
+            });
+            $('#myModal').foundation('reveal', 'open');
+        },
+
+        unselect: function() {
+            $('#eventButtons').hide();
+            selectedEvent = null;
+        },
+
+        eventResize: function(event) {
+          $.ajax({
+            type: 'POST',
+            url: '/modify-event',
+            data: {
+              'id': event._id.replace(/\D/g,''),
+              'title': event.title,
+              'start': event.start.format(),
+              'end1': event.end.format(),
+            },
+            success: function() {
+                console.log('Event resized');
+            },
+            error: function() {
+                alert('Error modifying event in database');
+            }
+          });
+        },
+
+        eventDrop: function(event) {
+          $.ajax({
+            type: 'POST',
+            url: '/modify-event',
+            data: {
+              'id': event._id.replace(/\D/g,''),
+              'title': event.title,
+              'start': event.start.format(),
+              'end1': event.end.format(),
+            },
+            success: function() {
+                console.log('Event dropped');
+            },
+            error: function() {
+                alert('Error modifying event in database');
+            }
+          });
+        },
+        
+        // Show event info
+        eventClick: function(calEvent, jsEvent, view) {
+            var obj = {title: calEvent.title, start: calEvent.start, end: calEvent.end};
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+            $('#downloadBtn').wrap('<a href="data:' + data + '" download="data.json"></a>');
+            selectedEvent = calEvent;
+            
+            $('#eventButtons').show();
+            $("#modalTitle").html("Edit Event");
+            $('#myModal').foundation('reveal', 'open');
+            $("#titleField").val(selectedEvent.title);
+            $("#startDateField").val(selectedEvent.start.format('MMM DD, YYYY'));
+            $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
+            $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
+            $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
+            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
+        }
+    });
+}
+
+function loadEvents() {
+    var events = [];
+    $.ajax({
+        type:'GET',
+        url:'/load-events',
+        dataType:'json',
+        success: function(data){
+          for (var z = 0; z < data.events.length; z++) {
+            var event = {};
+            event.title = data.events[z].title;
+            event.start = data.events[z].start;
+            event.end = data.events[z].end1;
+            events.push(event);
+          }
+          $('#calendar').fullCalendar('addEventSource', events);
+        }
+    });
+}
 
 function validateAddEvent() {
   // var tReg = new RegExp('^.{0,100}$');
@@ -981,90 +1557,6 @@ function validateAddEvent() {
       });
     }
   }
-}
-
-function renderCalendar() {
-    var selectedEvent;
-    var eventTitle;
-    var eventStartDate;
-    var eventStartTime;
-    var eventEndDate;
-    var eventEndTime;
-
-    $('#calendar').fullCalendar({
-        header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'month,agendaWeek,agendaDay'
-        },
-        defaultView: 'agendaWeek',
-        timezone: 'local',
-        selectable: true,
-        selectHelper: true,
-        editable: true,
-
-        // Adding an event
-        select: function(start, end) {
-            eventStartDate = start.format('MMM DD, YYYY');
-            eventStartTime = start.format('hh:mm A');
-            eventEndDate = end.format('MMM DD, YYYY');
-            eventEndTime = end.format('hh:mm A');
-
-            // Open Modal
-            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-              var modal = $(this);
-              $("#modalTitle").html("Add Event");
-              $('#startDateField').val(eventStartDate);
-              $('#startTimeField').val(eventStartTime);
-              $('#endDateField').val(eventEndDate);
-              $('#endTimeField').val(eventEndTime);
-              $("#eventId").val("");
-            });
-            $('#myModal').foundation('reveal', 'open');
-        },
-
-        unselect: function() {
-            $('#eventButtons').hide();
-            selectedEvent = null;
-        },
-        
-        // Show event info
-        eventClick: function(calEvent, jsEvent, view) {
-            var obj = {title: calEvent.title, start: calEvent.start, end: calEvent.end};
-            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
-            $('#downloadBtn').wrap('<a href="data:' + data + '" download="data.json"></a>');
-            selectedEvent = calEvent;
-            
-            $('#eventButtons').show();
-            $("#modalTitle").html("Edit Event");
-            $('#myModal').foundation('reveal', 'open');
-            $("#titleField").val(selectedEvent.title);
-            $("#startDateField").val(selectedEvent.start.format('MMM DD, YYYY'));
-            $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
-            $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
-            $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
-            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
-        }
-    });
-}
-
-function loadEvents() {
-    var events = [];
-    $.ajax({
-        type:'GET',
-        url:'/load-events',
-        dataType:'json',
-        success: function(data){
-          for (var z = 0; z < data.events.length; z++) {
-            var event = {};
-            event.title = data.events[z].title;
-            event.start = data.events[z].start;
-            event.end = data.events[z].end1;
-            events.push(event);
-          }
-          $('#calendar').fullCalendar('addEventSource', events);
-        }
-    });
 }
 
 function storeEvent() {
@@ -1175,7 +1667,6 @@ function clearChildren(element) {
       }
    }
 }
-
 
 // Use the browser's built-in functionality to quickly and safely escape the
 // string

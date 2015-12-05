@@ -246,6 +246,22 @@ class StocksController < ApplicationController
     render :json => {transactions:ts}
   end
 
+  def delete_transactions
+    user = User.find_by(fbUserId:session[:user])
+    if user
+      ts = Transaction.destroy_all(user_id:user.id)
+      stocks = Stock.destroy_all(user_id:user.id)
+      puts "*************************************************"
+      puts "Transaction history deleted"
+      puts "*************************************************"
+    else
+      puts "*************************************************"
+      puts "Delete transactions failed. User does not exist"
+      puts "*************************************************"
+    end
+    render:nothing => true
+  end
+
   def upload_transactions
     data = JSON.parse(params[:data]).reverse
     data.each do |row|

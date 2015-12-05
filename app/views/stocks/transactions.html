@@ -1,5 +1,9 @@
 <html>
 	<body>
+		<div id="ts-delete-alert" class="alert-box success radius" style="color:black;">
+		  Transaction History Deleted
+		  <a id="ts-delete-close" href="#" class="close">&times;</a>
+		</div>
 		<div id="upload-alert" class="alert-box success radius" style="color:black;">
 			File Uploaded
 			<a id="upload-alert-close" href="#" class="close">&times;</a>
@@ -26,15 +30,32 @@
 		  <p>Note: any transactions with invalid values will be ignored.</p>
 		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 		</div>
+		<a href="javascript:void(0);" id="delete-ts" data-reveal-id="confirm-modal" class="radius button small alert">Delete Transaction History</a>
+		<div id="confirm-modal" class="reveal-modal" data-reveal aria-labelledby="confirm-modal-title" aria-hidden="true" role="dialog">
+		  <h2 id="confirm-modal-title">Are you sure you want to permanently delete all transactions?</h2>
+		  <p></p>
+		  <p><a href="javascript:void(0);" id="delete-ts-submit" data-reveal-id class="secondary button">Confirm</a></p>
+		  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+		</div>
 		<script src="http://jquery-csv.googlecode.com/files/jquery.csv-0.71.js"></script>
 		<script>
 			$(document).ready(function(){
+				$('#ts-delete-alert').hide();
 				$('#upload-alert').hide();
 				$('#upload-alert-close').click(function(){
 					$('#upload-alert').hide();
 				});
+				$('#ts-delete-close').click(function(){
+					$('#ts-delete-alert').hide();
+				});
 				// The event listener for the file upload
     			document.getElementById('txtFileUpload').addEventListener('change', upload, false);
+    			$('#delete-ts-submit').click(function(){
+    				deleteUserTransactions();
+    				$('#delete-ts-submit').foundation('reveal', 'close');
+    				window.transTable.destroy();
+                    getUserTransactions();
+    			});
 				
 				getUserTransactions();
 				

@@ -1643,12 +1643,14 @@ function storeEvent() {
                 $('#myModal').foundation('reveal', 'close');
               },
               error: function() {
-                console.log('Error adding event to database');
+                $('#invalid-event-input-modal p:first').text("Error adding event to database.");
+                $('#invalid-event-input-modal').foundation('reveal', 'close');
               }
             });
         }
     } else {
-        alert('Please fill in all fields');
+        $('#validationAlert p:first').text("Please fill in all fields.");
+        $('#validationAlert').show();
     }
 }
 

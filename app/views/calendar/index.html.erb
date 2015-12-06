@@ -23,6 +23,10 @@
 #startDateField, #endDateField {
 	width: 110px;
 }
+
+#eventButtons {
+	margin: 0 auto;
+}
 </style>
 <script>
 $(document).ready(function () {
@@ -116,9 +120,10 @@ $(document).ready(function () {
 			  </div>
 			</div>
 			<div id="eventButtons">
-  		  <button type="button" name="removeBtn" id="removeBtn">Remove</button>
-  		  <button type="button" name="downloadBtn" id="downloadBtn">Download</button>
-  		  </div><a href="#" class="button small round right closeModal">Save</a>
+	  		  <button type="button" class="small radius" name="removeBtn" id="removeBtn">Remove</button>
+	  		  <button type="button" class="small radius" name="downloadBtn" id="downloadBtn">Download</button>
+  		  </div>
+  		<a href="#" class="button small round right closeModal">Save</a>
 		</form>
 	<!-- Validation Alerts -->
 	<div id="invalid-event-input-modal" class="reveal-modal tiny" data-reveal aria-labelledby="invalid-event-input-modal-title" aria-hidden="true" role="dialog">
@@ -126,6 +131,5 @@ $(document).ready(function () {
 	  <p class="invalid"></p>
 	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 	</div>
-
 	</div>
 </div>

@@ -1494,7 +1494,7 @@ function renderCalendar() {
         }
     });
 
-    $('.fc-left').append($('<a data-reveal-id="uploadEventModal" class="button tiny radius">upload</a>'));
+    $('.fc-left').append($('<a data-reveal-id="uploadEventModal" id="uploadEventBtn" class="fc button tiny radius">upload</a>'));
     document.getElementById('eventTxtFileUpload').addEventListener('change', uploadEvent, false);
 }
 

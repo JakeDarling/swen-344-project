@@ -1365,6 +1365,8 @@ function renderFrontPageCalendar() {
     editable: false,
   });
   $('.fc-right').hide();
+  $('.fc-left h2').prepend('Today\'s Events - ');
+  $('.fc-day').prepend('<p id="noEvents">No Events</p>');
 }
 
 function loadFrontPageEvents() {
@@ -1492,7 +1494,7 @@ function renderCalendar() {
         }
     });
 
-    $('.fc-left').append($('<a data-reveal-id="uploadEventModal" class="button tiny radius">upload</a>'));
+    $('.fc-left').append($('<a data-reveal-id="uploadEventModal" id="uploadEventBtn" class="fc button tiny radius">upload</a>'));
     document.getElementById('eventTxtFileUpload').addEventListener('change', uploadEvent, false);
 }
 

@@ -38,6 +38,13 @@ $(document).ready(function () {
 <div class="row">
   <div id='calendar' class='modal'></div>
 
+  <!-- Upload Event Modal -->
+	<div id="uploadEventModal" class="reveal-modal tiny" data-reveal aria-labelledby="uploadModalTitle" aria-hidden="true" role="dialog">
+	  <h2 id="uploadModalTitle">Upload Event</h2>
+	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+	  <input type="file" name="File Upload" id="eventTxtFileUpload" accept=".json" />
+	</div>
+
   <!-- Add Event Modal -->
   <div id="myModal" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
 	  <h3 id="modalTitle">Add Event</h3>

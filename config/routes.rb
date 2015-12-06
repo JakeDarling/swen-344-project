@@ -13,7 +13,6 @@ Rails.application.routes.draw do
   post '/modify-event' => 'calendar#modify_event'
   post '/delete-event' => 'calendar#delete_event'
   get '/load-events' => 'calendar#load_events'
-  post '/upload-event' => 'calendar#upload_event'
   
   #stocks actions
   post '/buy-stock' => 'stocks#buy_stock'

@@ -875,6 +875,7 @@ function uploadEvent(evt) {
                       success: function(){
                         console.log('Event stored');
                         $('#calendar').fullCalendar('renderEvent', eventData, true);
+                        $('#uploadEventModal').foundation('reveal', 'close');
                       },
                       error: function() {
                         console.log('Error adding event to database');
@@ -1490,7 +1491,7 @@ function renderCalendar() {
         }
     });
 
-    $('.fc-left').append($('<input type="file" name="File Upload" id="eventTxtFileUpload" accept=".json" />'));
+    $('.fc-left').append($('<a data-reveal-id="uploadEventModal" class="button tiny radius">upload</a>'));
     document.getElementById('eventTxtFileUpload').addEventListener('change', uploadEvent, false);
 }
 

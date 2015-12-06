@@ -1227,22 +1227,22 @@ function showWall() {
               $('#comment' + comment.id).append($('</br>'));
 
               // Like/Unlike Comment
-              if (comment.can_like) {
-                if (comment.user_likes==true) {
-                  // Unlike Comment
-                  $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
-                } else {
-                  // Like Comment
-                  $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
-                }
-                $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
-              }
+              // if (comment.can_like) {
+              //   if (comment.user_likes==true) {
+              //     // Unlike Comment
+              //     $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
+              //   } else {
+              //     // Like Comment
+              //     $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
+              //   }
+              //   $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
+              // }
 
-              // Reply to Comment
-              if (comment.can_comment) {
-                $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
-              $('#comment' + comment.id).append($('</br>'));
-              }
+              // // Reply to Comment
+              // if (comment.can_comment) {
+              //   $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
+              // $('#comment' + comment.id).append($('</br>'));
+              // }
             }
           }
 

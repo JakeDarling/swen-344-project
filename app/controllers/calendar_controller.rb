@@ -9,6 +9,45 @@ class CalendarController < ApplicationController
 	    render :json => {events:events}
 	end
 
+	def upload_event
+    # data = JSON.parse(params[:data]).reverse
+    # data.each do |row|
+    #   ticker = row[0]
+    #   price = row[1]
+    #   shares = row[2]
+    #   tType = row[3]
+    #   timestamp = row[4]
+    #   index = 0
+    #   successful = 0
+
+    #   if validate_stock_input(shares, ticker, price, timestamp)
+    #     params[:ticker_symbol] = ticker
+    #     params[:shares] = shares
+    #     params[:price] = price
+    #     params[:timestamp] = timestamp
+    #     params[:internal] = true
+    #     if tType == "buy"
+    #       buy_stock()
+    #     elsif tType == "sell"
+    #       sell_stock()
+    #     else
+    #       puts "========================================"
+    #       puts "invalid transaction type. skipping row"
+    #       puts "========================================" 
+    #     end
+    #   else
+    #     puts "==========================================="
+    #     puts "invalid value(s) in this row. skipping row"
+    #     puts "==========================================="
+    #   end
+    # end
+    # puts "========================================"
+    # puts "Upload complete"
+    # puts "========================================"
+    # puts index
+    # render :json => { :ok => true }, :status => :ok
+  end
+
 	def store_event
 		title = params[:title]
 		start = params[:start]

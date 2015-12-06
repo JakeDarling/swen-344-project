@@ -876,6 +876,7 @@ function uploadEvent(evt) {
                         console.log('Event stored');
                         $('#calendar').fullCalendar('renderEvent', eventData, true);
                         $('#uploadEventModal').foundation('reveal', 'close');
+                        $('#uploadInstructionsText').hide();
                       },
                       error: function() {
                         console.log('Error adding event to database');

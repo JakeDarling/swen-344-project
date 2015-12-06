@@ -4,10 +4,17 @@
 	padding: 3px;
 	border: 1px solid black;
 }
+
+#uploadInstructionsText {
+	border: 1px solid #C0C0C0;
+	padding: 10px;
+	font-size: 14px;
+}
 </style>
 <script>
 $(document).ready(function () {
   	$('#eventButtons').hide();
+  	$('#uploadInstructionsText').hide();
 
   	// Render Calendar and Events
   	renderCalendar();
@@ -32,11 +39,27 @@ $(document).ready(function () {
 		$('#calendar').fullCalendar('unselect');
 		resetAddEventForm();
 	});
+
+	$('#uploadInstructionsTitle').click(function() {
+		$('#uploadInstructionsText').toggle();
+	});
 });
 </script>
 
 <div class="row">
   <div id='calendar' class='modal'></div>
+
+  <!-- Upload Event Modal -->
+	<div id="uploadEventModal" class="reveal-modal small" data-reveal aria-labelledby="uploadModalTitle" aria-hidden="true" role="dialog">
+	  <h2 id="uploadModalTitle">Upload Event</h2>
+	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+	  <input type="file" name="File Upload" id="eventTxtFileUpload" accept=".json" />
+	  <a id="uploadInstructionsTitle">Instructions</a>
+	  <div id="uploadInstructionsText">
+	  	<h5>Please upload a .json file with event data in the format: </h5>
+	    <p>{"title":"k","start":"2015-12-07T12:00:00.000Z","end":"2015-12-07T12:30:00.000Z"}</p>
+	  </div>
+	</div>
 
   <!-- Add Event Modal -->
   <div id="myModal" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">

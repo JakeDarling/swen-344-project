@@ -843,6 +843,55 @@ function upload(evt) {
         };
     }
 }
+
+function uploadEvent(evt) {
+    if (!browserSupportFileUpload()) {
+        alert('The File APIs are not fully supported in this browser!');
+    } else {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function(event) {
+            var jsonData = event.target.result;
+             if (jsonData) {
+                var objData = JSON.parse(jsonData);
+                if (objData.title && objData.start && objData.end) {
+                    console.log('good');
+                    var eventData;
+                    eventData = {
+                        title: objData.title,
+                        start: moment(new Date(objData.start)).format(),
+                        end: moment(new Date(objData.end)).format()
+                    };
+                    $.ajax({
+                      type:'POST',
+                      url:'/store-event',
+                      data:{
+                        'title': eventData.title,
+                        'start': eventData.start,
+                        'end1': eventData.end,
+                      },
+                      success: function(){
+                        console.log('Event stored');
+                        $('#calendar').fullCalendar('renderEvent', eventData, true);
+                        $('#uploadEventModal').foundation('reveal', 'close');
+                        $('#uploadInstructionsText').hide();
+                      },
+                      error: function() {
+                        console.log('Error adding event to database');
+                      }
+                    });
+                }
+            } else {
+                alert('No data to import!');
+            }
+        };
+        reader.onerror = function() {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+}
 /*****************************************************************************/
 /* END FILE UPLOAD*/
 /*****************************************************************************/
@@ -1442,6 +1491,9 @@ function renderCalendar() {
             $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
         }
     });
+
+    $('.fc-left').append($('<a data-reveal-id="uploadEventModal" class="button tiny radius">upload</a>'));
+    document.getElementById('eventTxtFileUpload').addEventListener('change', uploadEvent, false);
 }
 
 function loadEvents() {

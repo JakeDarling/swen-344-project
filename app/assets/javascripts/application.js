@@ -1365,6 +1365,8 @@ function renderFrontPageCalendar() {
     editable: false,
   });
   $('.fc-right').hide();
+  $('.fc-left h2').prepend('Today\'s Events - ');
+  $('.fc-day').prepend('<p id="noEvents">No Events</p>');
 }
 
 function loadFrontPageEvents() {

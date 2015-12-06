@@ -145,7 +145,7 @@ class Transactions
     @b.button(:id => 'delete-ts').click
   end
   def has_history?
-    @b.div(:id => 'TODO').exists?
+    @b.div(:class => 'odd').exists?
   end
 end
 

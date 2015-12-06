@@ -75,5 +75,5 @@ When(/^I delete my transaction history$/) do
 end
 
 Then(/^my transaction history is empty$/) do
-  Transactions.new(@b).has_history?
+  expect(! Transactions.new(@b).has_history?)
 end

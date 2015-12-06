@@ -26,7 +26,7 @@ Background:
         Then my transaction history shows the purchase
 
 
-    @p1 @uc8
+    @p1 @uc8 @done
     Scenario: Delete stock history
         Given I have navigated to the my stocks page
         And I have purchased some stocks

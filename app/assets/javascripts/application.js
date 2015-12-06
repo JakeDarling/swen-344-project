@@ -996,20 +996,17 @@ function renderCalendar() {
             eventEndTime = end.format('hh:mm A');
 
             // Open Modal
-            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-              var modal = $(this);
-              $("#modalTitle").html("Add Event");
-              $('#startDateField').val(eventStartDate);
-              $('#startTimeField').val(eventStartTime);
-              $('#endDateField').val(eventEndDate);
-              $('#endTimeField').val(eventEndTime);
-              $("#eventId").val("");
-            });
+            $("#modalTitle").html("Add Event");
+            $('#startDateField').val(eventStartDate);
+            $('#startTimeField').val(eventStartTime);
+            $('#endDateField').val(eventEndDate);
+            $('#endTimeField').val(eventEndTime);
+            $("#eventId").val("");
+            $('#eventButtons').hide();
             $('#myModal').foundation('reveal', 'open');
         },
 
         unselect: function() {
-            $('#eventButtons').hide();
             selectedEvent = null;
         },
 

@@ -44,7 +44,7 @@ $(document).ready(function () {
 
 	// Save Event
 	$('a.closeModal').on('click', function() {
-		if (!$(element).is(":visible")) {
+		if (!$("#eventButtons").is(":visible")) {
 			storeEvent();
 		} else {
 			modifyEvent();

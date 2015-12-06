@@ -272,6 +272,11 @@
     xom();
     */
 
+    getTopStocks();
+    renderFrontPageCalendar();
+    loadFrontPageEvents();
+  });
+
     function fb_login() {
       FB.login(function (response) {
           if (response.authResponse) {
@@ -721,11 +726,6 @@
     function logout() {
         FB.logout();
     }
-
-    getTopStocks();
-    renderFrontPageCalendar();
-    loadFrontPageEvents();
-  });
 </script>
 <body>
   <div class="row">

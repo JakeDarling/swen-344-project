@@ -134,167 +134,149 @@
     float: left;
     margin: 20px;
   }
+
+  .fc-content {
+    height: 20px;
+  }
+
+  .fc-left h2 {
+    font-size: 22px;
+  }
+
+  #noEvents {
+    text-align: center;
+  }
 </style>
 <script>
-    $(document).ready(function() {
-        getTopStocks();
-        /*
-        function ndaq() {
-            $.ajax({
-                dataType: "xml",
-                type: 'GET',
-                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-                data: {
-                    diagnostics: 'true',
-                    env: 'store://datatables.org/alltableswithkeys',
-                    symbol: 'NDAQ',
-                },
-                success: function (data) {
-                    printTicker(data, 'ndaq');
-                },
-                complete: function () {
-                    setTimeout(ndaq, 5000);
-                }
-            });
-        }
-
-        function nyse() {
-            $.ajax({
-                dataType: "xml",
-                type: 'GET',
-                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-                data: {
-                    diagnostics: 'true',
-                    env: 'store://datatables.org/alltableswithkeys',
-                    symbol: '^NYA',
-                },
-                success: function (data) {
-                    printTicker(data, 'nyse');
-                },
-                complete: function () {
-                    setTimeout(nyse, 5000);
-                }
-            });
-        }
-
-        function dow() {
-            $.ajax({
-                dataType: "xml",
-                type: 'GET',
-                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-                data: {
-                    diagnostics: 'true',
-                    env: 'store://datatables.org/alltableswithkeys',
-                    symbol: 'DOW',
-                },
-                success: function (data) {
-                    printTicker(data, 'dow');
-                },
-                complete: function () {
-                    setTimeout(dow, 5000);
-                }
-            });
-        }
-
-        function googl() {
-            $.ajax({
-                dataType: "xml",
-                type: 'GET',
-                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-                data: {
-                    diagnostics: 'true',
-                    env: 'store://datatables.org/alltableswithkeys',
-                    symbol: 'GOOGL',
-                },
-                success: function (data) {
-                    printTicker(data, 'googl');
-                },
-                complete: function () {
-                    setTimeout(googl, 5000);
-                }
-            });
-        }
-
-        function xrx() {
-            $.ajax({
-                dataType: "xml",
-                type: 'GET',
-                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-                data: {
-                    diagnostics: 'true',
-                    env: 'store://datatables.org/alltableswithkeys',
-                    symbol: 'XRX',
-                },
-                success: function (data) {
-                    printTicker(data, 'xrx');
-                },
-                complete: function () {
-                    setTimeout(xrx, 5000);
-                }
-            });
-        }
-
-        function xom() {
-            $.ajax({
-                dataType: "xml",
-                type: 'GET',
-                url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
-                data: {
-                    diagnostics: 'true',
-                    env: 'store://datatables.org/alltableswithkeys',
-                    symbol: 'XOM',
-                },
-                success: function (data) {
-                    printTicker(data, 'xom');
-                },
-                complete: function () {
-                    setTimeout(xom, 5000);
-                }
-            });
-        }
-
-        function initCalendar() {
-          $('#frontPageCalendar').fullCalendar({
-            defaultView: 'agendaDay',
-          });
-        }
-
-        function loadCalendarEvents() {
-          // Load Events from Database
-          $.ajax({
-            type:'GET',
-            url:'/get-front-page-events',
-            dataType:'json',
-            success: function(data){
-              var events = [];
-              for (var z = 0; z < data.events.length; z++) {
-                var event = {};
-
-                event.title = data.events[z].title;
-                event.start = data.events[z].start;
-                event.end = data.events[z].end1;
-
-                events.push(event);
-              }
-              $('#frontPageCalendar').fullCalendar('addEventSource', events);
+  $(document).ready(function() {
+    /*
+    function ndaq() {
+        $.ajax({
+            dataType: "xml",
+            type: 'GET',
+            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+            data: {
+                diagnostics: 'true',
+                env: 'store://datatables.org/alltableswithkeys',
+                symbol: 'NDAQ',
+            },
+            success: function (data) {
+                printTicker(data, 'ndaq');
+            },
+            complete: function () {
+                setTimeout(ndaq, 5000);
             }
-          });
-        }
+        });
+    }
 
-        ndaq();
-        nyse();
-        dow();
-        googl();
-        xrx();
-        xom();
-        */
+    function nyse() {
+        $.ajax({
+            dataType: "xml",
+            type: 'GET',
+            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+            data: {
+                diagnostics: 'true',
+                env: 'store://datatables.org/alltableswithkeys',
+                symbol: '^NYA',
+            },
+            success: function (data) {
+                printTicker(data, 'nyse');
+            },
+            complete: function () {
+                setTimeout(nyse, 5000);
+            }
+        });
+    }
 
-        initCalendar();
-        loadCalendarEvents();
-    });
+    function dow() {
+        $.ajax({
+            dataType: "xml",
+            type: 'GET',
+            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+            data: {
+                diagnostics: 'true',
+                env: 'store://datatables.org/alltableswithkeys',
+                symbol: 'DOW',
+            },
+            success: function (data) {
+                printTicker(data, 'dow');
+            },
+            complete: function () {
+                setTimeout(dow, 5000);
+            }
+        });
+    }
 
+    function googl() {
+        $.ajax({
+            dataType: "xml",
+            type: 'GET',
+            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+            data: {
+                diagnostics: 'true',
+                env: 'store://datatables.org/alltableswithkeys',
+                symbol: 'GOOGL',
+            },
+            success: function (data) {
+                printTicker(data, 'googl');
+            },
+            complete: function () {
+                setTimeout(googl, 5000);
+            }
+        });
+    }
 
-    // Login and Wall stuff
+    function xrx() {
+        $.ajax({
+            dataType: "xml",
+            type: 'GET',
+            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+            data: {
+                diagnostics: 'true',
+                env: 'store://datatables.org/alltableswithkeys',
+                symbol: 'XRX',
+            },
+            success: function (data) {
+                printTicker(data, 'xrx');
+            },
+            complete: function () {
+                setTimeout(xrx, 5000);
+            }
+        });
+    }
+
+    function xom() {
+        $.ajax({
+            dataType: "xml",
+            type: 'GET',
+            url: 'https://query.yahooapis.com/v1/public/yql/derekleung/getQuote',
+            data: {
+                diagnostics: 'true',
+                env: 'store://datatables.org/alltableswithkeys',
+                symbol: 'XOM',
+            },
+            success: function (data) {
+                printTicker(data, 'xom');
+            },
+            complete: function () {
+                setTimeout(xom, 5000);
+            }
+        });
+    }
+
+    ndaq();
+    nyse();
+    dow();
+    googl();
+    xrx();
+    xom();
+    */
+
+    getTopStocks();
+    renderFrontPageCalendar();
+    loadFrontPageEvents();
+  });
+
     function statusChangeCallback(response) {
         console.log('statusChangeCallback');
         console.log(response);
@@ -318,7 +300,7 @@
 
     window.fbAsyncInit = function () {
         FB.init({
-            appId: '1715981821968291', // 1715981821968291 //459724754210681
+            appId: '1715981821968291',
             cookie: true,
             xfbml: true,
             version: 'v2.4'
@@ -327,7 +309,6 @@
         FB.getLoginStatus(function (response) {
             statusChangeCallback(response);
         });
-
     };
 
     (function (d, s, id) {
@@ -340,23 +321,17 @@
     }(document, 'script', 'facebook-jssdk'));
 
     function testAPI() {
-        console.log('Welcome!  Fetching your information.... ');
         FB.api('/me?fields=name,id', function (response) {
             myName = response.name;
             myId = response.id            
-            console.log(response);
 
             //associate user in our database
             $.ajax({
                 type:'POST',
                 url:'/associate-user',
                 data:{'idString': response.id},
-                success: function(){
-                    //alert("Successfully associated user with FB ID: " + response.id);
-                }
             });
 
-            console.log('Successful login for: ' + response.name);
             document.getElementById('login-status').innerHTML =
                     'Thanks for logging in, ' + response.name + '!';
             document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
@@ -380,8 +355,7 @@
         $(document).foundation();
     }
 
-    function showWall() {
-          
+    function showWall() {   
       FB.api(
         '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id', 
         function(response) {
@@ -400,21 +374,12 @@
               var minutes = (fbTime.getMinutes() < 10) ? ("0" + fbTime.getMinutes()) : fbTime.getMinutes();
               var strFbTime = monthNames[fbTime.getMonth()] + ' ' + fbTime.getDay() + ' at ' + fbTime.getHours() + ':' + minutes;
 
-              // Post Type
-              var postType = post.type;
-
-              // Poster (from)
-              var from = post.from
-
-              // Post ID
-              var postId = post.id;
-
               // Post Link
-              var postLink = 'https://www.facebook.com/' + from.id + '/posts/' + postId.split('_')[1];
+              var postLink = 'https://www.facebook.com/' + post.from.id + '/posts/' + post.id.split('_')[1];
 
               // Post Story
               if (post.story) {
-                var postStory = ' ' + post.story.split(from.name + ' ')[1];
+                var postStory = ' ' + post.story.split(post.from.name + ' ')[1];
               }
 
               // Comments
@@ -423,17 +388,17 @@
               }
 
               // Post
-              $('#wall').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + postId}));
+              $('#wall').append($('<div>', {class: 'fbPost', name: 'fbPost', id: 'post' + post.id}));
 
               // Post Profile Pic Link
-              $('#post' + postId).append($('<a>', {
-                href: 'https://facebook.com/' + from.id,
+              $('#post' + post.id).append($('<a>', {
+                href: 'https://facebook.com/' + post.from.id,
                 target: '_blank',
-                id: 'pplink' + postId
+                id: 'pplink' + post.id
               }));
 
               // Post Profile Pic
-              $('#pplink' + postId).append($('<img>', {
+              $('#pplink' + post.id).append($('<img>', {
                 src: postProfilePic,
                 alt: 'Post Profile Picture',
                 class: 'postProfilePic',
@@ -442,42 +407,42 @@
               }));
 
               // Poster (from)
-              $('#post' + postId).append($('<a>', {
-                href: 'https://facebook.com/' + from.id,
+              $('#post' + post.id).append($('<a>', {
+                href: 'https://facebook.com/' + post.from.id,
                 class: 'poster',
                 target: '_blank',
-                text: from.name
+                text: post.from.name
               }));
 
               // Story
               if (post.story) {
-                $('#post' + postId).append($('<span>', { class: 'postStory', text: postStory }));
+                $('#post' + post.id).append($('<span>', { class: 'postStory', text: postStory }));
               }
-              $('#post' + postId).append($('</br>'));
+              $('#post' + post.id).append($('</br>'));
 
               // Post Time
-              $('#post' + postId).append($('<a>', { 
+              $('#post' + post.id).append($('<a>', { 
                 href: postLink,   
                 target: '_blank',  
                 class: 'postTime',
                 text: strFbTime
               }));
-              $('#post' + postId).append($('</br>'));
+              $('#post' + post.id).append($('</br>'));
 
               // Post Message
               if (post.message) {
-                $('#post' + postId).append($('<p>', { class: 'postMessage', text: post.message }));
+                $('#post' + post.id).append($('<p>', { class: 'postMessage', text: post.message }));
               }
 
               // Attachments
               if (post.attachments) {
-                if (postType == 'photo') {
+                if (post.type == 'photo') {
                   if (post.attachments.data[0].type == 'album') {
                     var attachments = post.attachments.data[0].subattachments.data;
                     for (var n = 0; n < attachments.length; n++) {
                       var attachment = attachments[n];
                       // Image Link
-                      $('#post' + postId).append($('<a>', {
+                      $('#post' + post.id).append($('<a>', {
                         href: attachment.target.url,
                         target: '_blank',
                         id: 'imglink' + attachment.target.id
@@ -490,13 +455,13 @@
                         width: attachment.media.image.width / 2
                       }));
                     }
-                    $('#post' + postId).append($('</br>'));
+                    $('#post' + post.id).append($('</br>'));
                   } else if (post.attachments.data[0].type == 'photo') {
                     var attachments = post.attachments.data;
                     for (var m = 0; m < attachments.length; m++) {
                       var attachment = attachments[m];
                       // Image Link
-                      $('#post' + postId).append($('<a>', {
+                      $('#post' + post.id).append($('<a>', {
                         href: attachment.target.url,
                         target: '_blank',
                         id: 'imglink' + attachment.target.id
@@ -508,7 +473,7 @@
                         height: attachment.media.image.height / 2,
                         width: attachment.media.image.width / 2
                       }));
-                      $('#post' + postId).append($('</br>'));
+                      $('#post' + post.id).append($('</br>'));
                     }
                   }
                 }
@@ -527,31 +492,31 @@
               }
 
               // Like Post
-              $('#post' + postId).append($('<hr>'));
+              $('#post' + post.id).append($('<hr>'));
 
               if (iLike) {
-                $('#post' + postId).append($('<a>', { class: 'likePost liked', id: post.id, text: 'Like '}));
+                $('#post' + post.id).append($('<a>', { class: 'likePost liked', id: post.id, text: 'Like '}));
               } else {
-                $('#post' + postId).append($('<a>', { class: 'likePost notLiked', id: post.id, text: 'Like '}));
+                $('#post' + post.id).append($('<a>', { class: 'likePost notLiked', id: post.id, text: 'Like '}));
               }
 
               // Comment on Post
-              $('#post' + postId).append($('<a>', { 
+              $('#post' + post.id).append($('<a>', { 
                 class: 'commentPost',
                 id: 'commentPost' + post.id, 
                 text: 'Comment '  
               }));
 
               // Share Post
-              if (postType == 'link') {
-                $('#post' + postId).append($('<a>', { class: 'sharePost', text: 'Share '  }));
+              if (post.type == 'link') {
+                $('#post' + post.id).append($('<a>', { class: 'sharePost', text: 'Share '  }));
               }
 
               // Comments Box
               $('#wall').append($('<div>', {
                 name: 'fbComments',
                 class: 'fbComments',
-                id: 'comments' + postId
+                id: 'comments' + post.id
               }));
 
 
@@ -563,7 +528,7 @@
                 } else {
                   likesMessage = postLikes[0].name + ' likes this.';
                 }
-                $('#comments' + postId).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+                $('#comments' + post.id).append($('<p>', { class: 'likesMessage', text: likesMessage }));
               }
 
               // 2 people like this.
@@ -580,7 +545,7 @@
                 } else {
                   likesMessage = postLikes[0].name + ' and ' + postLikes[1].name + ' like this.';
                 }
-                $('#comments' + postId).append($('<p>', { class: 'likesMessage', text: likesMessage }));
+                $('#comments' + post.id).append($('<p>', { class: 'likesMessage', text: likesMessage }));
               }
 
               // Comments
@@ -588,7 +553,7 @@
                 for (var k = 0; k < post.comments.data.length; k++) {
                   var comment = post.comments.data[k];
                   // Comment Div
-                  $('#comments' + postId).append($('<div>', {
+                  $('#comments' + post.id).append($('<div>', {
                     class: 'comment',
                     id: 'comment' + comment.id
                   }));
@@ -629,7 +594,7 @@
               }
 
               // Add Comment Profile Pic
-              $('#comments' + postId).append($('<img>', {
+              $('#comments' + post.id).append($('<img>', {
                 src: 'https://graph.facebook.com/' + myId + '/picture?fields=url&type=square',
                 alt: 'Add Comment Profile Picture',
                 class: 'addCommentPic',
@@ -638,11 +603,11 @@
               }));
 
               // Add Comment Input Field
-              $('#comments' + postId).append($('<input>', {
+              $('#comments' + post.id).append($('<input>', {
                 type: 'text',
                 class: 'addCommentField',
                 id: 'addCommentField' + post.id,
-                name: 'addComment' + postId,
+                name: 'addComment' + post.id,
                 placeholder: 'Write a comment...'
               }));
             }
@@ -710,25 +675,25 @@
 
     function updateStatus(status) {
         FB.api('/me/feed',
-                'post',
-                {
-                    message: status,
-                    privacy: {
-                        "value": $("#status_privacy").val()
-                    }
-                });
+            'post',
+            {
+                message: status,
+                privacy: {
+                    "value": $("#status_privacy").val()
+                }
+            });
     }
 
     function uploadPhoto(status, url) {
         FB.api("/me/photos",
-               "POST",
-               {
+            "POST",
+            {
                 "caption": status,
                 "url": url,
                 "privacy": {
                     "value": $("#status_privacy").val()
                 }
-               });
+            });
     }
 
     function logout() {
@@ -736,77 +701,71 @@
     }
 </script>
 <body>
-
-<div class="row">
-
-
-  <!-- FACEBOOK INFO-->
-  <div data-alert class="alert-box">
-    <div id="login-status" name="login-status"></div>
-    <a href="#" class="close">&times;</a>
-  </div>
-  Top Stocks
-<table id="top-stock-table" style="display:inline-table">
-            <thead>
-            </thead>
-            <tbody>
-            </tbody>
-            <tfoot>
-            </tfoot>
-        </table>
-  <div id="facebook-post-status" name="facebook-post-status">
-  </div>
-
-  <i class="general foundicon-edit"><p>edit</p></i>
-  <div id="wall" class="large-6 small-12 columns" name="wall">
-  </div>
-
-  <!-- STOCK INFO -->
-        
-    <!--
-  <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
-    <div class="row">
-      <div class="large-12 small-12 columns">
-        <div id='ndaq' name='ndaq'>
-          <div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="nyse" name='nyse'>
-          <div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="dow" name='dow'>
-          <div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="googl" name='googl'>
-          <div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="xrx" name='xrx'>
-          <div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-        <div id="xom" name='xom'>
-          <div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
-          <div name='price' class='one-line last-trade-price quote-info'></div>
-          <div name='change' class='one-line quote-info'></div>
-        </div>
-      </div>
+  <div class="row">
+    <!-- FACEBOOK INFO-->
+    <div data-alert class="alert-box">
+      <div id="login-status" name="login-status"></div>
+      <a href="#" class="close">&times;</a>
     </div>
 
-  </div>-->
+    Top Stocks
+    <table id="top-stock-table" style="display:inline-table">
+      <thead>
+      </thead>
+      <tbody>
+      </tbody>
+      <tfoot>
+      </tfoot>
+    </table>
 
+    <div id="facebook-post-status" name="facebook-post-status"></div>
+
+    <i class="general foundicon-edit"><p>edit</p></i>
+
+    <!-- TODAY'S EVENTS CALENDAR -->
+    <div id="frontPageCalendar"></div>
+
+    <!-- FACEBOOK WALL -->
+    <div id="wall" class="large-6 small-12 columns" name="wall"></div>
+
+    <!-- STOCK INFO -->
+    <!--
+    <div id="tickerContainer" class="large-6 small-12 columns" name="tickerContainer">
+      <div class="row">
+        <div class="large-12 small-12 columns">
+          <div id='ndaq' name='ndaq'>
+            <div name='title' class='one-line'>The NASDAQ OMX Group, Inc. ("NDAQ")</div>
+            <div name='price' class='one-line last-trade-price quote-info'></div>
+            <div name='change' class='one-line quote-info'></div>
+          </div>
+          <div id="nyse" name='nyse'>
+            <div name='title' class='one-line'>NYSE COMPOSITE (DJ) ("^NYA")</div>
+            <div name='price' class='one-line last-trade-price quote-info'></div>
+            <div name='change' class='one-line quote-info'></div>
+          </div>
+          <div id="dow" name='dow'>
+            <div name='title' class='one-line'>Dow Chemical Company (The) Comm ("DOW")</div>
+            <div name='price' class='one-line last-trade-price quote-info'></div>
+            <div name='change' class='one-line quote-info'></div>
+          </div>
+          <div id="googl" name='googl'>
+            <div name='title' class='one-line'>Google Inc. ("GOOGL")</div>
+            <div name='price' class='one-line last-trade-price quote-info'></div>
+            <div name='change' class='one-line quote-info'></div>
+          </div>
+          <div id="xrx" name='xrx'>
+            <div name='title' class='one-line'>Xerox Corporation Common Stock ("XRX")</div>
+            <div name='price' class='one-line last-trade-price quote-info'></div>
+            <div name='change' class='one-line quote-info'></div>
+          </div>
+          <div id="xom" name='xom'>
+            <div name='title' class='one-line'>Exxon Mobil Corporation Common ("XOM")</div>
+            <div name='price' class='one-line last-trade-price quote-info'></div>
+            <div name='change' class='one-line quote-info'></div>
+          </div>
+        </div>
+      </div>
+    </div>-->
   </div>
-  <!-- TODAY's EVENTS CALENDAR -->
-  <div id="frontPageCalendar"></div>
-
-</div>
-</div>
 </body>
 </html>

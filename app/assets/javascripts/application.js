@@ -789,6 +789,7 @@ function postNote(){
 /*****************************************************************************/
 /* END STOCKS */
 /*****************************************************************************/
+
 /*****************************************************************************/
 /* FILE UPLOAD */
 /*****************************************************************************/
@@ -842,9 +843,59 @@ function upload(evt) {
         };
     }
 }
+
+function uploadEvent(evt) {
+    if (!browserSupportFileUpload()) {
+        alert('The File APIs are not fully supported in this browser!');
+    } else {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function(event) {
+            var jsonData = event.target.result;
+             if (jsonData) {
+                var objData = JSON.parse(jsonData);
+                if (objData.title && objData.start && objData.end) {
+                    console.log('good');
+                    var eventData;
+                    eventData = {
+                        title: objData.title,
+                        start: moment(new Date(objData.start)).format(),
+                        end: moment(new Date(objData.end)).format()
+                    };
+                    $.ajax({
+                      type:'POST',
+                      url:'/store-event',
+                      data:{
+                        'title': eventData.title,
+                        'start': eventData.start,
+                        'end1': eventData.end,
+                      },
+                      success: function(){
+                        console.log('Event stored');
+                        $('#calendar').fullCalendar('renderEvent', eventData, true);
+                        $('#uploadEventModal').foundation('reveal', 'close');
+                        $('#uploadInstructionsText').hide();
+                      },
+                      error: function() {
+                        console.log('Error adding event to database');
+                      }
+                    });
+                }
+            } else {
+                alert('No data to import!');
+            }
+        };
+        reader.onerror = function() {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+}
 /*****************************************************************************/
 /* END FILE UPLOAD*/
 /*****************************************************************************/
+
 $(function () {
     $(document).foundation();
 });
@@ -852,37 +903,178 @@ $(function () {
 /*****************************************************************************/
 /* FACEBOOK */
 /*****************************************************************************/
-function fb_login() {
-    FB.login(function (response) {
+    function fb_login() {
+      FB.login(function (response) {
+          if (response.authResponse) {
+              access_token = response.authResponse.accessToken; //get access token
+              user_id = response.authResponse.userID; //get FB UID
 
-        if (response.authResponse) {
-            console.log('Welcome!  Fetching your information.... ');
-            //console.log(response); // dump complete info
-            access_token = response.authResponse.accessToken; //get access token
-            user_id = response.authResponse.userID; //get FB UID
+              FB.api('/me', function (response) {
+                  user_email = response.email; //get user email
+                  // you can store this data into your database
+              });
+              window.location.reload();
 
-            FB.api('/me', function (response) {
-                user_email = response.email; //get user email
-                // you can store this data into your database
-            });
-            window.location.reload();
-
-        } else {
-            //user hit cancel button
-            console.log('User cancelled login or did not fully authorize.');
-
-        }
-    }, {
-        scope: 'publish_actions,email,public_profile,user_posts'
-    });
+          } else {
+              //user hit cancel button
+              console.log('User cancelled login or did not fully authorize.');
+          }
+      }, {
+          scope: 'publish_actions,email,public_profile,user_posts'
+      });
+    }
+    (function () {
+        var e = document.createElement('script');
+        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+        e.async = true;
+        document.getElementById('fb-root').appendChild(e);
+    }());
+/*********************************************************/
+/* CALENDAR */
+/*********************************************************/
+function renderFrontPageCalendar() {
+  $('#frontPageCalendar').fullCalendar({
+    defaultView: 'basicDay',
+    timezone: 'local',
+    selectable: false,
+    allDaySlot: false,
+    editable: false,
+  });
+  $('.fc-right').hide();
+  $('.fc-left h2').prepend('Today\'s Events - ');
+  $('.fc-day').prepend('<p id="noEvents">No Events</p>');
 }
-(function () {
-    var e = document.createElement('script');
-    e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-    e.async = true;
-    document.getElementById('fb-root').appendChild(e);
-}());
 
+function loadFrontPageEvents() {
+  // Load Events from Database
+  $.ajax({
+    type:'GET',
+    url:'/get-front-page-events',
+    dataType:'json',
+    success: function(data){
+      var events = [];
+      for (var z = 0; z < data.events.length; z++) {
+        var event = {};
+
+        event.title = data.events[z].title;
+        event.start = data.events[z].start;
+        event.end = data.events[z].end1;
+
+        events.push(event);
+      }
+      $('#frontPageCalendar').fullCalendar('addEventSource', events);
+    }
+  });
+}
+
+function renderCalendar() {
+    var selectedEvent;
+    var eventTitle;
+    var eventStartDate;
+    var eventStartTime;
+    var eventEndDate;
+    var eventEndTime;
+
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        defaultView: 'agendaWeek',
+        timezone: 'local',
+        selectable: true,
+        selectHelper: true,
+        editable: true,
+        allDaySlot: false,
+
+        // Adding an event
+        select: function(start, end) {
+            eventStartDate = start.format('MMM DD, YYYY');
+            eventStartTime = start.format('hh:mm A');
+            eventEndDate = end.format('MMM DD, YYYY');
+            eventEndTime = end.format('hh:mm A');
+
+            // Open Modal
+            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+              var modal = $(this);
+              $("#modalTitle").html("Add Event");
+              $('#startDateField').val(eventStartDate);
+              $('#startTimeField').val(eventStartTime);
+              $('#endDateField').val(eventEndDate);
+              $('#endTimeField').val(eventEndTime);
+              $("#eventId").val("");
+            });
+            $('#myModal').foundation('reveal', 'open');
+        },
+
+        unselect: function() {
+            $('#eventButtons').hide();
+            selectedEvent = null;
+        },
+
+        eventResize: function(event) {
+          $.ajax({
+            type: 'POST',
+            url: '/modify-event',
+            data: {
+              'id': event._id.replace(/\D/g,''),
+              'title': event.title,
+              'start': event.start.format(),
+              'end1': event.end.format(),
+            },
+            success: function() {
+                console.log('Event resized');
+            },
+            error: function() {
+                alert('Error modifying event in database');
+            }
+          });
+        },
+
+        eventDrop: function(event) {
+          $.ajax({
+            type: 'POST',
+            url: '/modify-event',
+            data: {
+              'id': event._id.replace(/\D/g,''),
+              'title': event.title,
+              'start': event.start.format(),
+              'end1': event.end.format(),
+            },
+            success: function() {
+                console.log('Event dropped');
+            },
+            error: function() {
+                alert('Error modifying event in database');
+            }
+          });
+        },
+        
+        // Show event info
+        eventClick: function(calEvent, jsEvent, view) {
+            var obj = {title: calEvent.title, start: calEvent.start, end: calEvent.end};
+            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+            $('#downloadBtn').wrap('<a href="data:' + data + '" download="data.json"></a>');
+            selectedEvent = calEvent;
+            
+            $('#eventButtons').show();
+            $("#modalTitle").html("Edit Event");
+            $('#myModal').foundation('reveal', 'open');
+            $("#titleField").val(selectedEvent.title);
+            $("#startDateField").val(selectedEvent.start.format('MMM DD, YYYY'));
+            $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
+            $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
+            $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
+            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
+        }
+    });
+
+    $('.fc-left').append($('<a data-reveal-id="uploadEventModal" id="uploadEventBtn" class="fc button tiny radius">upload</a>'));
+    document.getElementById('eventTxtFileUpload').addEventListener('change', uploadEvent, false);
+}
+
+<<<<<<< HEAD
 function fb_logout() {
     FB.logout(function(response) {
         // Person is now logged out
@@ -891,6 +1083,26 @@ function fb_logout() {
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
+=======
+function loadEvents() {
+    var events = [];
+    $.ajax({
+        type:'GET',
+        url:'/load-events',
+        dataType:'json',
+        success: function(data){
+          for (var z = 0; z < data.events.length; z++) {
+            var event = {};
+            event.title = data.events[z].title;
+            event.start = data.events[z].start;
+            event.end = data.events[z].end1;
+            events.push(event);
+          }
+          $('#calendar').fullCalendar('addEventSource', events);
+        }
+    });
+}
+>>>>>>> remotes/origin/develop
 
 function validateAddEvent() {
   // var tReg = new RegExp('^.{0,100}$');
@@ -988,90 +1200,6 @@ function validateAddEvent() {
   }
 }
 
-function renderCalendar() {
-    var selectedEvent;
-    var eventTitle;
-    var eventStartDate;
-    var eventStartTime;
-    var eventEndDate;
-    var eventEndTime;
-
-    $('#calendar').fullCalendar({
-        header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'month,agendaWeek,agendaDay'
-        },
-        defaultView: 'agendaWeek',
-        timezone: 'local',
-        selectable: true,
-        selectHelper: true,
-        editable: true,
-
-        // Adding an event
-        select: function(start, end) {
-            eventStartDate = start.format('MMM DD, YYYY');
-            eventStartTime = start.format('hh:mm A');
-            eventEndDate = end.format('MMM DD, YYYY');
-            eventEndTime = end.format('hh:mm A');
-
-            // Open Modal
-            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-              var modal = $(this);
-              $("#modalTitle").html("Add Event");
-              $('#startDateField').val(eventStartDate);
-              $('#startTimeField').val(eventStartTime);
-              $('#endDateField').val(eventEndDate);
-              $('#endTimeField').val(eventEndTime);
-              $("#eventId").val("");
-            });
-            $('#myModal').foundation('reveal', 'open');
-        },
-
-        unselect: function() {
-            $('#eventButtons').hide();
-            selectedEvent = null;
-        },
-        
-        // Show event info
-        eventClick: function(calEvent, jsEvent, view) {
-            var obj = {title: calEvent.title, start: calEvent.start, end: calEvent.end};
-            var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
-            $('#downloadBtn').wrap('<a href="data:' + data + '" download="data.json"></a>');
-            selectedEvent = calEvent;
-            
-            $('#eventButtons').show();
-            $("#modalTitle").html("Edit Event");
-            $('#myModal').foundation('reveal', 'open');
-            $("#titleField").val(selectedEvent.title);
-            $("#startDateField").val(selectedEvent.start.format('MMM DD, YYYY'));
-            $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
-            $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
-            $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
-            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
-        }
-    });
-}
-
-function loadEvents() {
-    var events = [];
-    $.ajax({
-        type:'GET',
-        url:'/load-events',
-        dataType:'json',
-        success: function(data){
-          for (var z = 0; z < data.events.length; z++) {
-            var event = {};
-            event.title = data.events[z].title;
-            event.start = data.events[z].start;
-            event.end = data.events[z].end1;
-            events.push(event);
-          }
-          $('#calendar').fullCalendar('addEventSource', events);
-        }
-    });
-}
-
 function storeEvent() {
     // If All fields are filled...
     if ($('#titleField').val() != '' &&
@@ -1145,6 +1273,26 @@ function modifyEvent() {
     }
 }
 
+function deleteEvent() {
+    if (window.confirm("Are you sure? This event will be deleted.")) {
+    	$.ajax({
+            type: 'POST',
+    	    url: '/delete-event',
+    	    data: {
+                'id': $("#eventId").val()
+    	    },
+    	    success: function() {
+                $("#calendar").fullCalendar('removeEvents');
+                loadEvents();
+    			$('#myModal').foundation('reveal', 'close');
+    	    },
+    	    error: function() {
+    	        alert('Error deleting event in database');
+    	    }
+        });
+    }
+}
+
 function resetAddEventForm() {
     $('#titleField').val('');
     $('#startDateField').val('');
@@ -1180,7 +1328,6 @@ function clearChildren(element) {
       }
    }
 }
-
 
 // Use the browser's built-in functionality to quickly and safely escape the
 // string

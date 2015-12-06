@@ -5,6 +5,7 @@ require 'logger'
 # URL configurations, should probably be pulled into a config file
 APP_URL = 'https://epicapp-dev.herokuapp.com' #'http://localhost:3000'
 STOCKS_URL = APP_URL + '/stocks'
+CALENDAR_URL = APP_URL + '/calendar'
 
 log = Logger.new(STDOUT)
 

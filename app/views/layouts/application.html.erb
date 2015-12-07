@@ -13,7 +13,6 @@
 </head>
 <script>
     $(document).ready(function () {
-
         $('#fbSubmit').click(function () {
             $.ajax({
                 type: 'POST',
@@ -27,12 +26,10 @@
         });
 
     });
-    $(function() {
-        var pusher = new Pusher('159043');
-        var chatWidget = new PusherChatWidget(pusher, {
-            chatEndPoint: 'pusher-realtime-chat-widget/src/php/chat.php'
-        });
-    });
+
+        if(checkLoginState == false){
+            window.location.replace("/login");
+        }
 </script>
 <body>
 <nav class="top-bar" data-topbar role="navigation">
@@ -54,7 +51,7 @@
       <li><input type="text" id="fbIdTextBox" name="fbIdTextBox"/></li>
       <li><input type="submit" id="fbSubmit" name="fbSubmit"/></li>
       <li>
-        <a class="facebook" href="#" onclick="fb_login();;"><%= image_tag('facebook_logout.png', :alt => 'facebook logout') %></a>
+        <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logout.png', :alt => 'facebook logout') %></a>
       </li>
     </ul>
   </section>

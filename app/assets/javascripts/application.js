@@ -29,7 +29,7 @@
 //= require dataTables/extras/dataTables.responsive
 $(document).foundation();
 
-$(function() {
+$(function () {
     $(document).foundation();
 });
 
@@ -166,12 +166,12 @@ function printQuote(data) {
     dataTableQuote(sArr);
 }
 
-function validateBuyForm(){
+function validateBuyForm() {
     var ticker = $('#buy-ticker').val().toUpperCase();
     var shares = $('#buy-shares').val();
     var sReg = new RegExp('^[0-9]*$');
     var tReg = new RegExp('^[a-zA-Z]+$');
-    var invalid=false;
+    var invalid = false;
     var invalidFields = {
         ticker: false,
         shares: false,
@@ -179,49 +179,49 @@ function validateBuyForm(){
     };
 
     //validate inputs
-    if (ticker=='' || !tReg.test(ticker)) {
+    if (ticker == '' || !tReg.test(ticker)) {
         invalid = true;
         invalidFields['ticker'] = true;
     }
-    if (shares=='' || !sReg.test(shares)){
+    if (shares == '' || !sReg.test(shares)) {
         invalid = true;
         invalidFields['shares'] = true;
     } else if (parseInt(shares) > 1000000) {
         invalid = true;
         invalidFields['sharesMax'] = true;
     }
-    
-    if(invalid){
+
+    if (invalid) {
         $('#invalid-buy-modal p:first').empty();
         $('#invalid-buy-modal').foundation('reveal', 'open');
-        if(invalidFields['ticker']){
+        if (invalidFields['ticker']) {
             $('#invalid-buy-modal p:first').append("<br>Invalid ticker");
         }
-        if(invalidFields['shares']){
+        if (invalidFields['shares']) {
             $('#invalid-buy-modal p:first').append("<br>Invalid shares");
         }
-        if(invalidFields['sharesMax']){
+        if (invalidFields['sharesMax']) {
             $('#invalid-buy-modal p:first').append("<br>Shares cannot be greater than 1,000,000");
         }
     } else {
-        $('#confirm-modal').foundation('reveal','open');
+        $('#confirm-modal').foundation('reveal', 'open');
         $('#confirm-modal p:first').html("Are you sure you want to buy " + shares + " share(s) of " + ticker + "?");
     }
 }
 
-function postBuyForm(ticker, shares, price){
+function postBuyForm(ticker, shares, price) {
     var pReg = new RegExp("^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*\.[0-9]{2}$");
 
-    if(pReg.test(price)) {
+    if (pReg.test(price)) {
         $.ajax({
-            type:'POST',
-            url:'/buy-stock',
-            data:{
+            type: 'POST',
+            url: '/buy-stock',
+            data: {
                 'ticker_symbol': ticker,
                 'shares': shares,
                 'price': price,
             },
-            success: function(){
+            success: function () {
                 $('#note-success-alert').hide();
                 $('#sell-success-alert').hide();
                 $('#buy-success-alert').show();
@@ -237,10 +237,10 @@ function postBuyForm(ticker, shares, price){
         $('#ticker-not-exist-modal').foundation('reveal', 'open');
     }
 
-    
+
 }
 
-function getStockPrice(ticker, shares, transType){
+function getStockPrice(ticker, shares, transType) {
     var price;
     $.ajax({
         dataType: "xml",
@@ -254,17 +254,17 @@ function getStockPrice(ticker, shares, transType){
         success: function (data) {
             //printTicker(data, 'ndaq');
             price = parseFloat($(data).find('LastTradePriceOnly').text()).toFixed(2);
-            if(transType == 'buy'){
+            if (transType == 'buy') {
                 postBuyForm(ticker, shares, price);
-            } else if(transType == 'sell'){
+            } else if (transType == 'sell') {
                 postSellForm(ticker, shares, price);
             }
-            
+
         }
     });
 }
 
-function buildStockTable(data){
+function buildStockTable(data) {
     //$('#debug-output').html(JSON.stringify(data));
     var stocks = data['stocks'];
     var sArr = [];
@@ -272,12 +272,12 @@ function buildStockTable(data){
     var numStocks = Object.keys(stocks).length;
     var index = 0;
 
-    if(stocks.length == 0){
+    if (stocks.length == 0) {
         dataTable([]);
     } else {
-        $.each(stocks, function(index, value){
-            index ++;
-            if(parseInt(value['shares']) > 0){
+        $.each(stocks, function (index, value) {
+            index++;
+            if (parseInt(value['shares']) > 0) {
                 $.ajax({
                     async: false,
                     dataType: "xml",
@@ -295,28 +295,28 @@ function buildStockTable(data){
             } else {
                 buildRows(data, value, sArr, index, numStocks, totalChange, true);
             }
-            
+
         });
     }
 }
 
-function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
+function buildRows(data, value, sArr, index, numStocks, totalChange, noShares) {
     var change;
     var marketCap;
     var gain;
     var gain_pc;
-    if(noShares){
+    if (noShares) {
         change = 0;
         marketCap = 0;
         gain = value['base_cost'] * -1;
-        gain_pc = (gain/value['base_cost'] * 100).toFixed(2);
+        gain_pc = (gain / value['base_cost'] * 100).toFixed(2);
     } else {
         var avgDailyVol = $(data).find('AverageDailyVolume').text();
         change = $(data).find('Change').text();
         var sign = change.substring(0, 1);
         change = change.substring(1);
         var changeStr = sign + change;
-        if(sign=="-"){
+        if (sign == "-") {
             change *= -1;
         }
         var daysLow = $(data).find('DaysLow').text();
@@ -332,7 +332,7 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
         var stockxchange = $(data).find('StockExchange').text();
 
         gain = ((lastTradePrice * value['shares']) - value['base_cost']).toFixed(2);
-        gain_pc = ((gain/value['base_cost']) * 100).toFixed(2);
+        gain_pc = ((gain / value['base_cost']) * 100).toFixed(2);
         var note = value['note'];
         row = [
             name,
@@ -343,8 +343,8 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
             marketCap,
             gain,
             gain_pc,
-            '<button id="' + symbol + ' ' + '" class="button tiny radius" data-reveal onClick="noteButtonClicked(\''+symbol+'\',\''+note+'\')">note</button>',
-            '<button id="' + symbol +  '" class="button tiny radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>',
+            '<button id="' + symbol + ' ' + '" class="button tiny radius" data-reveal onClick="noteButtonClicked(\'' + symbol + '\',\'' + note + '\')">note</button>',
+            '<button id="' + symbol + '" class="button tiny radius" data-reveal onClick="sellButtonClicked(' + symbol + ',' + value['shares'] + ')">sell</button>',
         ];
         sArr.push(row);
     }
@@ -355,46 +355,46 @@ function buildRows(data, value, sArr, index, numStocks, totalChange, noShares){
     window.totalGain = (parseFloat(window.totalGain) + parseFloat(gain)).toFixed(2);
     window.totalGainPc = (parseFloat(window.totalGainPc) + parseFloat(gain_pc)).toFixed(2);
 
-    if(index==numStocks){
+    if (index == numStocks) {
         dataTable(sArr);
     }
 }
 
-function getUserStockData(){
+function getUserStockData() {
     $.ajax({
-        type:'GET',
-        url:'/get-my-stocks',
-        dataType:'json',
+        type: 'GET',
+        url: '/get-my-stocks',
+        dataType: 'json',
 
-        success: function(data){
+        success: function (data) {
             buildStockTable(data);
         }
     });
 }
 
-function noteButtonClicked(symbol, note){
+function noteButtonClicked(symbol, note) {
     var sym = symbol;
     //alert(symbol.id + ' ' + shares);
     $('#note-modal').foundation('reveal', 'open');
     $(document).foundation('reveal', {
-        opened: function(event){
+        opened: function (event) {
             $(event.target).find('[autofocus]').first().focus();
         }
-    });  
+    });
     $('#note-modal h2').html('Note for ' + sym);
-    if (note == null || note == "" || note == 'null'){
+    if (note == null || note == "" || note == 'null') {
         note = "edit note here...";
     }
     $('#note-editable').html('<p>' + unescapeHtml(note) + '</p>');
     $('#note-form-ticker').val($.trim(sym));
 }
 
-function sellButtonClicked(symbol, shares){
+function sellButtonClicked(symbol, shares) {
     var sym = symbol.id;
     //alert(symbol.id + ' ' + shares);
     $('#sell-modal').foundation('reveal', 'open');
     $(document).foundation('reveal', {
-        opened: function(event){
+        opened: function (event) {
             $(event.target).find('[autofocus]').first().focus();
         }
     });
@@ -403,7 +403,7 @@ function sellButtonClicked(symbol, shares){
     $('#sell-form-held').val(parseInt(shares));
 }
 
-function validateSellForm(){
+function validateSellForm() {
     var ticker = $('#sell-form-ticker').val().toUpperCase();
     var shares = $('#sell-form-shares').val();
     var sHeld = $('#sell-form-held').val();
@@ -416,59 +416,59 @@ function validateSellForm(){
         sharesNone: false,
     };
 
-    if (shares=='' || !sReg.test(shares)){
+    if (shares == '' || !sReg.test(shares)) {
         invalid = true;
         invalidFields['shares'] = true;
     } else {
-        if(parseInt(shares) > 1000000) {
+        if (parseInt(shares) > 1000000) {
             invalid = true;
             invalidFields['sharesMax'] = true;
         }
-        if(parseInt(shares) > parseInt($('#sell-form-held').val())){
+        if (parseInt(shares) > parseInt($('#sell-form-held').val())) {
             invalid = true;
             invalidFields['moreSharesThanHeld'] = true;
         }
-        if(parseInt(shares) < 1){
+        if (parseInt(shares) < 1) {
             invalid = true;
             invalidFields['sharesNone'] = true;
         }
     }
 
-    if(invalid){
+    if (invalid) {
         $('#invalid-sell-modal p:first').empty();
         $('#invalid-sell-modal').foundation('reveal', 'open');
-        if(invalidFields['shares']){
+        if (invalidFields['shares']) {
             $('#invalid-sell-modal p:first').append("<br>Invalid shares");
         }
-        if(invalidFields['sharesMax']){
+        if (invalidFields['sharesMax']) {
             $('#invalid-sell-modal p:first').append("<br>Shares cannot be greater than 1,000,000");
         }
-        if(invalidFields['moreSharesThanHeld']){
+        if (invalidFields['moreSharesThanHeld']) {
             $('#invalid-sell-modal p:first').append("<br>Shares cannot be greater than the number of shares you hold.");
         }
-        if(invalidFields['sharesNone']){
+        if (invalidFields['sharesNone']) {
             $('#invalid-sell-modal p:first').append("<br>Shares must be greater than 0");
-        }    
+        }
     } else {
-        $('#confirm-sell-modal').foundation('reveal','open');
+        $('#confirm-sell-modal').foundation('reveal', 'open');
         $('#confirm-sell-modal p:first').html("Are you sure you want to sell " + shares + " share(s) of " + ticker + "?");
     }
 
 }
 
-function postSellForm(ticker, shares, price){
+function postSellForm(ticker, shares, price) {
     var pReg = new RegExp("^[+-]?[0-9]{1,3}(?:,?[0-9]{3})*\.[0-9]{2}$");
 
-    if(pReg.test(price)) {
+    if (pReg.test(price)) {
         $.ajax({
-            type:'POST',
-            url:'/sell-stock',
-            data:{
+            type: 'POST',
+            url: '/sell-stock',
+            data: {
                 'ticker_symbol': ticker,
                 'shares': shares,
                 'price': price,
             },
-            success: function(){
+            success: function () {
                 $('#note-success-alert').hide();
                 $('#buy-success-alert').hide();
                 $('#sell-success-alert').show();
@@ -486,55 +486,55 @@ function postSellForm(ticker, shares, price){
     }
 }
 
-function dataTable(sArr){
+function dataTable(sArr) {
     var options = {}
     options.data = sArr;
     options.columns = [
-            { title: "Name" },
-            { title: "Symbol" },
-            { title: "Last Trade Price" },
-            { title: "Change" },
-            { title: "Shares" },
-            { title: "Market Cap." },
-            { title: "Gain" },
-            { title: "Gain %" },
-            { title: ""},
-            { title: "" },
-        ];
-    options.fnInitComplete = function(){
-        $('#myTable tfoot').prepend(                
+        {title: "Name"},
+        {title: "Symbol"},
+        {title: "Last Trade Price"},
+        {title: "Change"},
+        {title: "Shares"},
+        {title: "Market Cap."},
+        {title: "Gain"},
+        {title: "Gain %"},
+        {title: ""},
+        {title: ""},
+    ];
+    options.fnInitComplete = function () {
+        $('#myTable tfoot').prepend(
             '<tr>' +
-                '<th>' +
-                    'Portfolio Value' +
-                '</th>' +
-                '<th></th><th></th>' + 
-                '<th>' +
-                    window.totalChange +
-                '</th>' +
-                '<th>' +
-                '</th>' +
-                '<th>' +
-                    window.totalMarketCap +
-                '</th>' +
-                '<th>' +
-                    window.totalGain +
-                '</th>' +
-                '<th>' +
-                    window.totalGainPc +
-                '</th>' +
-                '<th>' +
-                    
-                '</th>' +
-                '<th>' +
-                    
-                '</th>' +
+            '<th>' +
+            'Portfolio Value' +
+            '</th>' +
+            '<th></th><th></th>' +
+            '<th>' +
+            window.totalChange +
+            '</th>' +
+            '<th>' +
+            '</th>' +
+            '<th>' +
+            window.totalMarketCap +
+            '</th>' +
+            '<th>' +
+            window.totalGain +
+            '</th>' +
+            '<th>' +
+            window.totalGainPc +
+            '</th>' +
+            '<th>' +
+
+            '</th>' +
+            '<th>' +
+
+            '</th>' +
             '</tr>'
         );
     };
 
     options.aoColumnDefs = [
 
-        { "bSortable": false, 'aTargets': [ -1 ]},
+        {"bSortable": false, 'aTargets': [-1]},
     ];
 
     options.lengthMenu = [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]];
@@ -544,8 +544,8 @@ function dataTable(sArr){
     window.stockTable = $('#myTable').DataTable(options);
 }
 
-function dataTableTrans(sArr){
-    window.transTable = $('#trans-table').DataTable( {
+function dataTableTrans(sArr) {
+    window.transTable = $('#trans-table').DataTable({
 
         "columns": [
             {title: "Symbol"},
@@ -555,52 +555,54 @@ function dataTableTrans(sArr){
             {title: "Date"},
         ],
         "data": sArr,
-        "order": [[ 4, "desc" ]],
+        "order": [[4, "desc"]],
         "fixedHeader": true,
         "responsive": true,
         "lengthMenu": [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]],
         "aoColumnDefs": [
             {
-                "aTargets":[3],
-                "fnCreatedCell": function(nTd, sData, oData, iRow, iCol)
-                {
-                    if(sData == 'sell' ) {
-                         $(nTd).css('color', 'red');
-                    } else if(sData == 'buy'){
+                "aTargets": [3],
+                "fnCreatedCell": function (nTd, sData, oData, iRow, iCol) {
+                    if (sData == 'sell') {
+                        $(nTd).css('color', 'red');
+                    } else if (sData == 'buy') {
                         $(nTd).css('color', 'green');
                     }
                 }
             }
         ],
         /*"oTableTools": {
-            "sSwfPath": "dataTables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf",
-            "aButtons": ["copy", "print", {
-                 "sExtends": "collection",
-                 "sButtonText": "Save <span class=\"caret\" />",
-                 "aButtons": ["csv", "xls", "pdf"]
-            }]
-        },*/
+         "sSwfPath": "dataTables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf",
+         "aButtons": ["copy", "print", {
+         "sExtends": "collection",
+         "sButtonText": "Save <span class=\"caret\" />",
+         "aButtons": ["csv", "xls", "pdf"]
+         }]
+         },*/
         "dom": 'T<"clear">lfrtip',
         "tableTools": {
             "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
         },
         aButtons: [
-            { sExtends: "csv",
-              sFileName: 'download.csv',
-              sFieldSeperator: "," //<--- example of how to set the delimiter
+            {
+                sExtends: "csv",
+                sFileName: 'download.csv',
+                sFieldSeperator: "," //<--- example of how to set the delimiter
             },
-            { sExtends: "xls",
-              sFileName: 'download.xls'
+            {
+                sExtends: "xls",
+                sFileName: 'download.xls'
             },
-            { sExtends: "pdf",
-              sFileName: 'download.pdf'
-            }   
-        ], 
-    } );
+            {
+                sExtends: "pdf",
+                sFileName: 'download.pdf'
+            }
+        ],
+    });
 }
 
-function dataTableQuote(sArr){
-    if (window.quoteTable!=undefined){
+function dataTableQuote(sArr) {
+    if (window.quoteTable != undefined) {
         window.quoteTable.destroy();
     }
     window.quoteTable = $('#quote-table').DataTable({
@@ -613,38 +615,38 @@ function dataTableQuote(sArr){
         "responsive": true,
         "bFilter": false,
         "paging": false,
-        "bSort" : false,
+        "bSort": false,
     });
     document.getElementById("quote-table").deleteTHead();
     document.getElementById("quote-table").deleteTFoot();
     $('#quote-table_info').hide();
 }
 
-function getUserTransactions(){
+function getUserTransactions() {
     $.ajax({
-        type:'GET',
-        url:'/get-my-transactions',
-        dataType:'json',
+        type: 'GET',
+        url: '/get-my-transactions',
+        dataType: 'json',
 
-        success: function(data){
+        success: function (data) {
             buildTransTable(data);
         }
     });
 }
 
-function deleteUserTransactions(){
+function deleteUserTransactions() {
     $.ajax({
-        type:'POST',
-        url:'/delete-transactions',
-        success: function(data){
+        type: 'POST',
+        url: '/delete-transactions',
+        success: function (data) {
             $('#upload-alert').hide();
-            $('#ts-delete-alert').show();           
+            $('#ts-delete-alert').show();
         }
     });
 }
 
-function buildTransTable(data){
-        //$('#debug-output').html(JSON.stringify(data));
+function buildTransTable(data) {
+    //$('#debug-output').html(JSON.stringify(data));
     var ts = data['transactions'];
     var sArr = [];
     var row;
@@ -654,39 +656,41 @@ function buildTransTable(data){
     var tType;
     var datetime;
 
-    if(ts.length == 0){
-        $('#delete-ts').click(function () {return false;});
+    if (ts.length == 0) {
+        $('#delete-ts').click(function () {
+            return false;
+        });
         $('#delete-ts').css("background-color", "grey");
         dataTableTrans([]);
     } else {
         $('#delete-ts').unbind('click', false);
         $('#delete-ts').css("background-color", "rgb(240, 65, 36)");
         $('#delete-ts').replaceWith('<a href="javascript:void(0);" id="delete-ts" data-reveal-id="confirm-modal" class="radius button small alert">Delete Transaction History</a>');
-        $.each(ts, function(index, value){
+        $.each(ts, function (index, value) {
             price = parseFloat(value['price']);
             shares = parseInt(value['shares']);
             tType = 'buy'
             datetime = new Date(value['timestamp']);
-            index ++;
-            if(shares < 0.0){
+            index++;
+            if (shares < 0.0) {
                 tType = 'sell';
                 shares *= -1;
             }
             sArr.push([value['ticker_symbol'], price, shares, tType, formatDate(datetime)])
-            
+
         });
         dataTableTrans(sArr);
     }
 }
 
-function getTopStocks(){
+function getTopStocks() {
     $.ajax({
-        type:'GET',
-        url:'/get-top-stocks',
-        dataType:'json',
+        type: 'GET',
+        url: '/get-top-stocks',
+        dataType: 'json',
 
-        success: function(data){
-            if (Object.keys(data['stocks']).length > 0){
+        success: function (data) {
+            if (Object.keys(data['stocks']).length > 0) {
                 buildTopStockTable(data);
             } else {
                 //user has no stocks so use default
@@ -697,7 +701,7 @@ function getTopStocks(){
     });
 }
 
-function buildTopStockTable(data){
+function buildTopStockTable(data) {
     var ts = data['stocks'];
     var sArr = [];
     var row;
@@ -707,10 +711,10 @@ function buildTopStockTable(data){
     var tType;
     var datetime;
 
-    if(ts.length == 0){
+    if (ts.length == 0) {
         dataTableTrans([]);
     } else {
-        $.each(ts, function(index, value){
+        $.each(ts, function (index, value) {
             $.ajax({
                 async: false,
                 dataType: "xml",
@@ -727,14 +731,14 @@ function buildTopStockTable(data){
                     sArr.push([value['ticker_symbol'], price, change])
                 },
             });
-            
+
         });
         dataTableTopStocks(sArr);
     }
 }
 
-function dataTableTopStocks(sArr){
-    window.topStockTable = $('#top-stock-table').DataTable( {
+function dataTableTopStocks(sArr) {
+    window.topStockTable = $('#top-stock-table').DataTable({
 
         "columns": [
             {title: "Symbol"},
@@ -745,34 +749,34 @@ function dataTableTopStocks(sArr){
         "responsive": true,
         "bFilter": false,
         "paging": false,
-        "order": [[ 1, "desc" ]]
+        "order": [[1, "desc"]]
     });
 }
 
 function formatDate(date) {
-  var hours = date.getHours();
-  var minutes = date.getMinutes();
-  var seconds = date.getSeconds();
-  var ampm = hours >= 12 ? 'pm' : 'am';
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
-  minutes = minutes < 10 ? '0'+minutes : minutes;
-  seconds = seconds < 10 ? '0'+seconds : seconds;
-  var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-  return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var seconds = date.getSeconds();
+    var ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+    var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+    return date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
 }
 
-function postNote(){
+function postNote() {
     var ticker = $('#note-form-ticker').val().toUpperCase();
     var note = escapeHtml($('#note-editable p').html());
     $.ajax({
-        type:'POST',
-        url:'/edit-stock-note',
-        data:{
+        type: 'POST',
+        url: '/edit-stock-note',
+        data: {
             'ticker_symbol': ticker,
             'note': note,
         },
-        success: function(){
+        success: function () {
             $('#buy-success-alert').hide();
             $('#sell-success-alert').hide();
             $('#note-modal').foundation('reveal', 'close');
@@ -797,7 +801,7 @@ function postNote(){
 function browserSupportFileUpload() {
     var isCompatible = false;
     if (window.File && window.FileReader && window.FileList && window.Blob) {
-    isCompatible = true;
+        isCompatible = true;
     }
     return isCompatible;
 }
@@ -813,32 +817,32 @@ function upload(evt) {
         var file = evt.target.files[0];
         var reader = new FileReader();
         reader.readAsText(file);
-        reader.onload = function(event) {
+        reader.onload = function (event) {
             var csvData = event.target.result;
             data = $.csv.toArrays(csvData);
             if (data && data.length > 0) {
                 //alert('Imported -' + data.length + '- rows successfully!');
                 $.ajax({
-                    type:'POST',
-                    url:'/upload-transactions',
+                    type: 'POST',
+                    url: '/upload-transactions',
                     dataType: 'json',
-                    data:{
+                    data: {
                         'data': JSON.stringify(data),
                     },
-                    success: function(){
+                    success: function () {
                         $('#upload-alert').show();
                         //refresh the transaction datatable
                         window.transTable.destroy();
                         getUserTransactions();
                         resetFormElement($('#txtFileUpload'));
-                        
+
                     },
                 });
             } else {
                 alert('No data to import!');
             }
         };
-        reader.onerror = function() {
+        reader.onerror = function () {
             alert('Unable to read ' + file.fileName);
         };
     }
@@ -852,9 +856,9 @@ function uploadEvent(evt) {
         var file = evt.target.files[0];
         var reader = new FileReader();
         reader.readAsText(file);
-        reader.onload = function(event) {
+        reader.onload = function (event) {
             var jsonData = event.target.result;
-             if (jsonData) {
+            if (jsonData) {
                 var objData = JSON.parse(jsonData);
                 if (objData.title && objData.start && objData.end) {
                     console.log('good');
@@ -865,29 +869,29 @@ function uploadEvent(evt) {
                         end: moment(new Date(objData.end)).format()
                     };
                     $.ajax({
-                      type:'POST',
-                      url:'/store-event',
-                      data:{
-                        'title': eventData.title,
-                        'start': eventData.start,
-                        'end1': eventData.end,
-                      },
-                      success: function(){
-                        console.log('Event stored');
-                        $('#calendar').fullCalendar('renderEvent', eventData, true);
-                        $('#uploadEventModal').foundation('reveal', 'close');
-                        $('#uploadInstructionsText').hide();
-                      },
-                      error: function() {
-                        console.log('Error adding event to database');
-                      }
+                        type: 'POST',
+                        url: '/store-event',
+                        data: {
+                            'title': eventData.title,
+                            'start': eventData.start,
+                            'end1': eventData.end,
+                        },
+                        success: function () {
+                            console.log('Event stored');
+                            $('#calendar').fullCalendar('renderEvent', eventData, true);
+                            $('#uploadEventModal').foundation('reveal', 'close');
+                            $('#uploadInstructionsText').hide();
+                        },
+                        error: function () {
+                            console.log('Error adding event to database');
+                        }
                     });
                 }
             } else {
                 alert('No data to import!');
             }
         };
-        reader.onerror = function() {
+        reader.onerror = function () {
             alert('Unable to read ' + file.fileName);
         };
     }
@@ -903,68 +907,135 @@ $(function () {
 /*****************************************************************************/
 /* FACEBOOK*/
 /*****************************************************************************/
-    function fb_login() {
-      FB.login(function (response) {
-          if (response.authResponse) {
-              access_token = response.authResponse.accessToken; //get access token
-              user_id = response.authResponse.userID; //get FB UID
 
-              FB.api('/me', function (response) {
-                  user_email = response.email; //get user email
-                  // you can store this data into your database
-              });
-              window.location.reload();
+window.fbAsyncInit = function () {
+    FB.init({
+        appId: '1715981821968291',
+        cookie: true,
+        xfbml: true,
+        version: 'v2.4'
+    });
 
-          } else {
-              //user hit cancel button
-              console.log('User cancelled login or did not fully authorize.');
-          }
-      }, {
-          scope: 'publish_actions,email,public_profile,user_posts'
-      });
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+};
+
+(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+        testAPI();
+        return true;
+    } else if (response.status === 'not_authorized') {
+        document.getElementById('login-status').innerHTML = 'Please log ' +
+            'into this app.';
+        return false;
+    } else {
+        document.getElementById('login-status').innerHTML = 'Please log ' +
+            'into Facebook.';
+        return false;
     }
-    (function () {
-        var e = document.createElement('script');
-        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-        e.async = true;
-        document.getElementById('fb-root').appendChild(e);
-    }());
+}
+
+function checkLoginState() {
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+}
+
+function testAPI() {
+    FB.api('/me?fields=name,id', function (response) {
+        myName = response.name;
+        myId = response.id
+
+        //associate user in our database
+        $.ajax({
+            type: 'POST',
+            url: '/associate-user',
+            data: {'idString': response.id},
+        });
+
+        document.getElementById('login-status').innerHTML =
+            'Thanks for logging in, ' + response.name + '!';
+        document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
+
+        displayPostStatus();
+    });
+}
+
+
+function fb_login() {
+    FB.login(function (response) {
+        if (response.authResponse) {
+            access_token = response.authResponse.accessToken; //get access token
+            user_id = response.authResponse.userID; //get FB UID
+
+            FB.api('/me', function (response) {
+                user_email = response.email; //get user email
+                // you can store this data into your database
+            });
+            window.location.reload();
+
+        } else {
+            //user hit cancel button
+            console.log('User cancelled login or did not fully authorize.');
+        }
+    }, {
+        scope: 'publish_actions,email,public_profile,user_posts'
+    });
+}
+(function () {
+    var e = document.createElement('script');
+    e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+    e.async = true;
+    document.getElementById('fb-root').appendChild(e);
+}());
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
 function renderFrontPageCalendar() {
-  $('#frontPageCalendar').fullCalendar({
-    defaultView: 'basicDay',
-    timezone: 'local',
-    selectable: false,
-    allDaySlot: false,
-    editable: false,
-  });
-  $('.fc-right').hide();
-  $('.fc-left h2').prepend('Today\'s Events - ');
-  $('.fc-day').prepend('<p id="noEvents">No Events</p>');
+    $('#frontPageCalendar').fullCalendar({
+        defaultView: 'basicDay',
+        timezone: 'local',
+        selectable: false,
+        allDaySlot: false,
+        editable: false,
+    });
+    $('.fc-right').hide();
+    $('.fc-left h2').prepend('Today\'s Events - ');
+    $('.fc-day').prepend('<p id="noEvents">No Events</p>');
 }
 
 function loadFrontPageEvents() {
-  // Load Events from Database
-  $.ajax({
-    type:'GET',
-    url:'/get-front-page-events',
-    dataType:'json',
-    success: function(data){
-      var events = [];
-      for (var z = 0; z < data.events.length; z++) {
-        var event = {};
+    // Load Events from Database
+    $.ajax({
+        type: 'GET',
+        url: '/get-front-page-events',
+        dataType: 'json',
+        success: function (data) {
+            var events = [];
+            for (var z = 0; z < data.events.length; z++) {
+                var event = {};
 
-        event.title = data.events[z].title;
-        event.start = data.events[z].start;
-        event.end = data.events[z].end1;
+                event.title = data.events[z].title;
+                event.start = data.events[z].start;
+                event.end = data.events[z].end1;
 
-        events.push(event);
-      }
-      $('#frontPageCalendar').fullCalendar('addEventSource', events);
-    }
-  });
+                events.push(event);
+            }
+            $('#frontPageCalendar').fullCalendar('addEventSource', events);
+        }
+    });
 }
 
 function renderCalendar() {
@@ -989,7 +1060,7 @@ function renderCalendar() {
         allDaySlot: false,
 
         // Adding an event
-        select: function(start, end) {
+        select: function (start, end) {
             eventStartDate = start.format('MMM DD, YYYY');
             eventStartTime = start.format('hh:mm A');
             eventEndDate = end.format('MMM DD, YYYY');
@@ -997,67 +1068,67 @@ function renderCalendar() {
 
             // Open Modal
             $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-              var modal = $(this);
-              $("#modalTitle").html("Add Event");
-              $('#startDateField').val(eventStartDate);
-              $('#startTimeField').val(eventStartTime);
-              $('#endDateField').val(eventEndDate);
-              $('#endTimeField').val(eventEndTime);
-              $("#eventId").val("");
+                var modal = $(this);
+                $("#modalTitle").html("Add Event");
+                $('#startDateField').val(eventStartDate);
+                $('#startTimeField').val(eventStartTime);
+                $('#endDateField').val(eventEndDate);
+                $('#endTimeField').val(eventEndTime);
+                $("#eventId").val("");
             });
             $('#myModal').foundation('reveal', 'open');
         },
 
-        unselect: function() {
+        unselect: function () {
             $('#eventButtons').hide();
             selectedEvent = null;
         },
 
-        eventResize: function(event) {
-          $.ajax({
-            type: 'POST',
-            url: '/modify-event',
-            data: {
-              'id': event._id.replace(/\D/g,''),
-              'title': event.title,
-              'start': event.start.format(),
-              'end1': event.end.format(),
-            },
-            success: function() {
-                console.log('Event resized');
-            },
-            error: function() {
-                alert('Error modifying event in database');
-            }
-          });
+        eventResize: function (event) {
+            $.ajax({
+                type: 'POST',
+                url: '/modify-event',
+                data: {
+                    'id': event._id.replace(/\D/g, ''),
+                    'title': event.title,
+                    'start': event.start.format(),
+                    'end1': event.end.format(),
+                },
+                success: function () {
+                    console.log('Event resized');
+                },
+                error: function () {
+                    alert('Error modifying event in database');
+                }
+            });
         },
 
-        eventDrop: function(event) {
-          $.ajax({
-            type: 'POST',
-            url: '/modify-event',
-            data: {
-              'id': event._id.replace(/\D/g,''),
-              'title': event.title,
-              'start': event.start.format(),
-              'end1': event.end.format(),
-            },
-            success: function() {
-                console.log('Event dropped');
-            },
-            error: function() {
-                alert('Error modifying event in database');
-            }
-          });
+        eventDrop: function (event) {
+            $.ajax({
+                type: 'POST',
+                url: '/modify-event',
+                data: {
+                    'id': event._id.replace(/\D/g, ''),
+                    'title': event.title,
+                    'start': event.start.format(),
+                    'end1': event.end.format(),
+                },
+                success: function () {
+                    console.log('Event dropped');
+                },
+                error: function () {
+                    alert('Error modifying event in database');
+                }
+            });
         },
-        
+
         // Show event info
-        eventClick: function(calEvent, jsEvent, view) {
+        eventClick: function (calEvent, jsEvent, view) {
             var obj = {title: calEvent.title, start: calEvent.start, end: calEvent.end};
             var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
             $('#downloadBtn').wrap('<a href="data:' + data + '" download="data.json"></a>');
             selectedEvent = calEvent;
-            
+
             $('#eventButtons').show();
             $("#modalTitle").html("Edit Event");
             $('#myModal').foundation('reveal', 'open');
@@ -1066,7 +1137,7 @@ function renderCalendar() {
             $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
             $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
             $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
-            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
+            $("#eventId").val(selectedEvent._id.replace(/\D/g, ''));
         }
     });
 
@@ -1077,152 +1148,152 @@ function renderCalendar() {
 function loadEvents() {
     var events = [];
     $.ajax({
-        type:'GET',
-        url:'/load-events',
-        dataType:'json',
-        success: function(data){
-          for (var z = 0; z < data.events.length; z++) {
-            var event = {};
-            event.title = data.events[z].title;
-            event.start = data.events[z].start;
-            event.end = data.events[z].end1;
-            events.push(event);
-          }
-          $('#calendar').fullCalendar('addEventSource', events);
+        type: 'GET',
+        url: '/load-events',
+        dataType: 'json',
+        success: function (data) {
+            for (var z = 0; z < data.events.length; z++) {
+                var event = {};
+                event.title = data.events[z].title;
+                event.start = data.events[z].start;
+                event.end = data.events[z].end1;
+                events.push(event);
+            }
+            $('#calendar').fullCalendar('addEventSource', events);
         }
     });
 }
 
 function validateAddEvent() {
-  // var tReg = new RegExp('^.{0,100}$');
-  // var sReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
-  // var eReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
+    // var tReg = new RegExp('^.{0,100}$');
+    // var sReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
+    // var eReg = new RegExp('^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$');
 
-  var title = $('#titleField').val();
-  var startDate = $('#startDateField').val();
-  var startTime = $('#startTimeField').val();
-  var endDate = $('#endDateField').val();
-  var endTime = $('#endTimeField').val();
+    var title = $('#titleField').val();
+    var startDate = $('#startDateField').val();
+    var startTime = $('#startTimeField').val();
+    var endDate = $('#endDateField').val();
+    var endTime = $('#endTimeField').val();
 
-  var invalid=false;
-  var invalidFields = {
-      title: false,
-      startDate: false,
-      startTime: false,
-      endDate: false,
-      endTime: false
-  };
-
-  //validate inputs
-  if (title == '') {
-    invalid = true;
-    invalidFields['title'] = true;
-  } else if (title.length > 100) {
-    invalid = true;
-    invalidFields['titleLength'] = true;
-  }
-  if (startDate == ''){
-    invalid = true;
-    invalidFields['startDate'] = true;
-  }
-  if (startTime == ''){
-    invalid = true;
-    invalidFields['startTime'] = true;
-  }
-  if (endDate == ''){
-    invalid = true;
-    invalidFields['endDate'] = true;
-  }
-  if (endTime == ''){
-    invalid = true;
-    invalidFields['endTime'] = true;
-  }
-  
-  // Set error message
-  if(invalid){
-    $('#invalid-event-input-modal p:first').empty();
-    $('#invalid-event-input-modal').foundation('reveal', 'open');
-
-    if(invalidFields['title']){
-      $('#invalid-event-input-modal p:first').append("<br>Please enter a title");
-    }
-    if(invalidFields['titleLength']){
-      $('#invalid-event-input-modal p:first').append("<br>Title must be less than 100 characters");
-    }
-    if(invalidFields['startDate']){
-      $('#invalid-event-input-modal p:first').append("<br>Please select a Start Date");
-    }
-    if(invalidFields['startTime']){
-      $('#invalid-event-input-modal p:first').append("<br>Please enter a Start Time");
-    }
-    if(invalidFields['endDate']){
-      $('#invalid-event-input-modal p:first').append("<br>Please select an End Date");
-    }
-    if(invalidFields['endTime']){
-      $('#invalid-event-input-modal p:first').append("<br>Please enter an End Time");
-    }
-  } else {
-    // Create eventData to render FullCalendar event
-    var eventData;
-    eventData = {
-      title: $('#titleField').val(),
-      start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
-      end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+    var invalid = false;
+    var invalidFields = {
+        title: false,
+        startDate: false,
+        startTime: false,
+        endDate: false,
+        endTime: false
     };
 
-    // Store event in database
-    if (eventData.title && eventData.start && eventData.end) {
-      $.ajax({
-        type:'POST',
-        url:'/store-event',
-        data:{
-          'title': eventData.title,
-          'start': eventData.start,
-          'end1': eventData.end,
-        },
-        success: function(){
-          $('#calendar').fullCalendar('renderEvent', eventData, true);
-          $('#myModal').foundation('reveal', 'close');
-        }
-      });
+    //validate inputs
+    if (title == '') {
+        invalid = true;
+        invalidFields['title'] = true;
+    } else if (title.length > 100) {
+        invalid = true;
+        invalidFields['titleLength'] = true;
     }
-  }
-}
+    if (startDate == '') {
+        invalid = true;
+        invalidFields['startDate'] = true;
+    }
+    if (startTime == '') {
+        invalid = true;
+        invalidFields['startTime'] = true;
+    }
+    if (endDate == '') {
+        invalid = true;
+        invalidFields['endDate'] = true;
+    }
+    if (endTime == '') {
+        invalid = true;
+        invalidFields['endTime'] = true;
+    }
 
-function storeEvent() {
-    // If All fields are filled...
-    if ($('#titleField').val() != '' &&
-            $('#startDateField').val() != '' &&
-            $('#startTimeField').val() != '' &&
-            $('#endDateField').val() != '' &&
-            $('#endTimeField').val() != '') {
-        
+    // Set error message
+    if (invalid) {
+        $('#invalid-event-input-modal p:first').empty();
+        $('#invalid-event-input-modal').foundation('reveal', 'open');
+
+        if (invalidFields['title']) {
+            $('#invalid-event-input-modal p:first').append("<br>Please enter a title");
+        }
+        if (invalidFields['titleLength']) {
+            $('#invalid-event-input-modal p:first').append("<br>Title must be less than 100 characters");
+        }
+        if (invalidFields['startDate']) {
+            $('#invalid-event-input-modal p:first').append("<br>Please select a Start Date");
+        }
+        if (invalidFields['startTime']) {
+            $('#invalid-event-input-modal p:first').append("<br>Please enter a Start Time");
+        }
+        if (invalidFields['endDate']) {
+            $('#invalid-event-input-modal p:first').append("<br>Please select an End Date");
+        }
+        if (invalidFields['endTime']) {
+            $('#invalid-event-input-modal p:first').append("<br>Please enter an End Time");
+        }
+    } else {
         // Create eventData to render FullCalendar event
         var eventData;
-            eventData = {
+        eventData = {
             title: $('#titleField').val(),
-            start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
+            start: moment(new Date($('#startDateField').val() + ' ' + $('#startTimeField').val())).format(),
             end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
         };
 
         // Store event in database
         if (eventData.title && eventData.start && eventData.end) {
             $.ajax({
-              type:'POST',
-              url:'/store-event',
-              data:{
-                'title': eventData.title,
-                'start': eventData.start,
-                'end1': eventData.end,
-              },
-              success: function(){
-                console.log('Event stored');
-                $('#calendar').fullCalendar('renderEvent', eventData, true);
-                $('#myModal').foundation('reveal', 'close');
-              },
-              error: function() {
-                console.log('Error adding event to database');
-              }
+                type: 'POST',
+                url: '/store-event',
+                data: {
+                    'title': eventData.title,
+                    'start': eventData.start,
+                    'end1': eventData.end,
+                },
+                success: function () {
+                    $('#calendar').fullCalendar('renderEvent', eventData, true);
+                    $('#myModal').foundation('reveal', 'close');
+                }
+            });
+        }
+    }
+}
+
+function storeEvent() {
+    // If All fields are filled...
+    if ($('#titleField').val() != '' &&
+        $('#startDateField').val() != '' &&
+        $('#startTimeField').val() != '' &&
+        $('#endDateField').val() != '' &&
+        $('#endTimeField').val() != '') {
+
+        // Create eventData to render FullCalendar event
+        var eventData;
+        eventData = {
+            title: $('#titleField').val(),
+            start: moment(new Date($('#startDateField').val() + ' ' + $('#startTimeField').val())).format(),
+            end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+        };
+
+        // Store event in database
+        if (eventData.title && eventData.start && eventData.end) {
+            $.ajax({
+                type: 'POST',
+                url: '/store-event',
+                data: {
+                    'title': eventData.title,
+                    'start': eventData.start,
+                    'end1': eventData.end,
+                },
+                success: function () {
+                    console.log('Event stored');
+                    $('#calendar').fullCalendar('renderEvent', eventData, true);
+                    $('#myModal').foundation('reveal', 'close');
+                },
+                error: function () {
+                    console.log('Error adding event to database');
+                }
             });
         }
     } else {
@@ -1234,50 +1305,50 @@ function modifyEvent() {
     var eventData;
     eventData = {
         id: $("#eventId").val(),
-    	title: $('#titleField').val(),
-    	start: moment(new Date($('#startDateField').val() + ' ' +  $('#startTimeField').val())).format(),
-    	end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
+        title: $('#titleField').val(),
+        start: moment(new Date($('#startDateField').val() + ' ' + $('#startTimeField').val())).format(),
+        end: moment(new Date($('#endDateField').val() + ' ' + $('#endTimeField').val())).format()
     };
 
     if (eventData.title && eventData.start && eventData.end) {
-    	$.ajax({
+        $.ajax({
             type: 'POST',
-    	    url: '/modify-event',
-    	    data: {
+            url: '/modify-event',
+            data: {
                 'id': eventData.id,
-    	        'title': eventData.title,
-    	        'start': eventData.start,
-    	        'end1': eventData.end,
-    	    },
-    	    success: function() {
-    	        console.log('Event modified');
-                $("#calendar").fullCalendar( 'removeEvents');
+                'title': eventData.title,
+                'start': eventData.start,
+                'end1': eventData.end,
+            },
+            success: function () {
+                console.log('Event modified');
+                $("#calendar").fullCalendar('removeEvents');
                 loadEvents();
-    			$('#myModal').foundation('reveal', 'close');
-    	    },
-    	    error: function() {
-    	        alert('Error modifying event in database');
-    	    }
+                $('#myModal').foundation('reveal', 'close');
+            },
+            error: function () {
+                alert('Error modifying event in database');
+            }
         });
     }
 }
 
 function deleteEvent() {
     if (window.confirm("Are you sure? This event will be deleted.")) {
-    	$.ajax({
+        $.ajax({
             type: 'POST',
-    	    url: '/delete-event',
-    	    data: {
+            url: '/delete-event',
+            data: {
                 'id': $("#eventId").val()
-    	    },
-    	    success: function() {
+            },
+            success: function () {
                 $("#calendar").fullCalendar('removeEvents');
                 loadEvents();
-    			$('#myModal').foundation('reveal', 'close');
-    	    },
-    	    error: function() {
-    	        alert('Error deleting event in database');
-    	    }
+                $('#myModal').foundation('reveal', 'close');
+            },
+            error: function () {
+                alert('Error deleting event in database');
+            }
         });
     }
 }
@@ -1294,28 +1365,38 @@ function resetAddEventForm() {
 /* HELPER*/
 /*****************************************************************************/
 /*
-    clears the children of an element.
-    use to clear forms
-*/
+ clears the children of an element.
+ use to clear forms
+ */
 function clearChildren(element) {
-   for (var i = 0; i < element.childNodes.length; i++) {
-      var e = element.childNodes[i];
-      if (e.tagName) switch (e.tagName.toLowerCase()) {
-         case 'input':
-            switch (e.type) {
-               case "radio":
-               case "checkbox": e.checked = false; break;
-               case "button":
-               case "submit":
-               case "image": break;
-               default: e.value = ''; break;
-            }
-            break;
-         case 'select': e.selectedIndex = 0; break;
-         case 'textarea': e.innerHTML = ''; break;
-         default: clearChildren(e);
-      }
-   }
+    for (var i = 0; i < element.childNodes.length; i++) {
+        var e = element.childNodes[i];
+        if (e.tagName) switch (e.tagName.toLowerCase()) {
+            case 'input':
+                switch (e.type) {
+                    case "radio":
+                    case "checkbox":
+                        e.checked = false;
+                        break;
+                    case "button":
+                    case "submit":
+                    case "image":
+                        break;
+                    default:
+                        e.value = '';
+                        break;
+                }
+                break;
+            case 'select':
+                e.selectedIndex = 0;
+                break;
+            case 'textarea':
+                e.innerHTML = '';
+                break;
+            default:
+                clearChildren(e);
+        }
+    }
 }
 
 // Use the browser's built-in functionality to quickly and safely escape the
@@ -1323,8 +1404,8 @@ function clearChildren(element) {
 // Use the browser's built-in functionality to quickly and safely escape the
 // string
 function escapeHtml(str) {
-    if(str == null){
-        str="";
+    if (str == null) {
+        str = "";
     }
     var div = document.createElement('div');
     div.appendChild(document.createTextNode(str.replace(/"/g, '&quot;')));
@@ -1341,10 +1422,10 @@ function unescapeHtml(escapedStr) {
 };
 
 function resetFormElement(e) {
-  e.wrap('<form>').closest('form').get(0).reset();
-  e.unwrap();
+    e.wrap('<form>').closest('form').get(0).reset();
+    e.unwrap();
 
-  // Prevent form submission
-  e.stopPropagation();
-  e.preventDefault();
+    // Prevent form submission
+    e.stopPropagation();
+    e.preventDefault();
 }

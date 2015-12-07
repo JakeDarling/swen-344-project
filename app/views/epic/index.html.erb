@@ -277,70 +277,12 @@
     loadFrontPageEvents();
   });
 
-    function statusChangeCallback(response) {
-        console.log('statusChangeCallback');
-        console.log(response);
-        if (response.status === 'connected') {
-            testAPI();
-            showWall();
-        } else if (response.status === 'not_authorized') {
-            document.getElementById('login-status').innerHTML = 'Please log ' +
-                    'into this app.';
-        } else {
-            document.getElementById('login-status').innerHTML = 'Please log ' +
-                    'into Facebook.';
-        }
-    }
+  if(checkLoginState() == true)
+  {
+      showWall();
+  }
 
-    function checkLoginState() {
-        FB.getLoginStatus(function (response) {
-            statusChangeCallback(response);
-        });
-    }
-
-    window.fbAsyncInit = function () {
-        FB.init({
-            appId: '1715981821968291',
-            cookie: true,
-            xfbml: true,
-            version: 'v2.4'
-        });
-
-        FB.getLoginStatus(function (response) {
-            statusChangeCallback(response);
-        });
-    };
-
-    (function (d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-
-    function testAPI() {
-        FB.api('/me?fields=name,id', function (response) {
-            myName = response.name;
-            myId = response.id            
-
-            //associate user in our database
-            $.ajax({
-                type:'POST',
-                url:'/associate-user',
-                data:{'idString': response.id},
-            });
-
-            document.getElementById('login-status').innerHTML =
-                    'Thanks for logging in, ' + response.name + '!';
-            document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
-            
-            displayPostStatus();
-        });
-    }
-
-    function displayPostStatus() {
+  function displayPostStatus() {
         $("#facebook-post-status").append(
             '<select id="status_privacy"><option value="EVERYONE">Public</option><option value="ALL_FRIENDS">Friends</option>' +
             '<option value="FRIENDS_OF_FRIENDS">Friends of Friends</option><option value="SELF">Only Me</option></select>');

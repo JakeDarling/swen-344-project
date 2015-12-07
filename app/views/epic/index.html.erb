@@ -2,7 +2,6 @@
 <style>
   #wall {
     background-color: #e9eaed;
-    border: 1px solid black;
     padding: 5px;
     font-family: Helvetica, Arial, sans-serif;
   }
@@ -58,6 +57,9 @@
     border: 1px solid #aeacae;
   }
 
+  #facebook-post-status{
+      background: #3B569D;
+  }
   .postProfilePic {
     float: left;
     margin-right: 5px;
@@ -132,6 +134,7 @@
     width: 45%;
     float: left;
     margin: 20px;
+
   }
 
   .fc-content {
@@ -634,14 +637,18 @@
       <tfoot>
       </tfoot>
     </table>
-
-    <div id="facebook-post-status" name="facebook-post-status"></div>
+</div>
+  <div class="row">
+    <div id="facebook-post-status" class="large-6 small-12 columns" name="facebook-post-status" ></div>
 
     <!-- TODAY'S EVENTS CALENDAR -->
-    <div id="frontPageCalendar"></div>
+    <div id="frontPageCalendar" class="large-6 small-12 columns" name="calebdar"></div>
 
     <!-- FACEBOOK WALL -->
-    <div id="wall" class="large-6 small-12 columns" name="wall"></div>
+    </div>
+  <div class="row">
+    <div id="wall" class="large-12 small-12 columns" name="wall"></div>
+    </div>
 
     <!-- STOCK INFO -->
     <!--

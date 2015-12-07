@@ -1010,7 +1010,7 @@ function displayPostStatus() {
 
 function showWall() {   
   FB.api(
-    '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id', 
+    '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id&limit=100', 
     function(response) {
       if (response && !response.error) {
         postsData = response.data;

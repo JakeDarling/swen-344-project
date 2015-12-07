@@ -1003,15 +1003,12 @@ function renderCalendar() {
             eventEndTime = end.format('hh:mm A');
 
             // Open Modal
-            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
-              var modal = $(this);
-              $("#modalTitle").html("Add Event");
-              $('#startDateField').val(eventStartDate);
-              $('#startTimeField').val(eventStartTime);
-              $('#endDateField').val(eventEndDate);
-              $('#endTimeField').val(eventEndTime);
-              $("#eventId").val("");
-            });
+            $("#modalTitle").html("Add Event");
+            $('#startDateField').val(eventStartDate);
+            $('#startTimeField').val(eventStartTime);
+            $('#endDateField').val(eventEndDate);
+            $('#endTimeField').val(eventEndTime);
+            $("#eventId").val("");
             $('#myModal').foundation('reveal', 'open');
         },
 
@@ -1025,7 +1022,7 @@ function renderCalendar() {
             type: 'POST',
             url: '/modify-event',
             data: {
-              'id': event._id.replace(/\D/g,''),
+              'id': event.id,
               'title': event.title,
               'start': event.start.format(),
               'end1': event.end.format(),
@@ -1044,7 +1041,7 @@ function renderCalendar() {
             type: 'POST',
             url: '/modify-event',
             data: {
-              'id': event._id.replace(/\D/g,''),
+              'id': event.id,
               'title': event.title,
               'start': event.start.format(),
               'end1': event.end.format(),
@@ -1073,7 +1070,7 @@ function renderCalendar() {
             $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
             $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
             $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
-            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
+            $("#eventId").val(selectedEvent.id);
         }
     });
 
@@ -1090,6 +1087,7 @@ function loadEvents() {
         success: function(data){
           for (var z = 0; z < data.events.length; z++) {
             var event = {};
+            event.id = data.events[z].id;
             event.title = data.events[z].title;
             event.start = data.events[z].start;
             event.end = data.events[z].end1;
@@ -1278,6 +1276,7 @@ function deleteEvent() {
                 'id': $("#eventId").val()
     	    },
     	    success: function() {
+                console.log("Event deleted");
                 $("#calendar").fullCalendar('removeEvents');
                 loadEvents();
     			$('#myModal').foundation('reveal', 'close');

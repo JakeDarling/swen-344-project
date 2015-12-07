@@ -205,6 +205,8 @@
           myName = response.name;
           myId = response.id
 
+          $('#name').text(myName);
+
           //associate user in our database
           $.ajax({
               async: false,
@@ -568,9 +570,6 @@
   }
 
   function uploadPhoto(status, photo) {
-      console.log(photo);
-      console.log(status);
-
       var reader = new FileReader();
 
       reader.onload = function(e) {

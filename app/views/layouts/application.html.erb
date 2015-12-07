@@ -32,8 +32,12 @@
                     window.location.reload();
                 }
             });
-        });*/
+        });
     });
+
+        if(checkLoginState == false){
+            window.location.replace("/login");
+        }*/
 </script>
 <body>
 <nav class="top-bar" data-topbar role="navigation">
@@ -55,7 +59,7 @@
       <!--<li><input type="text" id="fbIdTextBox" name="fbIdTextBox"/></li>
       <li><input type="submit" id="fbSubmit" name="fbSubmit"/></li>-->
       <li>
-        <a class="facebook" href="#" onclick="fb_logout();"><%= image_tag('facebook_logout.png', :alt => 'facebook logout') %></a>
+        <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logon.png', :alt => 'facebook logon') %></a>
       </li>
     </ul>
   </section>

@@ -957,10 +957,13 @@ function testAPI() {
 
         //associate user in our database
         $.ajax({
+            async: false,
             type: 'POST',
             url: '/associate-user',
             data: {'idString': response.id},
         });
+
+        getTopStocks();
 
         document.getElementById('login-status').innerHTML =
             'Thanks for logging in, ' + response.name + '!';

@@ -300,7 +300,7 @@
 
     window.fbAsyncInit = function () {
         FB.init({
-            appId: '1715981821968291',
+            appId: '459724754210681', //1715981821968291
             cookie: true,
             xfbml: true,
             version: 'v2.4'
@@ -348,9 +348,9 @@
         $("#facebook-post-status").append('<ul class="tabs" data-tab><li class="tab-title active"><a href="#panel1">Post Status</a></li><li class="tab-title"><a href="#panel2">Post Photo</a></li></ul>');
         $("#facebook-post-status").append(
             '<div class="tabs-content"><div class="content active" id="panel1">' +
-            '<form onsubmit="updateStatus(this.status.value)"><input type="text" name="status" placeholder="What\'s on your mind?" /><input type="submit" style="visibility: hidden;" /></form>' +
+            '<form enctype="multipart/form-data" onsubmit="updateStatus(this.status.value)"><input type="text" name="status" placeholder="What\'s on your mind?" /><input type="submit" style="visibility: hidden;" /></form>' +
             '</div><div class="content" id="panel2">' +
-            '<form onsubmit="uploadPhoto(this.caption.value, this.url.value)"><input type="text" name="url" placeholder="Enter URL" /><input type="text" name="caption" placeholder="Caption" /><input type="submit" style="visibility: hidden;" /></form>' +
+            '<form onsubmit="uploadPhoto(this.caption.value, this.file)"><input type="file" name="file" required /><input type="text" name="caption" placeholder="Caption" /><input type="submit" style="visibility: hidden;" /></form>' +
             '</div></div>');
         $(document).foundation();
     }
@@ -684,16 +684,43 @@
             });
     }
 
-    function uploadPhoto(status, url) {
-        FB.api("/me/photos",
-            "POST",
-            {
-                "caption": status,
-                "url": url,
-                "privacy": {
-                    "value": $("#status_privacy").val()
+    function uploadPhoto(status, photo) {
+        console.log(photo);
+        
+        var reader = new FileReader();
+        
+        reader.onload = function(e) {
+            var data = e.target.result.substr(e.target.result.indexOf(",") + 1, e.target.result.length);
+
+            $.ajax({
+                url: 'https://api.imgur.com/3/upload',
+                headers: {
+                    'Authorization': 'Client-ID e5a7509c0da2c8a'
+                },
+                type: 'POST',
+                data: {
+                    'image': data,
+                    'type': 'base64'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        FB.api("/me/photos",
+                            "POST",
+                            {
+                                "caption": status,
+                                "url": response.data.link,
+                                "privacy": {
+                                    "value": $("#status_privacy").val()
+                                }
+                            });
+                    }
+                },
+                error: function() {
+                    console.log("Uploading image failed.");
                 }
             });
+        };
+        reader.readAsDataURL(photo.files[0]);
     }
 
     function logout() {

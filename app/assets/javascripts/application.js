@@ -1215,7 +1215,8 @@ function storeEvent() {
               },
               success: function(){
                 console.log('Event stored');
-                $('#calendar').fullCalendar('renderEvent', eventData, true);
+                $("#calendar").fullCalendar( 'removeEvents');
+                loadEvents();
                 $('#myModal').foundation('reveal', 'close');
               },
               error: function() {

@@ -33,5 +33,8 @@ class ApplicationController < ActionController::Base
     	session[:user] = savedUserId
     	render:nothing => true
     end
-
 end
+
+
+
+

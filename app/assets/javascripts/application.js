@@ -582,7 +582,7 @@ function dataTableTrans(sArr){
         },*/
         "dom": 'T<"clear">lfrtip',
         "tableTools": {
-            "sSwfPath": "https://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
+            "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
         },
         aButtons: [
             { sExtends: "csv",
@@ -903,32 +903,99 @@ $(function () {
 /*****************************************************************************/
 /* FACEBOOK*/
 /*****************************************************************************/
-    function fb_login() {
-      FB.login(function (response) {
-          if (response.authResponse) {
-              access_token = response.authResponse.accessToken; //get access token
-              user_id = response.authResponse.userID; //get FB UID
 
-              FB.api('/me', function (response) {
-                  user_email = response.email; //get user email
-                  // you can store this data into your database
-              });
-              window.location.reload();
+window.fbAsyncInit = function () {
+    FB.init({
+        appId: '1715981821968291',
+        cookie: true,
+        xfbml: true,
+        version: 'v2.4'
+    });
 
-          } else {
-              //user hit cancel button
-              console.log('User cancelled login or did not fully authorize.');
-          }
-      }, {
-          scope: 'publish_actions,email,public_profile,user_posts'
-      });
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+};
+
+(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+        testAPI();
+        return true;
+    } else if (response.status === 'not_authorized') {
+        document.getElementById('login-status').innerHTML = 'Please log ' +
+            'into this app.';
+        return false;
+    } else {
+        document.getElementById('login-status').innerHTML = 'Please log ' +
+            'into Facebook.';
+        return false;
     }
-    (function () {
-        var e = document.createElement('script');
-        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-        e.async = true;
-        document.getElementById('fb-root').appendChild(e);
-    }());
+}
+
+function checkLoginState() {
+    FB.getLoginStatus(function (response) {
+        statusChangeCallback(response);
+    });
+}
+
+function testAPI() {
+    FB.api('/me?fields=name,id', function (response) {
+        myName = response.name;
+        myId = response.id
+
+        //associate user in our database
+        $.ajax({
+            type: 'POST',
+            url: '/associate-user',
+            data: {'idString': response.id},
+        });
+
+        document.getElementById('login-status').innerHTML =
+            'Thanks for logging in, ' + response.name + '!';
+        document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';
+
+        displayPostStatus();
+    });
+}
+
+
+function fb_login() {
+    FB.login(function (response) {
+        if (response.authResponse) {
+            access_token = response.authResponse.accessToken; //get access token
+            user_id = response.authResponse.userID; //get FB UID
+
+            FB.api('/me', function (response) {
+                user_email = response.email; //get user email
+                // you can store this data into your database
+            });
+            window.location.reload();
+
+        } else {
+            //user hit cancel button
+            console.log('User cancelled login or did not fully authorize.');
+        }
+    }, {
+        scope: 'publish_actions,email,public_profile,user_posts'
+    });
+}
+(function () {
+    var e = document.createElement('script');
+    e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+    e.async = true;
+    document.getElementById('fb-root').appendChild(e);
+}());
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
@@ -996,17 +1063,20 @@ function renderCalendar() {
             eventEndTime = end.format('hh:mm A');
 
             // Open Modal
-            $("#modalTitle").html("Add Event");
-            $('#startDateField').val(eventStartDate);
-            $('#startTimeField').val(eventStartTime);
-            $('#endDateField').val(eventEndDate);
-            $('#endTimeField').val(eventEndTime);
-            $("#eventId").val("");
-            $('#eventButtons').hide();
+            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+              var modal = $(this);
+              $("#modalTitle").html("Add Event");
+              $('#startDateField').val(eventStartDate);
+              $('#startTimeField').val(eventStartTime);
+              $('#endDateField').val(eventEndDate);
+              $('#endTimeField').val(eventEndTime);
+              $("#eventId").val("");
+            });
             $('#myModal').foundation('reveal', 'open');
         },
 
         unselect: function() {
+            $('#eventButtons').hide();
             selectedEvent = null;
         },
 
@@ -1015,7 +1085,7 @@ function renderCalendar() {
             type: 'POST',
             url: '/modify-event',
             data: {
-              'id': event.id,
+              'id': event._id.replace(/\D/g,''),
               'title': event.title,
               'start': event.start.format(),
               'end1': event.end.format(),
@@ -1034,7 +1104,7 @@ function renderCalendar() {
             type: 'POST',
             url: '/modify-event',
             data: {
-              'id': event.id,
+              'id': event._id.replace(/\D/g,''),
               'title': event.title,
               'start': event.start.format(),
               'end1': event.end.format(),
@@ -1063,7 +1133,7 @@ function renderCalendar() {
             $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
             $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
             $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
-            $("#eventId").val(selectedEvent.id);
+            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
         }
     });
 
@@ -1080,7 +1150,6 @@ function loadEvents() {
         success: function(data){
           for (var z = 0; z < data.events.length; z++) {
             var event = {};
-            event.id = data.events[z].id;
             event.title = data.events[z].title;
             event.start = data.events[z].start;
             event.end = data.events[z].end1;
@@ -1215,8 +1284,7 @@ function storeEvent() {
               },
               success: function(){
                 console.log('Event stored');
-                $("#calendar").fullCalendar( 'removeEvents');
-                loadEvents();
+                $('#calendar').fullCalendar('renderEvent', eventData, true);
                 $('#myModal').foundation('reveal', 'close');
               },
               error: function() {
@@ -1225,8 +1293,7 @@ function storeEvent() {
             });
         }
     } else {
-        $('#validationAlert p:first').text("Please fill in all fields.");
-        $('#validationAlert').show();
+        alert('Please fill in all fields');
     }
 }
 
@@ -1271,7 +1338,6 @@ function deleteEvent() {
                 'id': $("#eventId").val()
     	    },
     	    success: function() {
-                console.log("Event deleted");
                 $("#calendar").fullCalendar('removeEvents');
                 loadEvents();
     			$('#myModal').foundation('reveal', 'close');

@@ -2,25 +2,30 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 /**---------------------------------------------------------
- * SASS MIXINS
+}
+
+#main_wrap {
+  min-height: 45em;
+  * SASS MIXINS
  *----------------------------------------------------------*/
-@mixin animate($time) {
+  @mixin animate($time) {
   transition: all $time ease;
   -o-transition: all $time ease;
   -moz-transition: all $time ease;
   -webkit-transition: all $time ease;
 }
 
-/**---------------------------------------------------------
- * MAIN STYLING
- *----------------------------------------------------------*/
-body{
-  background: #e1e1e1 !important;
+  /**---------------------------------------------------------
+   * MAIN STYLING
+   *----------------------------------------------------------*/
+  body{
+    background: #e1e1e1 !important;
+  padding:1em;
+  background: white;
 }
 
-#main_wrap {
-  min-height: 45em;
-  padding:1em;
+#content_wrap{
+  background: white;
 }
 
 .dashboard-chart {
@@ -58,6 +63,7 @@ body{
 img{
   margin: 0;
   padding: 0;
+  vertical-align: top;
 }
 
 .full_width {

@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title><%= content_for?(:title) ? yield(:title) : "EPIC" %></title>
+
+  <%= stylesheet_link_tag "application" %>
+  <%= javascript_include_tag "vendor/modernizr" %>
+  <%= javascript_include_tag "application", 'data-turbolinks-track' => false %>
+  <%= csrf_meta_tags %>
+
+  <style>
+    .middlebox{
+        margin: auto;
+        height: 10em;
+        width: 20em;
+        background: #ededed;
+    }
+  </style>
+</head>
+<body>
+
+<div class="middlebox">
+  <p> Please log in to facebook to proceed </p>
+  <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logon.png', :alt => 'facebook logout') %></a>
+</div>
+</body>
+</html>

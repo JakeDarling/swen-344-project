@@ -933,6 +933,7 @@ function fb_login() {
 
 function fb_logout(){
     FB.logout(function(response) {
+        window.location.reload();
         // user is now logged out
     });
 }

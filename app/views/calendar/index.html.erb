@@ -27,6 +27,18 @@
 #eventButtons {
 	margin: 0 auto;
 }
+#closeValidationAlert {
+  right: 0.25rem;
+  background: inherit;
+  color: #333333;
+  font-size: 1.375rem;
+  line-height: .9;
+  margin-top: -0.6875rem;
+  opacity: 0.3;
+  padding: 0 6px 4px;
+  position: absolute;
+  top: 50%;
+}
 </style>
 <script>
 $(document).ready(function () {
@@ -60,6 +72,10 @@ $(document).ready(function () {
 	$('#uploadInstructionsTitle').click(function() {
 		$('#uploadInstructionsText').toggle();
 	});
+
+	$('#closeValidationAlert').click(function() {
+		$('#validationAlert').hide();
+	});
 });
 </script>
 
@@ -80,6 +96,11 @@ $(document).ready(function () {
 
   <!-- Add Event Modal -->
   <div id="myModal" class="reveal-modal tiny" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+  <!-- Validation Alerts -->
+	<div data-alert id="validationAlert" class="alert-box alert radius">
+	  <p></p>
+	  <a href="#" id="closeValidationAlert">&times;</a>
+	</div>
 	  <h3 id="modalTitle">Add Event</h3>
 	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 	  <form>
@@ -88,7 +109,7 @@ $(document).ready(function () {
 			  <div class="row">
 			    <div class="large-12 columns">
 			      <label>Title
-			        <input type="text" placeholder="New Event" name="titleField" id="titleField"/>
+			        <input type="text" placeholder="New Event" name="titleField" id="titleField" maxlength="100"/>
 			      </label>
 			    </div>
 			  </div>
@@ -97,24 +118,24 @@ $(document).ready(function () {
 			  <div class="row">
 			    <div class="large-6 columns">
 			      <label>Start Date
-			        <input type="text" placeholder="Jan. 1, 2015" name="startDateField" id="startDateField"/>
+			        <input type="text" placeholder="Jan. 1, 2015" name="startDateField" id="startDateField" maxlength="12"/>
 			      </label>
 			    </div>
 			    <div class="large-6 columns">
 			      <label>Start Time
-			        <input type="text" placeholder="8:00 AM"  name="startTimeField" id="startTimeField"/>
+			        <input type="text" placeholder="8:00 AM"  name="startTimeField" id="startTimeField" maxlength="8"/>
 			      </label>
 			    </div>
 			  </div>
 			  <div class="row">
 			    <div class="large-6 columns">
 			      <label>End Date
-			        <input type="text" placeholder="Jan. 1, 2015"  name="endDateField" id="endDateField"/>
+			        <input type="text" placeholder="Jan. 1, 2015"  name="endDateField" id="endDateField" maxlength="12"/>
 			      </label>
 			    </div>
 			    <div class="large-6 columns">
 			      <label>End Time
-			        <input type="text" placeholder="8:00 AM"  name="endTimeField" id="endTimeField"/>
+			        <input type="text" placeholder="8:00 AM"  name="endTimeField" id="endTimeField" maxlength="8"/>
 			      </label>
 			    </div>
 			  </div>
@@ -125,11 +146,5 @@ $(document).ready(function () {
   		  </div>
   		<a href="#" class="button small round right closeModal">Save</a>
 		</form>
-	<!-- Validation Alerts -->
-	<div id="invalid-event-input-modal" class="reveal-modal tiny" data-reveal aria-labelledby="invalid-event-input-modal-title" aria-hidden="true" role="dialog">
-	  <h2 id="invalid-event-input-modal-title">Invalid Field(s)</h2>
-	  <p class="invalid"></p>
-	  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-	</div>
 	</div>
 </div>

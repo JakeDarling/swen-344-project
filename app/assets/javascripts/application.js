@@ -1225,7 +1225,8 @@ function storeEvent() {
             });
         }
     } else {
-        alert('Please fill in all fields');
+        $('#validationAlert p:first').text("Please fill in all fields.");
+        $('#validationAlert').show();
     }
 }
 

@@ -111,7 +111,7 @@ class MyStocks
     @b.link(:href => TRANSACTION_HISTORY).click
   end
   def buy
-    @b.link(:id => 'first-buy').click
+    @b.link(:id => 'first-buy').when_present.click
   end
   def set_ticker(symbol)
     @b.text_field(:id => 'buy-ticker').when_present.set symbol
@@ -141,6 +141,12 @@ class Transactions
   def bought?(index)
     @b.tr(:index => index).td(:index => 4).text == 'buy'
   end
+  def delete_history
+    @b.button(:id => 'delete-ts').click
+  end
+  def has_history?
+    @b.div(:class => 'odd').exists?
+  end
 end
 
 # Epic calendar
@@ -149,19 +155,39 @@ class Calendar
     @b = browser
   end
   def on_page?
-    false
+    @b.div(:id => 'calendar').exists?
   end
-  # Clicks the nth day div on the calendar
-  def select_day(day_index)
-    @b.div(:class => 'TODO').click
+  def set_title(title)
+    @b.text_field(:id => 'titleField').set title
   end
-  def set_start_time(start_time)
-    @b.text_field(:id => 'TODO').set start_time
+  # Fullcalendar makes this odd, so this just clicks the first entry
+  def add_event
+    @b.div(:class => 'fc-widget-content').click
   end
-  def set_end_time(end_time)
-    @b.text_field(:id => 'TODO').set end_time
+  # Edit the nth event
+  def edit_event(index)
+    @b.div(:class => 'fc-event', :index => index).when_present.click
   end
-  def set_description(desc)
-    @b.text_field(:id => 'TODO').set desc
+  def delete_event
+    @b.button(:id => 'removeBtn').when_present.click
+  end
+  def set_start_time(time)
+    @b.text_field(:id => 'startTimeField').set time
+  end
+  def set_end_time(time)
+    @b.text_field(:id => 'endTimeField').set time
+  end
+  def set_start_day(day)
+    @b.text_field(:id => 'startDateField').set day
+  end
+  def set_end_day(day)
+    @b.text_field(:id => 'endDateField').set day
+  end
+  def save_event
+    @b.link(:class => 'closeModal').click
+  end
+  # True is at least one event exists
+  def has_events?
+    @b.div(:class => 'fc-event').exists?
   end
 end

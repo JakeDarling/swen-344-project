@@ -44,6 +44,7 @@ end
 
 When(/^I choose (\d+) shares$/) do |arg|
   MyStocks.new(@b).set_shares arg
+  @num_shares = arg
 end
 
 When(/^I confirm the purchase$/) do
@@ -51,7 +52,7 @@ When(/^I confirm the purchase$/) do
 end
 
 Then(/^my transaction history shows the purchase$/) do
-  Transactions.new(@b).num_shares(1)
+  expect(Transactions.new(@b).num_shares(1) == @num_shares);
 end
 
 And(/^I navigate to my transaction history$/) do
@@ -60,4 +61,19 @@ end
 
 Given(/^I have navigated to the my stocks page$/) do
   Navigation.new(@b).my_stocks
+end
+
+Given(/^I have purchased some stocks$/) do
+  step 'I enter the ticker "AAPL"'
+  step 'I choose 10 shares'
+  step 'I choose the buy option'
+  step 'I confirm the purchase'
+end
+
+When(/^I delete my transaction history$/) do
+  Transactions.new(@b).delete_history
+end
+
+Then(/^my transaction history is empty$/) do
+  expect(! Transactions.new(@b).has_history?)
 end

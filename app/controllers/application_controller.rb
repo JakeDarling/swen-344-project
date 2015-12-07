@@ -18,6 +18,8 @@ class ApplicationController < ActionController::Base
     	if user.valid?	
 			 user = User.create(fbUserId:fbUserIdString)
 			 success = true
+      else
+        redirect_to
 		  end
 		  start_session(fbUserIdString)
     end
@@ -34,4 +36,13 @@ class ApplicationController < ActionController::Base
     	render:nothing => true
     end
 
+  def hello_world
+    Pusher.trigger('test_channel', 'my_event', {
+                                     message: 'hello world'
+                                 })
+  end
 end
+
+
+
+

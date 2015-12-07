@@ -1,3 +1,13 @@
+<style>
+  #name {
+    font-weight: bold;
+    text-align: right;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    margin-right: 8px;
+  }
+</style>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,6 +62,7 @@
     </ul>
   </section>
 </nav>
+<p id="name"></p>
 <div id="main_wrap" class="row full_width">
   <div id="main_wrap" class="large-12 small-12 columns">
     <div>Session User FB ID: <%= session[:user] %></div>

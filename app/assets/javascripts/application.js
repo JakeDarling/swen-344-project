@@ -976,7 +976,9 @@ window.fbAsyncInit = function () {
 function testAPI() {
     FB.api('/me?fields=name,id', function (response) {
         myName = response.name;
-        myId = response.id            
+        myId = response.id   
+
+        $('#name').text(myName);
 
         //associate user in our database
         $.ajax({

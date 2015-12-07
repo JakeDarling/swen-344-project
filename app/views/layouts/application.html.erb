@@ -11,9 +11,18 @@
   <%= javascript_include_tag "application", 'data-turbolinks-track' => false %>
   <%= csrf_meta_tags %>
 </head>
+<style>
+  #name {
+    font-weight: bold;
+    text-align: right;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    margin-right: 8px;
+  }
+</style>
 <script>
     $(document).ready(function () {
-        $('#fbSubmit').click(function () {
+        /*$('#fbSubmit').click(function () {
             $.ajax({
                 type: 'POST',
                 url: '/associate-user',
@@ -24,7 +33,6 @@
                 }
             });
         });
-
     });
 
         if(checkLoginState == false){
@@ -48,17 +56,18 @@
       <li><a href="/calendar"><%= image_tag('calendar_button.png', :alt => 'calendar page') %></a></li>
       <li><a href="/stocks"><%= image_tag('stock_button.png', :alt => 'stocks page') %></a></li>
       <li><a href="/my-stocks">My Stocks</a></li>
-      <li><input type="text" id="fbIdTextBox" name="fbIdTextBox"/></li>
-      <li><input type="submit" id="fbSubmit" name="fbSubmit"/></li>
+      <!--<li><input type="text" id="fbIdTextBox" name="fbIdTextBox"/></li>
+      <li><input type="submit" id="fbSubmit" name="fbSubmit"/></li>-->
       <li>
-        <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logout.png', :alt => 'facebook logout') %></a>
+        <a class="facebook" href="#" onclick="fb_login();"><%= image_tag('facebook_logon.png', :alt => 'facebook logon') %></a>
       </li>
     </ul>
   </section>
 </nav>
+<p id="name"></p>
 <div id="main_wrap" class="row full_width">
   <div id="main_wrap" class="large-12 small-12 columns">
-    <div>Session User FB ID: <%= session[:user] %></div>
+    <!--<div>Session User FB ID: <%= session[:user] %></div>-->
     <%= yield %>
   </div>
   <div class="row">
@@ -70,25 +79,16 @@
       </div>
     </div>
   </div>
-
 </div>
 <script>
-    (function (i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function () {
-                    (i[r].q = i[r].q || []).push(arguments)
-                }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-70455511-1', 'auto');
-    ga('send', 'pageview');
+  ga('create', 'UA-70455511-1', 'auto');
+  ga('send', 'pageview');
 
 </script>
-
 </body>
 </html>

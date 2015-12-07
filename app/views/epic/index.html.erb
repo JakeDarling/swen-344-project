@@ -32,9 +32,9 @@
   }
 
   .addCommentField {
-    width: 450px;
-    height: 27px;
-    margin-top: 0;
+    width: 440px !important;
+    height: 27px !important;
+    margin-top: 12px !important;
     margin-top: 11;
     font-size: 12px;
     line-height: 16px;
@@ -290,16 +290,16 @@
         $("#facebook-post-status").append('<ul class="tabs" data-tab><li class="tab-title active"><a href="#panel1">Post Status</a></li><li class="tab-title"><a href="#panel2">Post Photo</a></li></ul>');
         $("#facebook-post-status").append(
             '<div class="tabs-content"><div class="content active" id="panel1">' +
-            '<form onsubmit="updateStatus(this.status.value)"><input type="text" name="status" placeholder="What\'s on your mind?" /><input type="submit" style="visibility: hidden;" /></form>' +
+            '<form enctype="multipart/form-data" onsubmit="updateStatus(this.status.value)"><input type="text" name="status" placeholder="What\'s on your mind?" /><input type="submit" style="visibility: hidden;" /></form>' +
             '</div><div class="content" id="panel2">' +
-            '<form onsubmit="uploadPhoto(this.caption.value, this.url.value)"><input type="text" name="url" placeholder="Enter URL" /><input type="text" name="caption" placeholder="Caption" /><input type="submit" style="visibility: hidden;" /></form>' +
+            '<form onsubmit="uploadPhoto(this.caption.value, this.file)"><input type="file" name="file" required="required" /><input type="text" name="caption" placeholder="Caption" /><input type="submit" style="visibility: hidden;" /></form>' +
             '</div></div>');
         $(document).foundation();
     }
 
     function showWall() {   
       FB.api(
-        '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id', 
+        '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id&limit=100', 
         function(response) {
           if (response && !response.error) {
             postsData = response.data;
@@ -515,23 +515,23 @@
                   $('#comment' + comment.id).append($('<span>', { text: comment.message  }));
                   $('#comment' + comment.id).append($('</br>'));
 
-                  // Like/Unlike Comment
-                  if (comment.can_like) {
-                    if (comment.user_likes==true) {
-                      // Unlike Comment
-                      $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
-                    } else {
-                      // Like Comment
-                      $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
-                    }
-                    $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
-                  }
+                  // // Like/Unlike Comment
+                  // if (comment.can_like) {
+                  //   if (comment.user_likes==true) {
+                  //     // Unlike Comment
+                  //     $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
+                  //   } else {
+                  //     // Like Comment
+                  //     $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
+                  //   }
+                  //   $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
+                  // }
 
-                  // Reply to Comment
-                  if (comment.can_comment) {
-                    $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
-                  $('#comment' + comment.id).append($('</br>'));
-                  }
+                  // // Reply to Comment
+                  // if (comment.can_comment) {
+                  //   $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
+                  // $('#comment' + comment.id).append($('</br>'));
+                  // }
                 }
               }
 
@@ -626,16 +626,54 @@
             });
     }
 
-    function uploadPhoto(status, url) {
-        FB.api("/me/photos",
-            "POST",
-            {
-                "caption": status,
-                "url": url,
-                "privacy": {
-                    "value": $("#status_privacy").val()
+    function uploadPhoto(status, photo) {
+        console.log(photo);
+        console.log(status);
+        
+        var reader = new FileReader();
+        
+        reader.onload = function(e) {
+            var data = e.target.result.substr(e.target.result.indexOf(",") + 1, e.target.result.length);
+
+            $.ajax({
+                url: 'https://api.imgur.com/3/upload',
+                headers: {
+                    'Authorization': 'Client-ID e5a7509c0da2c8a'
+                },
+                type: 'POST',
+                data: {
+                    'image': data,
+                    'type': 'base64'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        if (status)
+                            FB.api("/me/photos",
+                                "POST",
+                                {
+                                    "caption": status,
+                                    "url": response.data.link,
+                                    "privacy": {
+                                        "value": $("#status_privacy").val()
+                                    }
+                                });
+                        else
+                            FB.api("/me/photos",
+                                "POST",
+                                {
+                                    "url": response.data.link,
+                                    "privacy": {
+                                        "value": $("#status_privacy").val()
+                                    }
+                                });
+                    }
+                },
+                error: function() {
+                    console.log("Uploading image to Imgur failed.");
                 }
             });
+        };
+        reader.readAsDataURL(photo.files[0]);
     }
 
     function logout() {

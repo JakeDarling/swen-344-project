@@ -961,6 +961,8 @@ function testAPI() {
             data: {'idString': response.id},
         });
 
+        getTopStocks();
+        
         document.getElementById('login-status').innerHTML =
             'Thanks for logging in, ' + response.name + '!';
         document.getElementById('wall').innerHTML = '<h2>' + response.name + '\'s Wall</h2>';

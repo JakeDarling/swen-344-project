@@ -787,7 +787,7 @@ function postNote(){
     });
 }
 /*****************************************************************************/
-/* END STOCKS */
+/* END STOCKS*/
 /*****************************************************************************/
 
 /*****************************************************************************/
@@ -901,7 +901,7 @@ $(function () {
 });
 
 /*****************************************************************************/
-/* FACEBOOK */
+/* FACEBOOK*/
 /*****************************************************************************/
     function fb_login() {
       FB.login(function (response) {
@@ -1074,16 +1074,6 @@ function renderCalendar() {
     document.getElementById('eventTxtFileUpload').addEventListener('change', uploadEvent, false);
 }
 
-<<<<<<< HEAD
-function fb_logout() {
-    FB.logout(function(response) {
-        // Person is now logged out
-    });
-}
-/*********************************************************/
-/* CALENDAR */
-/*********************************************************/
-=======
 function loadEvents() {
     var events = [];
     $.ajax({
@@ -1102,7 +1092,6 @@ function loadEvents() {
         }
     });
 }
->>>>>>> remotes/origin/develop
 
 function validateAddEvent() {
   // var tReg = new RegExp('^.{0,100}$');

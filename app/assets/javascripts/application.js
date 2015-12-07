@@ -582,7 +582,7 @@ function dataTableTrans(sArr){
         },*/
         "dom": 'T<"clear">lfrtip',
         "tableTools": {
-            "sSwfPath": "https://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
+            "sSwfPath": "http://cdn.datatables.net/tabletools/2.2.2/swf/copy_csv_xls_pdf.swf"
         },
         aButtons: [
             { sExtends: "csv",
@@ -903,32 +903,39 @@ $(function () {
 /*****************************************************************************/
 /* FACEBOOK*/
 /*****************************************************************************/
-    function fb_login() {
-      FB.login(function (response) {
-          if (response.authResponse) {
-              access_token = response.authResponse.accessToken; //get access token
-              user_id = response.authResponse.userID; //get FB UID
 
-              FB.api('/me', function (response) {
-                  user_email = response.email; //get user email
-                  // you can store this data into your database
-              });
-              window.location.reload();
+function fb_login() {
+    FB.login(function (response) {
+        if (response.authResponse) {
+            access_token = response.authResponse.accessToken; //get access token
+            user_id = response.authResponse.userID; //get FB UID
 
-          } else {
-              //user hit cancel button
-              console.log('User cancelled login or did not fully authorize.');
-          }
-      }, {
-          scope: 'publish_actions,email,public_profile,user_posts'
-      });
-    }
-    (function () {
-        var e = document.createElement('script');
-        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-        e.async = true;
-        document.getElementById('fb-root').appendChild(e);
-    }());
+            FB.api('/me', function (response) {
+                user_email = response.email; //get user email
+                // you can store this data into your database
+            });
+            window.location.reload();
+
+        } else {
+            //user hit cancel button
+            console.log('User cancelled login or did not fully authorize.');
+        }
+    }, {
+        scope: 'publish_actions,email,public_profile,user_posts'
+    });
+}
+(function () {
+    var e = document.createElement('script');
+    e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+    e.async = true;
+    document.getElementById('fb-root').appendChild(e);
+}());
+
+function fb_logout(){
+    FB.logout(function(response) {
+        // user is now logged out
+    });
+}
 /*********************************************************/
 /* CALENDAR */
 /*********************************************************/
@@ -996,17 +1003,20 @@ function renderCalendar() {
             eventEndTime = end.format('hh:mm A');
 
             // Open Modal
-            $("#modalTitle").html("Add Event");
-            $('#startDateField').val(eventStartDate);
-            $('#startTimeField').val(eventStartTime);
-            $('#endDateField').val(eventEndDate);
-            $('#endTimeField').val(eventEndTime);
-            $("#eventId").val("");
-            $('#eventButtons').hide();
+            $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
+              var modal = $(this);
+              $("#modalTitle").html("Add Event");
+              $('#startDateField').val(eventStartDate);
+              $('#startTimeField').val(eventStartTime);
+              $('#endDateField').val(eventEndDate);
+              $('#endTimeField').val(eventEndTime);
+              $("#eventId").val("");
+            });
             $('#myModal').foundation('reveal', 'open');
         },
 
         unselect: function() {
+            $('#eventButtons').hide();
             selectedEvent = null;
         },
 
@@ -1015,7 +1025,7 @@ function renderCalendar() {
             type: 'POST',
             url: '/modify-event',
             data: {
-              'id': event.id,
+              'id': event._id.replace(/\D/g,''),
               'title': event.title,
               'start': event.start.format(),
               'end1': event.end.format(),
@@ -1034,7 +1044,7 @@ function renderCalendar() {
             type: 'POST',
             url: '/modify-event',
             data: {
-              'id': event.id,
+              'id': event._id.replace(/\D/g,''),
               'title': event.title,
               'start': event.start.format(),
               'end1': event.end.format(),
@@ -1063,7 +1073,7 @@ function renderCalendar() {
             $("#startTimeField").val(selectedEvent.start.format('hh:mm A'));
             $("#endDateField").val(selectedEvent.end.format('MMM DD, YYYY'));
             $("#endTimeField").val(selectedEvent.end.format('hh:mm A'));
-            $("#eventId").val(selectedEvent.id);
+            $("#eventId").val(selectedEvent._id.replace(/\D/g,''));
         }
     });
 
@@ -1080,7 +1090,6 @@ function loadEvents() {
         success: function(data){
           for (var z = 0; z < data.events.length; z++) {
             var event = {};
-            event.id = data.events[z].id;
             event.title = data.events[z].title;
             event.start = data.events[z].start;
             event.end = data.events[z].end1;
@@ -1215,8 +1224,7 @@ function storeEvent() {
               },
               success: function(){
                 console.log('Event stored');
-                $("#calendar").fullCalendar( 'removeEvents');
-                loadEvents();
+                $('#calendar').fullCalendar('renderEvent', eventData, true);
                 $('#myModal').foundation('reveal', 'close');
               },
               error: function() {
@@ -1225,8 +1233,7 @@ function storeEvent() {
             });
         }
     } else {
-        $('#validationAlert p:first').text("Please fill in all fields.");
-        $('#validationAlert').show();
+        alert('Please fill in all fields');
     }
 }
 
@@ -1271,7 +1278,6 @@ function deleteEvent() {
                 'id': $("#eventId").val()
     	    },
     	    success: function() {
-                console.log("Event deleted");
                 $("#calendar").fullCalendar('removeEvents');
                 loadEvents();
     			$('#myModal').foundation('reveal', 'close');
@@ -1349,3 +1355,7 @@ function resetFormElement(e) {
   e.stopPropagation();
   e.preventDefault();
 }
+
+/*****************/
+/* stuff from epic index
+ */

@@ -80,3 +80,9 @@ gem 'coffee-script-source', '1.8.0'
 
 #jquery datatables
 gem 'jquery-datatables-rails', '~> 3.3.0'
+
+#pusher chat
+gem 'pusher'
+gem 'json'
+gem 'uuid'
+gem 'activejob'

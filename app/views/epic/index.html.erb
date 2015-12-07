@@ -32,9 +32,9 @@
   }
 
   .addCommentField {
-    width: 450px;
-    height: 27px;
-    margin-top: 0;
+    width: 440px !important;
+    height: 27px !important;
+    margin-top: 12px !important;
     margin-top: 11;
     font-size: 12px;
     line-height: 16px;
@@ -325,6 +325,8 @@
             myName = response.name;
             myId = response.id            
 
+            $('#name').text(myName);
+
             //associate user in our database
             $.ajax({
                 type:'POST',
@@ -357,7 +359,7 @@
 
     function showWall() {   
       FB.api(
-        '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id', 
+        '/me/feed?fields=id,type,story,message,created_time,comments{from,can_like,can_comment,message,like_count,user_likes},picture,from,link,attachments,likes{name,id,link},object_id&limit=100', 
         function(response) {
           if (response && !response.error) {
             postsData = response.data;
@@ -573,23 +575,23 @@
                   $('#comment' + comment.id).append($('<span>', { text: comment.message  }));
                   $('#comment' + comment.id).append($('</br>'));
 
-                  // Like/Unlike Comment
-                  if (comment.can_like) {
-                    if (comment.user_likes==true) {
-                      // Unlike Comment
-                      $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
-                    } else {
-                      // Like Comment
-                      $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
-                    }
-                    $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
-                  }
+                  // // Like/Unlike Comment
+                  // if (comment.can_like) {
+                  //   if (comment.user_likes==true) {
+                  //     // Unlike Comment
+                  //     $('#comment' + comment.id).append($('<a>', { text: 'Unlike ' }));
+                  //   } else {
+                  //     // Like Comment
+                  //     $('#comment' + comment.id).append($('<a>', { text: 'Like ' }));
+                  //   }
+                  //   $('#comment' + comment.id).append($('<span>', { text: ' · ' }));
+                  // }
 
-                  // Reply to Comment
-                  if (comment.can_comment) {
-                    $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
-                  $('#comment' + comment.id).append($('</br>'));
-                  }
+                  // // Reply to Comment
+                  // if (comment.can_comment) {
+                  //   $('#comment' + comment.id).append($('<a>', { text: 'Reply ' }));
+                  // $('#comment' + comment.id).append($('</br>'));
+                  // }
                 }
               }
 
